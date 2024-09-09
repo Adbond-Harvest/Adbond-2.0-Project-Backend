@@ -14,6 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('customer_next_of_kin', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->id();
             $table->foreignId('customer_id')->constrained()->cascadeOnDelete();
             $table->string('title')->nullable();

@@ -14,6 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('files', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->id();
             $table->foreignId('user_id')->nullable();
             $table->string('user_type')->default('App\Models\User')->nullable();

@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('email_verification_tokens', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->id();
             $table->string('email')->nullable();
             $table->foreignId('user_id')->nullable();
