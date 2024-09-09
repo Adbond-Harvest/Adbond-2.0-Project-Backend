@@ -45,8 +45,10 @@ return new class extends Migration
         });
 
         Schema::create('customer_password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
+            $table->engine = 'InnoDB';
+            $table->string('email', 191)->primary();
+            $table->string('token_signature');
+            $table->timestamp('expires_at');
             $table->timestamp('created_at')->nullable();
         });
 
