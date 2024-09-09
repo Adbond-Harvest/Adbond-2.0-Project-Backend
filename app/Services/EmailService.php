@@ -1,0 +1,148 @@
+<?php
+
+namespace App\Services;
+
+use Mail;
+use Hash;
+use Carbon\Carbon;
+use Illuminate\Support\Str;
+
+
+use App\Models\Customer;
+use App\Models\EmailVerificationToken;
+
+/**
+ * email service class
+ */
+class EmailService
+{
+    private $error;
+
+    public function genCode($email)
+    {
+        try{
+            do{
+                $token = '';
+                for($i=0; $i<6; $i++) {
+                    $token .= mt_rand(0, 9);
+                }
+                //$token = Str::random(4);
+                $signature = hash('md5', $token);
+                $exists = $this->getToken($email, $token);
+            } while ($exists);
+            return ['token'=>$token, 'signature'=>$signature];
+            //return $token;
+        }catch(\Exception $e){
+            throw $e;
+        }
+    }
+
+    /**
+     * Validate the Alphanumeric code sent by the user
+     *
+     * @param array data of password reset token
+     * 
+     * @return Array
+     *
+     */
+    public function validateEmailToken($data)
+    {
+        try{
+            $emailExists = $this->emailExists($data['email']);
+            if(!$emailExists) return ['success'=>false, 'error' => 'Email does not exist for verification'];
+            $emailToken = $this->getToken($data['email'], $data['token']);
+            if(!$emailToken) {
+                return [
+                    'error' => "Invalid token",
+                    'success' => false
+                ]; 
+            }
+            if(Carbon::now()->greaterThan($emailToken->expires_at)) {
+                $emailToken->verified = true;
+                $emailToken->update();
+                return [
+                    'error' => "The Token has expired",
+                    'success' => false
+                ];
+            }
+            // $customer = Customer::findOrFail($data['email']);
+            // $customer->activated = 1;
+            // $customer->email_verified_at = Carbon::now();
+            // $customer->update();
+            // $this->delete_email_tokens($data['email']);
+            //$emailToken->delete();
+            return [
+                "success" => true
+            ];
+        }catch(\Exception $e){
+            throw $e;
+        }
+    }
+
+    public function delete_email_token($email, $token)
+    {
+        $tokenObj = $this->getToken($email, $token);
+        if($tokenObj) {
+            $token->delete();
+        }
+    }
+
+    public function clearToken($token)
+    {
+        $verifyToken = EmailVerificationToken::findOrFail($token->id);
+        //delete password verify token
+        
+        if($verifyToken) $verifyToken->delete();
+    }
+
+    public function delete_email_tokens($email)
+    {
+        $tokens = EmailVerificationToken::where('email', $email)->get();
+        if($tokens->count()) {
+            foreach($tokens as $token) {
+                $token->delete();
+            }
+        }
+    }
+
+    private function clearExpiredTokens()
+    {
+        $tokens = EmailVerificationToken::all();
+        if($tokens->count()) {
+            foreach($tokens as $token) {
+                if(Carbon::now()->greaterThan($token->expires_at)) {
+                    $token->delete();
+                }
+            }
+        }
+    }
+
+    public function getToken($email, $token)
+    {
+        //$this->clearExpiredTokens();
+        return EmailVerificationToken::where('email', $email)->where('token_signature', hash('md5', $token))->first();
+    }
+
+    public function emailExists($email)
+    {
+        return EmailVerificationToken::where('email', $email)->first();
+    }
+
+    public function saveEmailVerificationToken($email)
+    {
+        // delete any tokens generated for this email before if it exists
+        $this->delete_email_tokens($email);
+        
+        $signatureToken = $this->genCode($email);
+        try{
+            $emailVerificationToken = new EmailVerificationToken;
+            $emailVerificationToken->email = $email;
+            $emailVerificationToken->token_signature = $signatureToken['signature'];
+            $emailVerificationToken->expires_at = Carbon::now()->addMinutes(30);
+            $emailVerificationToken->save();
+            return $signatureToken['token'];
+        }catch(\Exception $e){
+            throw $e;
+        }
+    }
+}

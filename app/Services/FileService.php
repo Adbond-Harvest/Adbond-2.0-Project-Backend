@@ -1,0 +1,312 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Profile;
+
+//use Cloudinary;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+
+use Illuminate\Support\Facades\Storage;
+
+use App\Models\File;
+
+class FileService 
+{
+
+    private static $userType = "App\Models\Customer";
+
+    public function getFile($id)
+    {
+        return File::find($id);
+    }
+
+    public function getFiles()
+    {
+        return File::all();
+    }
+
+    public function save($file, $fileType, $user_id, $user_type = null, $folder=null)
+    {
+        $uploadedFile = ($fileType=='image' || $fileType=='video') ? $this->uploadMedia($file, $fileType, $folder) : $this->uploadDoc($file, $folder);
+        if($uploadedFile) {
+            $status = $this->getStatus($uploadedFile);
+            //dd($uploadedFile->offsetGet('secure_url'));
+            if($status['code']==200) {
+                $url = $uploadedFile->offsetGet('url');
+                $secureUrl = $uploadedFile->offsetGet('secure_url');
+                $publicId = $uploadedFile->offsetGet('public_id');
+                $filename = $this->getFilename($publicId);
+                // $uploadDate = $uploadedFile->getTimeUploaded();
+                if($fileType=='image') $width = $uploadedFile->offsetGet('width'); 
+                if($fileType=='image') $height = $uploadedFile->offsetGet('height');
+                $size = $uploadedFile->offsetGet('bytes'); // Get the size of the uploaded file in bytes
+                $rSize = $this->convertSize($size); // Get the size of the uploaded file in bytes, megabytes, gigabytes or terabytes. E.g 1.5 MB
+
+                $fileObj = new File;
+                $fileObj->filename = $filename;
+                $fileObj->url = $secureUrl;
+                $fileObj->public_id = $publicId;
+                if($fileType=='image') $fileObj->width = $width;
+                if($fileType=='image') $fileObj->height = $height;
+                $fileObj->size = $size;
+                $fileObj->formatted_size = $rSize;
+                $fileObj->user_id = $user_id;
+                if($user_type) $fileObj->user_type = $user_type;
+                $fileObj->file_type = $fileType;
+                $fileObj->mime_type = $file->getMimeType();;
+                $fileObj->original_filename = $file->getClientOriginalName();
+                $fileObj->extension = $file->getClientOriginalExtension();
+                $fileObj->save();
+                return ['status'=>200, 'file'=>$fileObj];
+            }else{
+                return ['status'=>$status['code'], 'message'=>$status['message'], 'file'=>$file->getClientOriginalName()];
+            }
+        }else{
+            return ['status'=>402, 'message'=>'File upload failed', 'file'=>$file->getClientOriginalName()];
+        }
+        
+    }
+
+    private function saveToDB($file, $uploadedFile, $fileType, $user_id=null, $user_type = null)
+    {
+        $url = $uploadedFile->offsetGet('url');
+        $secureUrl = $uploadedFile->offsetGet('secure_url');
+        $publicId = $uploadedFile->offsetGet('public_id');
+        $filename = $this->getFilename($publicId);
+        // $uploadDate = $uploadedFile->getTimeUploaded();
+        if($fileType=='image') $width = $uploadedFile->offsetGet('width'); 
+        if($fileType=='image') $height = $uploadedFile->offsetGet('height');
+        $size = $uploadedFile->offsetGet('bytes'); // Get the size of the uploaded file in bytes
+        $rSize = $this->convertSize($size); // Get the size of the uploaded file in bytes, megabytes, gigabytes or terabytes. E.g 1.5 MB
+
+        $fileObj = new File;
+        $fileObj->filename = $filename;
+        $fileObj->url = $url;
+        $fileObj->secure_url = $secureUrl;
+        $fileObj->public_id = $publicId;
+        if($fileType=='image') $fileObj->width = $width;
+        if($fileType=='image') $fileObj->height = $height;
+        $fileObj->size = $size;
+        $fileObj->formatted_size = $rSize;
+        if($user_id) $fileObj->user_id = $user_id;
+        if($user_type) $fileObj->user_type = $user_type;
+        $fileObj->file_type = $fileType;
+        $fileObj->mime_type = (is_string($file)) ? mime_content_type($file) : $file->getMimeType();
+        $fileObj->original_filename = (is_string($file)) ? pathinfo($file, PATHINFO_BASENAME) : $file->getClientOriginalName();
+        $fileObj->extension = (is_string($file)) ? pathinfo($file, PATHINFO_EXTENSION) : $file->getClientOriginalExtension();
+        $fileObj->save();
+        return $fileObj;
+    }
+
+    public function update($file_id, $file, $fileType, $user_id, $folder=null)
+    {
+        $uploadedFile = ($fileType=='image' || $fileType=='video') ? $this->uploadMedia($file, $fileType) : $this->uploadDoc($file, $folder);
+        if($uploadedFile) {
+            $status = $this->getStatus($uploadedFile);
+            //dd($uploadedFile->offsetGet('secure_url'));
+            if($status['code']==200) {
+                $url = $uploadedFile->offsetGet('url');
+                $secureUrl = $uploadedFile->offsetGet('secure_url');
+                $publicId = $uploadedFile->offsetGet('public_id');
+                $filename = $this->getFilename($publicId);
+                // $uploadDate = $uploadedFile->getTimeUploaded();
+                if($fileType=='image') $width = $uploadedFile->offsetGet('width'); 
+                if($fileType=='image') $height = $uploadedFile->offsetGet('height');
+                $size = $uploadedFile->offsetGet('bytes'); // Get the size of the uploaded file in bytes
+                $rSize = $this->convertSize($size); // Get the size of the uploaded file in bytes, megabytes, gigabytes or terabytes. E.g 1.5 MB
+
+                $fileObj = $this->getFile($file_id);
+                if($fileObj) {
+                    $fileObj->filename = $filename;
+                    $fileObj->url = $url;
+                    $fileObj->secure_url = $secureUrl;
+                    $fileObj->public_id = $publicId;
+                    if($fileType=='image') $fileObj->width = $width;
+                    if($fileType=='image') $fileObj->height = $height;
+                    $fileObj->size = $size;
+                    $fileObj->formatted_size = $rSize;
+                    $fileObj->user_id = $user_id;
+                    $fileObj->file_type = $fileType;
+                    $fileObj->mime_type = $file->getMimeType();;
+                    $fileObj->original_filename = $file->getClientOriginalName();
+                    $fileObj->extension = $file->getClientOriginalExtension();
+                    $fileObj->update();
+                    return ['status'=>200, 'file'=>$fileObj];
+                }
+            }else{
+                return ['status'=>$status['code'], 'message'=>$status['message'], 'file'=>$file->getClientOriginalName()];
+            }
+        }else{
+            return ['status'=>402, 'message'=>'File upload failed', 'file'=>$file->getClientOriginalName()];
+        }
+        
+    }
+
+    
+
+    public function saveFiles($files, $fileType, $user_id)
+    {
+        $successFiles = [];
+        $errors = [];
+        $failedFiles = [];
+        $codes = [];
+        $response = [];
+        if(count($files) > 0) {
+            foreach($files as $file) {
+                //$ext = $file->getClientOriginalExtension();
+                if(empty($fileType)) $fileType =  $file->getClientOriginalExtension();
+                $res = $this->save($file, $fileType, $user_id);
+                if($res['status']==200) {
+                    $successFiles[] = $res['file'];
+                }else{
+                    $errors[] = $res['message'];
+                    $failedFiles[] = $res['file'];
+                    $codes[] = $res['status'];
+                }
+            }
+        }
+        if(empty($errors)) { 
+            $response = ['status'=>200, 'files'=>$successFiles];
+        }else{
+            if(!empty($successFiles)) {
+                $response = ['status'=>201, 'message'=>$this->getErrors($errors, $failedFiles), 'files'=>$successFiles, 'failedFiles'=>$failedFiles];
+            }else{
+                $response = ['status'=>402, 'message'=>$this->getErrors($errors, $failedFiles), 'files'=>$failedFiles];
+            }
+        }
+        return $response;
+    }
+
+    public function updateFiles($files, $fileType, $user_id)
+    {
+        $successFiles = [];
+        $errors = [];
+        $failedFiles = [];
+        $codes = [];
+        $response = [];
+        if(count($files) > 0) {
+            foreach($files as $file) {
+                //$ext = $file->getClientOriginalExtension();
+                if(empty($fileType)) $fileType =  $file->getClientOriginalExtension();
+                $res = $this->update($file['file_id'], $file['file'], $fileType, $user_id);
+                if($res['status']==200) {
+                    $successFiles[] = $res['file'];
+                }else{
+                    $errors[] = $res['message'];
+                    $failedFiles[] = $res['file'];
+                    $codes[] = $res['status'];
+                }
+            }
+        }
+        if(empty($errors)) { 
+            $response = ['status'=>200, 'files'=>$successFiles];
+        }else{
+            if(!empty($successFiles)) {
+                $response = ['status'=>201, 'message'=>$this->getErrors($errors, $failedFiles), 'files'=>$successFiles, 'failedFiles'=>$failedFiles];
+            }else{
+                $response = ['status'=>402, 'message'=>$this->getErrors($errors, $failedFiles), 'files'=>$failedFiles];
+            }
+        }
+        return $response;
+    }
+
+    
+
+    private function getErrors($errors, $failedFiles)
+    {
+        $message = '';
+        foreach($errors as $key=>$error) {
+            $message .= $failedFiles[$key].': '.$error.', ';
+        }
+        return $message;
+    }
+
+    private function uploadMedia($file, $fileType, $folder=null)
+    {
+        $imageUploadFolder = ($folder==null) ? env("CLOUDINARY_IMAGES") : env("CLOUDINARY_IMAGES")."/".$folder;
+        $videoUploadFolder = ($folder==null) ? env("CLOUDINARY_VIDEOS") : env("CLOUDINARY_VIDEOS")."/".$folder;
+        if($file->getSize() < 10000000) {
+            // dd($imageUploadFolder);
+            $uploadedFile = ($fileType=='image') ? 
+            Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                        "folder" => $imageUploadFolder,
+                        "sign_url" => true,
+                        "eager" => [
+                            ["width"=> 2000, "height"=> 1000, "crop"=> "pad", "gravity"=> "auto", "crop"=> "crop", "sign_url"=> true ],
+                            ["width"=> 0.9, "height"=> 0.8, "crop"=> "scale", "sign_url"=> true ]]
+                    ])
+                    :
+                    cloudinary()->uploadApi()->upload($file->getRealPath(), ["folder" => $videoUploadFolder, "resource_type"=>"video"]);
+        }else{
+            $uploadedFile = ($fileType=='image') ?
+                cloudinary()->uploadApi()->upload($file->getRealPath(), [
+                    "folder" => $imageUploadFolder,
+                    "sign_url" => true,
+                    "eager" => [
+                        ["width"=> 2000, "height"=> 1000, "crop"=> "pad", "gravity"=> "auto", "crop"=> "crop", "sign_url"=> true ],
+                            ["width"=> 0.9, "height"=> 0.8, "crop"=> "scale", "sign_url"=> true ]]
+                ])
+                :
+                cloudinary()->uploadApi()->upload($file->getRealPath(), ["folder" => $videoUploadFolder, "resource_type"=>"video", "chunk_size" => 6000000]);
+        }
+        // dd($uploadedFile);
+        return $uploadedFile;
+    }
+
+    private function uploadDoc($file, $folder=null)
+    {
+        $filename = time().$file->getClientOriginalName();
+        $upload = Storage::disk('local')->putFileAs('files', $file, $filename);
+        if($upload) {
+            $uploadFolder = ($folder==null) ? env("CLOUDINARY_DOCS") : env("CLOUDINARY_DOCS")."/".$folder;
+            $uploadedFile = cloudinary()->uploadApi()->upload(
+                $upload,  
+                [
+                    // "public_id" => $file->getClientOriginalName(),
+                    "folder" => $uploadFolder,
+                    "resource_type" => "raw",
+                    "transformation" => [
+                        "flags" => 'attachment'
+                    ],
+                    // "format" => "pdf"
+                ]
+            );
+            unlink($upload);
+            return $uploadedFile;
+        }else{
+            return false;
+        }
+    }
+
+    private function getStatus($uploadedFile)
+    {
+        $statusString = $uploadedFile->headers['Status'][0];
+        $status = explode(' ', $statusString);
+        return ['code'=>$status[0], 'message'=>$status[1]];
+    }
+
+    private function getFilename($publicId)
+    {
+        $arr = explode('/', $publicId);
+        $count = count($arr);
+        return $arr[$count-1];
+    }
+
+    private function convertSize($size)
+    {
+        $formatted = '';
+        $len = strlen($size);
+        if($len < 4) $formatted = $size.'Bytes'; 
+        if($len > 3 && $len < 7) $formatted = round((float)($size/1024), 1).'KB';
+        if($len > 6 && $len < 11) $formatted = round((float)(($size/1024)/1024), 1).'MB';
+        if($len > 10 && $len < 14) $formatted = round((float)((($size/1024)/1024)/1024), 1).'GB';
+        //return (float)$formatted;
+        return $formatted;
+    }
+
+}
+
+
+
+?>

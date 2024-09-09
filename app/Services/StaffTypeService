@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Services;
+
+use App\Notifications\APIPasswordResetNotification;
+use App\Exceptions\UserNotFoundException;
+
+use App\Models\User;
+use App\Models\Staff_type;
+
+/**
+ * Staff type service class
+ */
+class StaffTypeService
+{
+
+    public function getStaffTypes()
+    {
+        $types = cache()->remember('staff_types', 60 * 5, function () {
+            return Staff_type::all();
+            // return Staff_type::where('name', '!=', 'virtual-staff')->get();
+        });
+        return $types;
+    }
+
+    public function getStaffTypesCount()
+    {
+        return Staff_type::count();
+    }
+
+    public function getStaff_types()
+    {
+        return Staff_type::all();
+    }
+
+    public function getStaffType($id)
+    {
+        return Staff_type::find($id);
+    }
+
+    public function getStaffTypeByName($name)
+    {
+        return Staff_type::role($name);
+    }
+
+}
