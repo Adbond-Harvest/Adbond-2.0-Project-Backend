@@ -47,9 +47,9 @@ return [
             'hash' => true,
         ],
 
-        'customer' => [
+        'client' => [
             'driver' => 'jwt',
-            'provider' => 'customers',
+            'provider' => 'clients',
         ],
     ],
 
@@ -76,9 +76,9 @@ return [
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
 
-        'customers' => [
+        'clients' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Customer::class,
+            'model' => App\Models\Client::class,
         ],
 
         // 'users' => [
@@ -114,9 +114,9 @@ return [
             'throttle' => 60,
         ],
 
-        'customers' => [
-            'provider' => 'customers',
-            'table' => 'customer_password_resets',
+        'clients' => [
+            'provider' => 'clients',
+            'table' => 'client_password_resets',
             'expire' => 60,
             'throttle' => 60,
         ],

@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+use App\Enums\StaffTypes;
+
+class StaffType extends Model
+{
+    use HasFactory;
+
+    public static function FullStaff()
+    {
+        return self::where('name', StaffTypes::FULL_STAFF->value)->first();
+    }
+
+    public static function HybridStaff()
+    {
+        return self::where('name', StaffTypes::HYBRID_STAFF->value)->first();
+    }
+
+    public static function VirtualStaff()
+    {
+        return self::where('name', StaffTypes::VIRTUAL_STAFF->value)->first();
+    }
+}

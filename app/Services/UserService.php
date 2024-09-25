@@ -8,7 +8,7 @@ use App\Exceptions\UserNotFoundException;
 use App\Models\User;
 // use App\Models\Role;
 // use App\Models\Staff_type;
-use App\Models\Customer;
+use App\Models\Client;
 
 // use App\Services\StaffTypeService;
 
@@ -32,6 +32,11 @@ class UserService
     public function getUser($id)
     {
         return User::find($id);
+    }
+
+    public function getByEmail($email, $with=[])
+    {
+        return User::with($with)->where("email", $email)->first();
     }
 
     public function getUsers()
@@ -222,7 +227,7 @@ class UserService
     {
         $user = new User;
         $user->staff_type_id = Staff_type::VirtualStaff()->id;
-        // $user->role_id = Role::CustomerRelation()->id;
+        // $user->role_id = Role::ClientRelation()->id;
         $user->password = bcrypt('123456');
         $user->firstname = $virtualStaffAssessment->firstname;
         $user->lastname = $virtualStaffAssessment->lastname;

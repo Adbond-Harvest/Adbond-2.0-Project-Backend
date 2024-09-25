@@ -363,7 +363,7 @@
                 }
             }
         },
-        "/api/v2/auth/customer/send_verification_mail": {
+        "/api/v2/auth/client/send_verification_mail": {
             "post": {
                 "description": "",
                 "parameters": [],
@@ -488,7 +488,7 @@
                 }
             }
         },
-        "/api/v2/auth/customer/verify_email_token": {
+        "/api/v2/auth/client/verify_email_token": {
             "post": {
                 "description": "",
                 "parameters": [],
@@ -618,7 +618,7 @@
                 }
             }
         },
-        "/api/v2/auth/customer/register": {
+        "/api/v2/auth/client/register": {
             "post": {
                 "description": "",
                 "parameters": [],
@@ -773,7 +773,7 @@
                 }
             }
         },
-        "/api/v2/auth/customer/login": {
+        "/api/v2/auth/client/login": {
             "post": {
                 "description": "",
                 "parameters": [],
@@ -903,7 +903,7 @@
                 }
             }
         },
-        "/api/v2/auth/customer/google/get_url": {
+        "/api/v2/auth/client/google/get_url": {
             "get": {
                 "description": "",
                 "parameters": [],
@@ -1117,7 +1117,7 @@
                 }
             }
         },
-        "/api/v2/auth/customer/google/login": {
+        "/api/v2/auth/client/google/login": {
             "post": {
                 "description": "",
                 "parameters": [],
@@ -1236,7 +1236,7 @@
                 }
             }
         },
-        "/api/v2/customer/profile/update": {
+        "/api/v2/client/profile/update": {
             "post": {
                 "description": "",
                 "parameters": [],
@@ -1364,7 +1364,7 @@
                                         "nullable": true,
                                         "format": "string"
                                     },
-                                    "photo_id": {
+                                    "photoId": {
                                         "type": "integer",
                                         "nullable": true,
                                         "format": "integer"
@@ -1374,7 +1374,7 @@
                                         "nullable": true,
                                         "format": "string"
                                     },
-                                    "phone_number": {
+                                    "phoneNumber": {
                                         "type": "string",
                                         "nullable": true,
                                         "format": "string"
@@ -1384,17 +1384,17 @@
                                         "nullable": true,
                                         "format": "string"
                                     },
-                                    "country_id": {
+                                    "countryId": {
                                         "type": "integer",
                                         "nullable": true,
                                         "format": "integer"
                                     },
-                                    "marital_status": {
+                                    "maritalStatus": {
                                         "type": "string",
                                         "nullable": true,
                                         "format": "string"
                                     },
-                                    "employment_status": {
+                                    "employmentStatus": {
                                         "type": "string",
                                         "nullable": true,
                                         "format": "string"
@@ -1404,7 +1404,7 @@
                                         "nullable": true,
                                         "format": "string"
                                     },
-                                    "postal_code": {
+                                    "postalCode": {
                                         "type": "string",
                                         "nullable": true,
                                         "format": "string"
@@ -1421,7 +1421,7 @@
                 }
             }
         },
-        "/api/v2/customer/profile/save_next_of_kin": {
+        "/api/v2/client/profile/save_next_of_kin": {
             "post": {
                 "description": "",
                 "parameters": [],
@@ -1578,6 +1578,131 @@
                                         "type": "string",
                                         "nullable": false,
                                         "format": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v2/client/upload_photo": {
+            "post": {
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "405": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "description": "Request body",
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "photo": {
+                                        "type": "string",
+                                        "nullable": false,
+                                        "format": "binary"
                                     }
                                 }
                             }

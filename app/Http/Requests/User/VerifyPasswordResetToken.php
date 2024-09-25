@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\http\Requests\BaseRequest;
 
-class UpdateClient extends FormRequest
+class VerifyPasswordResetToken extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +23,8 @@ class UpdateClient extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "email" => "required|email|exists:users,email",
+            "token" => "required"
         ];
     }
 }

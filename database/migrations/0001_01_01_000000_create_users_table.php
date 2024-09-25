@@ -21,6 +21,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->boolean('email_confirmed')->default(1);
             $table->string('password');
+            $table->boolean('password_set')->default(false);
             $table->foreignId('role_id')->nullable();
             $table->foreignId('staff_type_id')->nullable();
             $table->string('phone_number')->nullable();
@@ -39,8 +40,8 @@ return new class extends Migration
             $table->double('commission_balance', 15, 2)->default(0);
             $table->double('commission_before_tax', 15, 2)->default(0);
             $table->foreignId('hybrid_staff_draw_id')->nullable();
-            $table->foreignId('account_number')->nullable();
-            $table->foreignId('account_name')->nullable();
+            $table->string('account_number')->nullable();
+            $table->string('account_name')->nullable();
             $table->foreignId('bank_id')->nullable();
             $table->date('date_joined')->nullable();
             $table->rememberToken();
@@ -49,7 +50,8 @@ return new class extends Migration
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->engine = 'InnoDB';
-            $table->string('email', 191)->primary();
+            $table->id();
+            $table->string('email', 191);
             $table->string('token_signature');
             $table->timestamp('expires_at');
             $table->timestamp('created_at')->nullable();

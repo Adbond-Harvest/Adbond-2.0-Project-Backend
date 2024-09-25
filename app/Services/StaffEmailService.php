@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 
 use App\Models\Client;
-use App\Models\EmailVerificationToken;
+use App\Models\StaffEmailVerificationToken;
 
 /**
  * email service class
@@ -89,7 +89,7 @@ class EmailService
 
     public function clearToken($token)
     {
-        $verifyToken = EmailVerificationToken::findOrFail($token->id);
+        $verifyToken = StaffEmailVerificationToken::findOrFail($token->id);
         //delete password verify token
         
         if($verifyToken) $verifyToken->delete();
@@ -97,7 +97,7 @@ class EmailService
 
     public function delete_email_tokens($email)
     {
-        $tokens = EmailVerificationToken::where('email', $email)->get();
+        $tokens = StaffEmailVerificationToken::where('email', $email)->get();
         if($tokens->count()) {
             foreach($tokens as $token) {
                 $token->delete();
@@ -120,12 +120,12 @@ class EmailService
     public function getToken($email, $token)
     {
         //$this->clearExpiredTokens();
-        return EmailVerificationToken::where('email', $email)->where('token_signature', hash('md5', $token))->first();
+        return StaffEmailVerificationToken::where('email', $email)->where('token_signature', hash('md5', $token))->first();
     }
 
     public function emailExists($email)
     {
-        return EmailVerificationToken::where('email', $email)->first();
+        return StaffEmailVerificationToken::where('email', $email)->first();
     }
 
     public function saveEmailVerificationToken($email)
@@ -135,7 +135,7 @@ class EmailService
         
         $signatureToken = $this->genCode($email);
         try{
-            $emailVerificationToken = new EmailVerificationToken;
+            $emailVerificationToken = new StaffEmailVerificationToken;
             $emailVerificationToken->email = $email;
             $emailVerificationToken->token_signature = $signatureToken['signature'];
             $emailVerificationToken->expires_at = Carbon::now()->addMinutes(30);

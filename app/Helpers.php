@@ -11,7 +11,7 @@ use App\Models\Notification;
 use App\Models\Company_info;
 use App\Models\Payment;
 use App\Models\SalesOfferPayment;
-use App\Models\Customer_package;
+use App\Models\Client_package;
 
 use Illuminate\Support\Facades\Http;
 use App\Services\HybridStaffDrawService;
@@ -37,13 +37,13 @@ Class Helpers
     }
 
     /*
-    * Determine whether the customer Package is on active offer
+    * Determine whether the client Package is on active offer
     */
-    public static function CustomerPackageOnOffer($customerPackageOffers)
+    public static function ClientPackageOnOffer($clientPackageOffers)
     {
         $onOffer = false;
-        if($customerPackageOffers->count() > 0) {
-            foreach($customerPackageOffers as $offer) {
+        if($clientPackageOffers->count() > 0) {
+            foreach($clientPackageOffers as $offer) {
                 if($offer->approved != -1) $onOffer = true;
             }
         }
@@ -119,7 +119,7 @@ Class Helpers
         return $promos;
     }
 
-    public static function item_price($packageItem, $customer_id=null)
+    public static function item_price($packageItem, $client_id=null)
     {
         $installmentDiscounts = 0;
         $fullPaymentDiscounts = 0;
@@ -139,10 +139,10 @@ Class Helpers
             }
         }
 
-        if($customer_id != null) {
+        if($client_id != null) {
             //Check for loyalty discount
             $loyaltyService = new LoyaltyService;
-            $loyalty = $loyaltyService->unredeemedCustomerLoyalty($customer_id);
+            $loyalty = $loyaltyService->unredeemedClientLoyalty($client_id);
             if($loyalty) {
                 $company = Company_info::company();
                 $fullPaymentDiscounts += $company->loyalty_discount;
@@ -181,55 +181,55 @@ Class Helpers
         return $soldOut;
     }
 
-    public static function kycCompleted($customer)
+    public static function kycCompleted($client)
     {
         $completed = true;
         if(
-            // $customer->photo_id == '' || $customer->photo_id == null ||
-            $customer->gender == '' || $customer->gender == null ||
-            $customer->marital_status == '' || $customer->marital_status == null ||
-            $customer->employment_status == '' || $customer->employment_status == null ||
-            $customer->occupation == '' || $customer->occupation == null ||
-            $customer->postal_code == '' || $customer->postal_code == null ||
-            $customer->phone_number == '' || $customer->phone_number == null ||
-            $customer->address == '' || $customer->address == null ||
-            $customer->age_group_id == '' || $customer->age_group_id == null ||
-            // $customer->country_id == '' || $customer->country_id == null ||
-            // $customer->state_id == '' || $customer->state_id == null ||
-            $customer->nextOfKins->count() == 0
+            // $client->photo_id == '' || $client->photo_id == null ||
+            $client->gender == '' || $client->gender == null ||
+            $client->marital_status == '' || $client->marital_status == null ||
+            $client->employment_status == '' || $client->employment_status == null ||
+            $client->occupation == '' || $client->occupation == null ||
+            $client->postal_code == '' || $client->postal_code == null ||
+            $client->phone_number == '' || $client->phone_number == null ||
+            $client->address == '' || $client->address == null ||
+            $client->age_group_id == '' || $client->age_group_id == null ||
+            // $client->country_id == '' || $client->country_id == null ||
+            // $client->state_id == '' || $client->state_id == null ||
+            $client->nextOfKins->count() == 0
         ) {
             $completed = false;
         }
         return $completed;
     }
 
-    public static function kycStarted($customer)
+    public static function kycStarted($client)
     {
         $started = false;
         if(
-            // $customer->photo_id == '' || $customer->photo_id == null ||
-            ($customer->gender != '' && $customer->gender != null) ||
-            ($customer->marital_status != '' || $customer->marital_status != null) ||
-            ($customer->employment_status != '' || $customer->employment_status != null) ||
-            ($customer->occupation != '' || $customer->occupation != null) ||
-            ($customer->postal_code != '' || $customer->postal_code != null) ||
-            ($customer->phone_number != '' || $customer->phone_number != null) ||
-            ($customer->address != '' || $customer->address != null) ||
-            ($customer->age_group_id != '' || $customer->age_group_id != null) ||
-            // $customer->country_id == '' || $customer->country_id == null ||
-            // $customer->state_id == '' || $customer->state_id == null ||
-            ($customer->nextOfKins && $customer->nextOfKins->count() > 0)
+            // $client->photo_id == '' || $client->photo_id == null ||
+            ($client->gender != '' && $client->gender != null) ||
+            ($client->marital_status != '' || $client->marital_status != null) ||
+            ($client->employment_status != '' || $client->employment_status != null) ||
+            ($client->occupation != '' || $client->occupation != null) ||
+            ($client->postal_code != '' || $client->postal_code != null) ||
+            ($client->phone_number != '' || $client->phone_number != null) ||
+            ($client->address != '' || $client->address != null) ||
+            ($client->age_group_id != '' || $client->age_group_id != null) ||
+            // $client->country_id == '' || $client->country_id == null ||
+            // $client->state_id == '' || $client->state_id == null ||
+            ($client->nextOfKins && $client->nextOfKins->count() > 0)
         ) {
             $started = true;
         }
         return $started;
     }
 
-    public static function customerPackageUnits($customerPackage)
+    public static function clientPackageUnits($clientPackage)
     {
-        $units = $customerPackage->order?->units;
-        if($customerPackage->purchase_type==Customer_package::$offerPurchase) {
-            $units = self::customerPackageUnits($customerPackage->offer->customerPackage);
+        $units = $clientPackage->order?->units;
+        if($clientPackage->purchase_type==Client_package::$offerPurchase) {
+            $units = self::clientPackageUnits($clientPackage->offer->clientPackage);
         }
         return $units;
     }
@@ -484,7 +484,7 @@ Class Helpers
         // $templateProcessor->saveAs('files/contract.docx');
 
         // $addressArr = [];
-        // $addressArr = self::formatAddress($payment?->customer?->address);
+        // $addressArr = self::formatAddress($payment?->client?->address);
         // $pdfData = [
         //     'image' => public_path('images/logo.PNG'),
         //     'day' => date('jS'),
@@ -545,7 +545,7 @@ Class Helpers
     //     $address1 = '';
     //     $address2 = '';
     //     $address3 = '';
-    //     $addressArr = self::formatAddress($payment?->customer?->address);
+    //     $addressArr = self::formatAddress($payment?->client?->address);
     //     if(count($addressArr) > 0) {
     //         if(isset($addressArr[0])) $address1 = $addressArr[0];
     //         if(isset($addressArr[1])) $address2 = $addressArr[1];
@@ -559,7 +559,7 @@ Class Helpers
     //     }
     //     $unitSize = $payment?->order?->packageItem->size;
     //     $size = ($unitSize != null && $payment?->order?->units != null && $payment?->order?->units > 0) ? $unitSize * $payment?->order?->units : $unitSize; 
-    //     $templateProcessor->setValue('name', ucfirst($payment?->customer->full_name));
+    //     $templateProcessor->setValue('name', ucfirst($payment?->client->full_name));
     //     $templateProcessor->setValue('date', date('jS F, Y'));
     //     $templateProcessor->setValue('receiptNo', $payment->receipt_no);
     //     $templateProcessor->setValue('address1', $address1);
@@ -581,12 +581,12 @@ Class Helpers
     // public static function generateLetterOfHappiness($payment)
     // {
     //     $addressArr = [];
-    //     $addressArr = self::formatAddress($payment?->customer?->address);
+    //     $addressArr = self::formatAddress($payment?->client?->address);
     //     $unitSize = $payment?->order?->packageItem->size;
     //     $size = ($unitSize != null && $payment?->order?->units != null && $payment?->order?->units > 0) ? $unitSize * $payment?->order?->units : $unitSize;
     //     $pdfData = [
     //         'image' => 'logo.jpg',
-    //         'name' => $payment?->customer?->full_name,
+    //         'name' => $payment?->client?->full_name,
     //         'addressArr' => $addressArr,
     //         'date' => date('jS F, Y'),
     //         'package' => $payment?->order?->packageItem?->package?->name,
@@ -610,7 +610,7 @@ Class Helpers
     //     $address1 = '';
     //     $address2 = '';
     //     $address3 = '';
-    //     $addressArr = self::formatAddress($payment?->customer?->address);
+    //     $addressArr = self::formatAddress($payment?->client?->address);
     //     if(count($addressArr) > 0) {
     //         if(isset($addressArr[0])) $address1 = $addressArr[0];
     //         if(isset($addressArr[1])) $address2 = $addressArr[1];
@@ -626,7 +626,7 @@ Class Helpers
     //     $size = ($unitSize != null && $payment?->order?->units != null && $payment?->order?->units > 0) ? $unitSize * $payment?->order?->units : $unitSize;
     //     $pdfData = [
     //         'image' => 'logo.jpg', 
-    //         'name' => ucfirst($payment?->customer?->full_name),
+    //         'name' => ucfirst($payment?->client?->full_name),
     //         'receiptNo' => $payment->receipt_no,
     //         'address1' => $address1,
     //         'address2' => $address2,
@@ -686,17 +686,17 @@ Class Helpers
     // public static function generateOfferLetterOfHappiness($payment)
     // {
     //     $addressArr = [];
-    //     $addressArr = self::formatAddress($payment?->customer?->address);
+    //     $addressArr = self::formatAddress($payment?->client?->address);
     //     $size = $payment?->offer?->packageItem?->size;
-    //     $purchaseType = $payment?->offer->customerPackage->purchase_type;
-    //     $units = $payment?->offer->customerPackage->order->units;
-    //     if($purchaseType == Customer_package::$orderPurchase && $size != null && $units != null && $units > 0) {
+    //     $purchaseType = $payment?->offer->clientPackage->purchase_type;
+    //     $units = $payment?->offer->clientPackage->order->units;
+    //     if($purchaseType == Client_package::$orderPurchase && $size != null && $units != null && $units > 0) {
     //         // if the item on offer was gotten by order and the size is not null and the units is greater than zero
     //         $size = $size * $units;
     //     }
     //     $pdfData = [
     //         'image' => 'logo.jpg',
-    //         'name' => $payment?->customer?->full_name,
+    //         'name' => $payment?->client?->full_name,
     //         'addressArr' => $addressArr,
     //         'date' => date('jS F, Y'),
     //         'package' => $payment?->offer?->packageItem?->package?->name,
@@ -718,7 +718,7 @@ Class Helpers
     //     $address1 = '';
     //     $address2 = '';
     //     $address3 = '';
-    //     $addressArr = self::formatAddress($payment?->customer?->address);
+    //     $addressArr = self::formatAddress($payment?->client?->address);
     //     if(count($addressArr) > 0) {
     //         if(isset($addressArr[0])) $address1 = $addressArr[0];
     //         if(isset($addressArr[1])) $address2 = $addressArr[1];
@@ -732,7 +732,7 @@ Class Helpers
     //     // }
     //     $pdfData = [
     //         'image' => 'logo.jpg',
-    //         'name' => ucfirst($payment?->customer?->full_name),
+    //         'name' => ucfirst($payment?->client?->full_name),
     //         'receiptNo' => $payment->receipt_no,
     //         'address1' => $address1,
     //         'address2' => $address2,

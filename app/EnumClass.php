@@ -6,7 +6,7 @@ use App\Enums\EmploymentStatus;
 use App\Enums\MaritalStatus;
 use App\Enums\KYCStatus;
 use App\Enums\Genders;
-use App\Enums\FileTypes;
+use App\Enums\StaffTypes;
 
 class EnumClass
 {

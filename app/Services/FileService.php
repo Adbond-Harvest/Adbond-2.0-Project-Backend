@@ -14,7 +14,7 @@ use App\Models\File;
 class FileService 
 {
 
-    private static $userType = "App\Models\Customer";
+    private static $userType = "App\Models\Client";
 
     public function getFile($id)
     {

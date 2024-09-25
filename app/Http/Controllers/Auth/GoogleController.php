@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Services\CustomerService;
+use App\Services\ClientService;
 
-use App\Http\Resources\CustomerBriefResource;
+use App\Http\Resources\ClientBriefResource;
 
 class GoogleController extends Controller
 {
-    private $customerService;
+    private $clientService;
 
     /**
      * Create a new GoogleController instance.
@@ -19,7 +19,7 @@ class GoogleController extends Controller
      * @return void
      */
     public function __construct() {
-        $this->customerService = new CustomerService;
+        $this->clientService = new ClientService;
     }
         /**
      * Gets a google client
@@ -143,11 +143,11 @@ class GoogleController extends Controller
                 /**
                  * Select user if already exists
                  */
-                $customer = $this->customerService->getcustomerByProvider('google', $userFromGoogle->id);
+                $client = $this->clientService->getclientByProvider('google', $userFromGoogle->id);
                 /**
                  */
-                if (!$customer) {
-                    if($this->customerService->getCustomerByEmail($userFromGoogle->email)) {
+                if (!$client) {
+                    if($this->clientService->getClientByEmail($userFromGoogle->email)) {
                         return response()->json([
                             'statusCode' => 403,
                             'message' => 'user already exists with this email, please login'
@@ -161,23 +161,23 @@ class GoogleController extends Controller
                             'email' => $userFromGoogle->email,
                             //'avatar' => $providerUser->picture, // in case you have an avatar and want to use google's
                         ];
-                    $customer = $this->customerService->saveGoogleUser($data);
+                    $client = $this->clientService->saveGoogleUser($data);
                 }
 
                 /**
                  * Log in and return token
                  * HTTP 201
                  */
-                //$token = $customer->createToken("Google")->accessToken;
-                //Attempt to login the customer automatically
-                $token = Auth::guard('customer')->login($customer);
-                $user = new CustomerResource($customer);
+                //$token = $client->createToken("Google")->accessToken;
+                //Attempt to login the client automatically
+                $token = Auth::guard('client')->login($client);
+                $user = new ClientResource($client);
                 return response()->json([
                     'statusCode' => 200,
                     'data' => [
                         'token' => $token,
                         'token_type' => 'bearer',
-                        'token_expires_in' => Auth::guard('customer')->factory()->getTTL(), 
+                        'token_expires_in' => Auth::guard('client')->factory()->getTTL(), 
                         'user' => $user
                     ]
                 ], 200);

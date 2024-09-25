@@ -6,13 +6,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 use App\Services\AuthService;
-use App\Models\HouseApprovalLog;
-use App\Enums\HouseApprovalStatus;
-use App\Enums\RealtorHouseRelationshipTypes;
-
-use App\Models\RealtorHouse;
-
-use App\Http\Resources\CircleResource;
+use App\Models\User;
 
 
 class Utilities
@@ -54,24 +48,22 @@ class Utilities
         return $authService->checkToRefreshToken();
     }
 
-    public function ok($data='')
+    public static function ok($data)
+    {
+        return response()->json([
+            'statusCode' => 200,
+            'data' => $data
+        ], 200);
+    }
+
+    public static function okay($message='', $data=null, )
     {
         $responseData = ['statusCode' => 200];
         if(!empty($data) || $data != '') $responseData['data'] = $data;
         return response()->json([
             'statusCode' => 200,
             'data' => $data,
-            // 'token' => Utilities::refreshToken($this->guard)
-        ], 200);
-    }
-
-    public static function okay($data='')
-    {
-        $responseData = ['statusCode' => 200];
-        if(!empty($data) || $data != '') $responseData['data'] = $data;
-        return response()->json([
-            'statusCode' => 200,
-            'data' => $data
+            'message' => $message
         ], 200);
     }
 
