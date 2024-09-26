@@ -44,15 +44,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Schema::create('client_password_reset_tokens', function (Blueprint $table) {
-        //     $table->engine = 'InnoDB';
-        //     $table->id();
-        //     $table->string('email', 191);
-        //     $table->string('token_signature');
-        //     $table->timestamp('expires_at');
-        //     $table->timestamp('created_at')->nullable();
-        // });
-
     }
 
     /**
@@ -61,6 +52,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('clients');
-        Schema::dropIfExists('client_password_reset_tokens');
     }
 };
