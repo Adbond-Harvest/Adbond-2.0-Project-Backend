@@ -1,0 +1,53 @@
+name: Deploy to the Server
+
+on:
+  push:
+    branches:
+      - master  # Change to your default branch if necessary
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    # - name: Install sshpass
+    #   run: sudo apt-get install -y sshpass
+
+    - name: Pull latest changes from GitHub
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@business38.web-hosting.com -p21098 << 'EOF'
+        cd /home/homesign/api
+        git pull https://${{ secrets.GH_ACCESS_TOKEN }}@github.com/Adbond-Harvest/Adbond-2.0-Project-Backend.git master
+        EOF
+
+    - name: Run post-deployment scripts
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@63.250.32.131 << 'EOF'
+        cd /home/eerc/web/eerc.ng/public_html
+
+        # Run migrations for the main database
+        php artisan migrate --force
+
+        # Run migrations for the tenants database
+        php artisan tenants:migrate --force
+
+        # Seed The datas
+        # php artisan db:seed
+
+        # Install Composer dependencies
+        composer install --no-dev --optimize-autoloader
+
+        # Clear various caches
+        php artisan route:clear
+        php artisan config:clear
+        php artisan cache:clear
+        php artisan view:clear
+        EOF

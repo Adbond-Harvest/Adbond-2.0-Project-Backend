@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\ProjectType;
 
-class ProjectTypeSeeder extends Seeder
+class ProjectTypes extends Seeder
 {
     /**
      * Run the database seeds.
