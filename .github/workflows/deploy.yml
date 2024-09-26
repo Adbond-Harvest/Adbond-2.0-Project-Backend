@@ -31,7 +31,7 @@ jobs:
     - name: Run post-deployment scripts
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@business38.web-hosting.com -p21098 << 'EOF'
-        cd /home/eerc/web/eerc.ng/public_html
+        cd /home/homesign/api
 
         # Run migrations for the main database
         php artisan migrate --force
