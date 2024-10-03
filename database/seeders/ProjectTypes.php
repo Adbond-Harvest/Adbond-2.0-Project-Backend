@@ -32,11 +32,14 @@ class ProjectTypes extends Seeder
         ];
 
         foreach($projectTypes as $type) {
-            $projectType = new ProjectType;
-            $projectType->name = $type['name'];
-            $projectType->description = $type['description'];
-            $projectType->order = $type['order'];
-            $projectType->save();
+            $projectType = ProjectType::where("name", $type['name'])->first();
+            if(!$projectType) {
+                $projectType = new ProjectType;
+                $projectType->name = $type['name'];
+                $projectType->description = $type['description'];
+                $projectType->order = $type['order'];
+                $projectType->save();
+            }
         }
     }
 }

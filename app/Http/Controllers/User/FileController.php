@@ -12,6 +12,7 @@ use App\Http\Resources\FileResource;
 
 use App\Services\FileService;
 
+use App\Enums\FilePurpose;
 use App\Utilities;
 
 class FileController extends Controller
@@ -27,7 +28,9 @@ class FileController extends Controller
     public function savePhoto(SavePhoto $request)
     {
         try{
-            $res = $this->fileService->save($request->file('photo'), 'image', Auth::user()->id, self::$userType, 'user-profile-photos');
+            $purpose = $request->validated("purpose");
+            
+            $res = $this->fileService->save($request->file('photo'), 'image', Auth::user()->id, $purpose, self::$userType, 'user-profile-photos');
             if($res['status'] != 200) return Utilities::error402('Sorry Photo could not be uploaded: '.$res['message']);
 
             return Utilities::ok(new FileResource($res['file']));

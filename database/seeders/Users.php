@@ -33,18 +33,21 @@ class Users extends Seeder
         ];
 
         foreach($users as $user) { //dd($user['name']);
-            $userObj = new User;
-            $userObj->firstname = $user['firstname'];
-            $userObj->lastname = $user['lastname'];
-            $userObj->email = $user['email'];
-            $userObj->password = $user['password'];
-            $userObj->role_id = $user['role_id'];
-            $userObj->referer_code = $user['referer_code'];
-            $userObj->phone_number = $user['phone_number'];
-            $userObj->activated = $user['activated'];
-            $userObj->staff_type_id = StaffType::FullStaff()?->id;
-            $userObj->email_verified_at = now();
-            $userObj->save();
+            $userObj = User::where("email", $user['email'])->first();
+            if(!$userObj) {
+                $userObj = new User;
+                $userObj->firstname = $user['firstname'];
+                $userObj->lastname = $user['lastname'];
+                $userObj->email = $user['email'];
+                $userObj->password = $user['password'];
+                $userObj->role_id = $user['role_id'];
+                $userObj->referer_code = $user['referer_code'];
+                $userObj->phone_number = $user['phone_number'];
+                $userObj->activated = $user['activated'];
+                $userObj->staff_type_id = StaffType::FullStaff()?->id;
+                $userObj->email_verified_at = now();
+                $userObj->save();
+            }
         }
     }
 }

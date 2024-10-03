@@ -26,7 +26,7 @@ class FileService
         return File::all();
     }
 
-    public function save($file, $fileType, $user_id, $user_type = null, $folder=null)
+    public function save($file, $fileType, $user_id, $purpose, $user_type = null, $folder=null)
     {
         $uploadedFile = ($fileType=='image' || $fileType=='video') ? $this->uploadMedia($file, $fileType, $folder) : $this->uploadDoc($file, $folder);
         if($uploadedFile) {
@@ -47,6 +47,7 @@ class FileService
                 $fileObj->filename = $filename;
                 $fileObj->url = $secureUrl;
                 $fileObj->public_id = $publicId;
+                $fileObj->purpose = $purpose;
                 if($fileType=='image') $fileObj->width = $width;
                 if($fileType=='image') $fileObj->height = $height;
                 $fileObj->size = $size;
@@ -99,7 +100,7 @@ class FileService
         return $fileObj;
     }
 
-    public function update($file_id, $file, $fileType, $user_id, $folder=null)
+    public function update($file_id, $file, $fileType, $user_id, $purpose, $folder=null)
     {
         $uploadedFile = ($fileType=='image' || $fileType=='video') ? $this->uploadMedia($file, $fileType) : $this->uploadDoc($file, $folder);
         if($uploadedFile) {
@@ -128,6 +129,7 @@ class FileService
                     $fileObj->formatted_size = $rSize;
                     $fileObj->user_id = $user_id;
                     $fileObj->file_type = $fileType;
+                    $fileObj->purpose = $purpose;
                     $fileObj->mime_type = $file->getMimeType();;
                     $fileObj->original_filename = $file->getClientOriginalName();
                     $fileObj->extension = $file->getClientOriginalExtension();
@@ -143,9 +145,17 @@ class FileService
         
     }
 
-    
+    public function updateFileObj($data, $file)
+    {
+        if(isset($data['belongsId'])) $file->belongs_id = $data['belongsId'];
+        if(isset($data['belongsType'])) $file->belongs_type = $data['belongsType'];
+        if(isset($data['purpose'])) $file->purpose = $data['purpose'];
+        $file->update();
+    }
 
-    public function saveFiles($files, $fileType, $user_id)
+
+
+    public function saveFiles($files, $fileType, $user_id, $meta, $user_type=null)
     {
         $successFiles = [];
         $errors = [];
@@ -156,7 +166,7 @@ class FileService
             foreach($files as $file) {
                 //$ext = $file->getClientOriginalExtension();
                 if(empty($fileType)) $fileType =  $file->getClientOriginalExtension();
-                $res = $this->save($file, $fileType, $user_id);
+                $res = $this->save($file, $fileType, $user_id, $meta, $user_type);
                 if($res['status']==200) {
                     $successFiles[] = $res['file'];
                 }else{
@@ -178,7 +188,7 @@ class FileService
         return $response;
     }
 
-    public function updateFiles($files, $fileType, $user_id)
+    public function updateFiles($files, $fileType, $user_id, $meta)
     {
         $successFiles = [];
         $errors = [];
@@ -189,7 +199,7 @@ class FileService
             foreach($files as $file) {
                 //$ext = $file->getClientOriginalExtension();
                 if(empty($fileType)) $fileType =  $file->getClientOriginalExtension();
-                $res = $this->update($file['file_id'], $file['file'], $fileType, $user_id);
+                $res = $this->update($file['file_id'], $file['file'], $fileType, $user_id, $meta);
                 if($res['status']==200) {
                     $successFiles[] = $res['file'];
                 }else{

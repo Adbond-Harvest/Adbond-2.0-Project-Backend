@@ -24,10 +24,13 @@ class AgeGroupSeeder extends Seeder
         ];
 
         foreach($ageGroups as $group) {
-            $ageGroup = new AgeGroup;
-            $ageGroup->start = $group['start'];
-            $ageGroup->end = $group['end'];
-            $ageGroup->save();
+            $ageGroup = AgeGroup::where("start", $group['start'])->where("end", $group['end'])->first();
+            if(!$ageGroup) {
+                $ageGroup = new AgeGroup;
+                $ageGroup->start = $group['start'];
+                $ageGroup->end = $group['end'];
+                $ageGroup->save();
+            }
         }
     }
 }

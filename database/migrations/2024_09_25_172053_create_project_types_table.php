@@ -12,8 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('project_types', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->id();
             $table->string("name");
+            $table->foreignId("file_id")->nullable()->references("id")->on("files");
             $table->text("description")->nullable();
             $table->tinyInteger("order");
             $table->timestamps();
