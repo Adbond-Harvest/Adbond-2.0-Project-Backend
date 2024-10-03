@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\ClientAuth;
 use App\Http\Middleware\UserAuth;
 
+
+use App\Http\Controllers\User\ProjectTypeController;
+use App\Http\Controllers\User\ProjectController;
+use App\Http\Controllers\User\IndexController;
+
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -29,12 +34,32 @@ Route::group(['prefix' => '/v2',], function () {
         });
     });
 
+    //User/Admin/Staff Routes
     Route::group(['middleware' => UserAuth::class, 'prefix' => '/user', 'namespace' => 'User',], function () {
+        Route::get('/dashboard', [IndexController::class, "dashboard"]);
+
         Route::group(['prefix' => '/profile'], function () {
             Route::post('/set_password', 'ProfileController@setPassword');
             Route::post('/update', 'ProfileController@update');
         });
         Route::post('/upload_photo', 'FileController@savePhoto');
+
+        //Project Types
+        Route::group(['prefix' => '/project_types'], function () {
+            Route::post('/update', [ProjectTypeController::class, "update"]);
+            Route::get('', [ProjectTypeController::class, "projectTypes"]);
+            Route::get('/{id}', [ProjectTypeController::class, "projectType"]);
+        });
+        // Project
+        Route::group(['prefix' => '/projects'], function () {
+            Route::post('', [ProjectController::class, "save"]);
+            Route::post('/update', [ProjectController::class, "update"]);
+            Route::post('/activate', [ProjectController::class, "activate"]);
+            Route::post('/deactivate', [ProjectController::class, "deactivate"]);
+            Route::post('/filter', [ProjectController::class, "filter"]);
+            Route::get('/all/{projectTypeId}', [ProjectController::class, "projects"]);
+            Route::get('/{id}', [ProjectController::class, "project"]);
+        });
     });
 
     // Client Routes

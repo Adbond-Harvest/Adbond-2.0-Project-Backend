@@ -7,6 +7,8 @@ use App\Enums\MaritalStatus;
 use App\Enums\KYCStatus;
 use App\Enums\Genders;
 use App\Enums\StaffTypes;
+use App\Enums\FileTypes;
+use App\Enums\FilePurpose;
 
 class EnumClass
 {
@@ -57,6 +59,16 @@ class EnumClass
             FileTypes::PDF->value,
             FileTypes::VIDEO->value,
             FileTypes::XLS->value
+        ];
+    }
+
+    public static function filePurposes()
+    {
+        return [
+            FilePurpose::USER_PROFILE_PHOTO->value,
+            FilePurpose::CLIENT_PROFILE_PHOTO->value,
+            FilePurpose::PROJECT_TYPE_PHOTO->value,
+            FilePurpose::PROJECT_PHOTO->value
         ];
     }
 }

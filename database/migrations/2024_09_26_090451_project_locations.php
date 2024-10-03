@@ -12,9 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('project_locations', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->id();
-            $table->foreignId('project_id');
-            $table->foreignId('state_id');
+            $table->foreignId('project_id')->references("id")->on("projects");
+            $table->foreignId('state_id')->references("id")->on("states");
             $table->string('address')->nullable();
             $table->boolean('active')->default(1);
             $table->dateTime('deactivated_at')->nullable();

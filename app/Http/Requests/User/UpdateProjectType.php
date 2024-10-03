@@ -1,14 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use App\Http\Requests\BaseRequest;
 
-use App\EnumClass;
-
-class SavePhoto extends BaseRequest
+class UpdateProjectType extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,8 +23,10 @@ class SavePhoto extends BaseRequest
     public function rules(): array
     {
         return [
-            'photo' => 'required|image|max:10000|mimes:jpeg,png,jpg,gif',
-            'purpose' => ["required", Rule::in(EnumClass::filePurposes())]
+            "id" => "required|integer|exists:project_types,id",
+            "photoId" => "nullable|integer",
+            "description" => "nullable|string",
+            "order" => "nullable|integer"
         ];
     }
 }

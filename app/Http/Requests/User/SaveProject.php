@@ -6,9 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\BaseRequest;
 use Illuminate\Validation\Rule;
 
-use App\EnumClass;
-
-class UpdateProfile extends BaseRequest
+class SaveProject extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,15 +24,13 @@ class UpdateProfile extends BaseRequest
     public function rules(): array
     {
         return [
-            "firstname" => "nullable|string",
-            "lastname" => "nullable|string",
-            "photoId" => "nullable|integer",
-            "phoneNumber" => "nullable|string",
-            "postalCode" => "nullable|string",
-            "gender" => ["nullable","string", Rule::in(EnumClass::genders())],
-            "accountNumber" => "nullable|string",
-            "accountName" => "nullable|string",
-            "bankId" => "nullable|integer|exists:banks,id" 
+            "name" => ["required", "string", Rule::unique('projects', 'name')->where(function ($query) {
+                return $query->where('project_type_id', $this->projectTypeId);
+            })],
+            "projectTypeId" => ["required","integer","exists:project_types,id"],
+            "description" => "nullable|string",
+            "stateId" => "required|integer|exists:states,id",
+            "address" => "required|string"
         ];
     }
 }

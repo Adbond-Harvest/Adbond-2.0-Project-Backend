@@ -26,6 +26,9 @@ return new class extends Migration
             $table->bigInteger('size');
             $table->string('formatted_size');
             $table->string('url');
+            $table->foreignId("belongs_id")->nullable();
+            $table->string("belongs_type")->nullable();
+            $table->string("purpose")->nullable();
             $table->string('public_id')->nullable();
             $table->mediumInteger('width')->nullable();
             $table->mediumInteger('height')->nullable();

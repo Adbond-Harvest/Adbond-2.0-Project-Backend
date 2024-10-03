@@ -12,9 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('projects', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->id();
             $table->string('name');
-            $table->foreignId('project_type_id');
+            $table->foreignId('project_type_id')->references("id")->on("project_types");
             $table->text('description')->nullable();
             $table->boolean('active')->default(true);
             $table->dateTime('deactivated_at')->nullable();
