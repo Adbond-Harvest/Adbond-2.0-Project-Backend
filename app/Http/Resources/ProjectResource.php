@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 use App\Http\Resources\ProjectTypeResource;
-use App\Http\Resources\ProjectLocationResource;
+use App\Http\Resources\PackageResource;
 
 class ProjectResource extends JsonResource
 {
@@ -17,14 +17,20 @@ class ProjectResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+        $resource = [
             "id" => $this->id,
+            "identifier" => $this->identifier,
             "name" => $this->name,
             "description" => $this->description,
             "status" => ($this->active) ? "Active" : "Inactive",
             "created" => $this->created_at->format("F j, Y"),
             "projectType" => new ProjectTypeResource($this->whenLoaded("projectType")),
-            "locations" => ProjectLocationResource::collection($this->whenLoaded("locations"))
+            "packages" => PackageResource::collection($this->whenLoaded("packages"))
+            // "locations" => ProjectLocationResource::collection($this->whenLoaded("locations"))
         ];
+        $resource['packageCount'] = $this->packages->count();
+        $resource['canDelete'] = $this->canDelete();
+
+        return $resource;
     }
 }

@@ -289,6 +289,14 @@ class FileService
         }
     }
 
+    public function deleteFiles($filesIds)
+    {
+        foreach($filesIds as $fileId) {
+            $file = File::find($fileId);
+            if($file) $file->delete();
+        }
+    }
+
     private function getStatus($uploadedFile)
     {
         $statusString = $uploadedFile->headers['Status'][0];

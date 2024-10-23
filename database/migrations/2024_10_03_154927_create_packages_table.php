@@ -13,7 +13,26 @@ return new class extends Migration
     {
         Schema::create('packages', function (Blueprint $table) {
             $table->id();
-            
+            $table->foreignId('user_id')->references("id")->on("users");
+            $table->string('name');
+            $table->foreignId('state_id')->references("id")->on("states");
+            $table->string('address')->nullable();
+            $table->foreignId('project_id')->references("id")->on("projects");
+            $table->double("size");
+            $table->double("amount");
+            $table->integer("units");
+            $table->integer("available_units")->nullable();
+            $table->double("discount")->default(0);
+            $table->double("min_price")->default(0);
+            $table->integer("installment_duration")->default(12);
+            $table->double("infrastructure_fee")->default(0);
+            $table->text('description')->nullable();
+            $table->json('benefits')->nullable();
+            $table->foreignId('package_brochure_file_id')->nullable();
+            $table->boolean("installment_option")->default(true);
+            $table->string("vr_url")->nullable();
+            $table->boolean('active')->default(true);
+            $table->dateTime('deactivated_at')->nullable();
             $table->timestamps();
         });
     }

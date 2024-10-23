@@ -3,10 +3,11 @@
 namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Requests\BaseRequest;
 use Illuminate\Validation\Rule;
+use App\Http\Requests\BaseRequest;
+use App\Enums\ProjectFilter;
 
-class SaveProject extends BaseRequest
+class FilterPackage extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,13 +25,8 @@ class SaveProject extends BaseRequest
     public function rules(): array
     {
         return [
-            "name" => ["required", "string", Rule::unique('projects', 'name')->where(function ($query) {
-                return $query->where('project_type_id', $this->projectTypeId);
-            })],
-            "projectTypeId" => ["required","integer","exists:project_types,id"],
-            "description" => "nullable|string",
-            // "stateId" => "required|integer|exists:states,id",
-            // "address" => "required|string"
+            "date" => "nullable|date",
+            "status" => ["nullable", Rule::in([ProjectFilter::ACTIVE->value, ProjectFilter::INACTIVE->value])]
         ];
     }
 }

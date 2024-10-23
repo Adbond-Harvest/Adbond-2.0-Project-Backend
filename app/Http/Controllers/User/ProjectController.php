@@ -13,20 +13,24 @@ use App\Http\Requests\User\ToggleProjectActivate;
 use App\Http\Requests\User\FilterProject;
 
 use App\Http\Resources\ProjectResource;
+use App\Http\Resources\Min\ProjectTypeResource;
 
 use App\Services\ProjectService;
 use App\Services\FileService;
+use App\Services\ProjectTypeService;
 
 use App\Utilities;
 
 class ProjectController extends Controller
 {
     private $projectService;
+    private $projectTypeService;
     private $fileService;
 
     public function __construct()
     {
         $this->projectService = new ProjectService;
+        $this->projectTypeService = new ProjectTypeService;
         $this->fileService = new FileService;
     }
 
@@ -36,13 +40,13 @@ class ProjectController extends Controller
             DB::beginTransaction();
             $data = $request->validated();
             $project = $this->projectService->save($data);
-            $this->projectService->addLocation($project, $data);
+            // $this->projectService->addLocation($project, $data);
 
             DB::commit();
             return Utilities::okay("Project created Successfully", new ProjectResource($project));
         }catch(\Exception $e){
             DB::rollBack();
-            return Utilities::error($e, 'An error occured while trying to process the request, Please try again later or contact support');
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }
     }
 
@@ -58,24 +62,52 @@ class ProjectController extends Controller
             $project = $this->projectService->update($data, $project);
             return Utilities::okay("Project Updated Successfully", new ProjectResource($project));
         }catch(\Exception $e){
-            return Utilities::error($e, 'An error occured while trying to process the request, Please try again later or contact support');
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }
     }
 
-    public function addLocation(AddProjectLocation $request)
-    {
-        try{
-            $data = $request->validated();
-            $project = $this->projectService->project($data['projectId']);
-            if(!$project) return Utilities::error402("Project not found");
-            $projectLocation = $this->projectService->projectLocationByState($project->id, $data['stateId']);
-            if($projectLocation) return Utilities::error402("This Project already exists in this State");
-            $this->projectService->addLocation($project, $data);
+    // public function addLocation(AddProjectLocation $request)
+    // {
+    //     try{
+    //         $data = $request->validated();
+    //         $project = $this->projectService->project($data['projectId']);
+    //         if(!$project) return Utilities::error402("Project not found");
+    //         $projectLocation = $this->projectService->projectLocationByState($project->id, $data['stateId']);
+    //         if($projectLocation) return Utilities::error402("This Project already exists in this State");
+    //         $this->projectService->addLocation($project, $data);
 
-            return Utilities::okay("Location has been added to Project Successfully");
-        }catch(\Exception $e){
-            return Utilities::error($e, 'An error occured while trying to process the request, Please try again later or contact support');
-        }
+    //         return Utilities::okay("Location has been added to Project Successfully");
+    //     }catch(\Exception $e){
+    //         return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+    //     }
+    // }
+
+    public function types()
+    {
+        $projectTypes = $this->projectTypeService->projectTypes();
+        return Utilities::ok(ProjectTypeResource::collection($projectTypes));
+    }
+
+    public function summary($projectTypeId)
+    {
+        if (!is_numeric($projectTypeId) || !ctype_digit($projectTypeId)) return Utilities::error402("Invalid parameter projectTypeID");
+        $projectType = $this->projectTypeService->projectType($projectTypeId);
+
+        // $this->projectService->count = true;
+        // $this->projectService->typeId = $projectTypeId;
+
+        $activeCount = $projectType->activeProjects->count(); //$this->projectService->filter(['status'=>'active']);
+        $inactiveCount = $projectType->inactiveProjects->count(); //$this->projectService->filter(['status'=>'active']);
+        $projectsCount = $projectType->projects->count(); //$this->projectService->projects($projectTypeId);
+        $packagesCount = $projectType->packages->count();
+
+        return [
+            "projectsCount" => $projectsCount,
+            "activeCount" => $activeCount,
+            "inactiveCount" => $inactiveCount,
+            "packagesCount" => $packagesCount
+        ];
+        
     }
 
     public function projects(Request $request, $projectTypeId)
@@ -84,11 +116,13 @@ class ProjectController extends Controller
         $page = ($request->query('page')) ?? 1;
         $perPage = ($request->query('perPage'));
         if(!is_int((int) $page) || $page <= 0) $page = 1;
-        if(!is_int((int) $perPage) || $perPage==null) $perPage = null;
+        if(!is_int((int) $perPage) || $perPage==null) $perPage = env('PAGINATION_PER_PAGE');
         $offset = $perPage * ($page-1);
-        $projects = $this->projectService->projects($projectTypeId, ['type'], $offset, $perPage);
+        $projects = $this->projectService->projects($projectTypeId, [], $offset, $perPage);
+        $this->projectService->count = true;
+        $projectsCount = $this->projectService->projects($projectTypeId);
 
-        return Utilities::ok(ProjectResource::collection($projects));
+        return Utilities::paginatedOkay(ProjectResource::collection($projects), $page, $perPage, $projectsCount);
     }
 
     public function project($id)
@@ -111,7 +145,7 @@ class ProjectController extends Controller
 
             return Utilities::okay("Project Activated Successfully", new ProjectResource($project));
         }catch(\Exception $e){
-            return Utilities::error($e, 'An error occured while trying to process the request, Please try again later or contact support');
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }
     }
 
@@ -127,19 +161,113 @@ class ProjectController extends Controller
 
             return Utilities::okay("Project Deactivated Successfully", new ProjectResource($project));
         }catch(\Exception $e){
-            return Utilities::error($e, 'An error occured while trying to process the request, Please try again later or contact support');
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }
     }
 
-    public function filter(FilterProject $request)
+    public function delete(ToggleProjectActivate $request)
     {
         try{
-            $filter = $request->validated();
-            $projects = $this->projectService->filter($filter);
+            $id = $request->validated("id");
+            $project = $this->projectService->project($id);
+            if(!$project) return Utilities::error402("Project not found");
 
-            return Utilities::ok(ProjectResource::collection($projects));
+            if($project->active) return Utilities::error402("Cannot delete an active Project");
+            if(!$project->canDelete()) return Utilities::error402("Cannot delete this Project");
+            $this->projectService->delete($project);
+
+        } catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
+    }
+
+    public function filter(FilterProject $request, $projectTypeId)
+    {
+        try{
+            if (!is_numeric($projectTypeId) || !ctype_digit($projectTypeId)) return Utilities::error402("Invalid parameter projectTypeID");
+            $page = ($request->query('page')) ?? 1;
+            $perPage = ($request->query('perPage'));
+            if(!is_int((int) $page) || $page <= 0) $page = 1;
+            if(!is_int((int) $perPage) || $perPage==null) $perPage = env('PAGINATION_PER_PAGE');
+            $offset = $perPage * ($page-1);
+
+            $filter = $request->validated();
+            $this->projectService->typeId = $projectTypeId;
+            $projects = $this->projectService->filter($filter, [], $offset, $perPage);
+            $this->projectService->count = true;
+            $projectsCount = $this->projectService->filter($filter);
+
+            return Utilities::paginatedOkay(ProjectResource::collection($projects), $page, $perPage, $projectsCount);
         }catch(\Exception $e){
-            return Utilities::error($e, 'An error occured while trying to process the request, Please try again later or contact support');
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
+    }
+
+    public function search(Request $request, $projectTypeId)
+    {
+        try{
+            if (!is_numeric($projectTypeId) || !ctype_digit($projectTypeId)) return Utilities::error402("Invalid parameter projectTypeID");
+            $page = ($request->query('page')) ?? 1;
+            $perPage = ($request->query('perPage'));
+            if(!is_int((int) $page) || $page <= 0) $page = 1;
+            if(!is_int((int) $perPage) || $perPage==null) $perPage = env('PAGINATION_PER_PAGE');
+            $offset = $perPage * ($page-1);
+
+            $text = ($request->query('text')) ?? null;
+            $projects = $this->projectService->search($text, $projectTypeId, $offset, $perPage);
+            $this->projectService->count = true;
+            $projectsCount = $this->projectService->search($text, $projectTypeId);
+
+            return Utilities::paginatedOkay(ProjectResource::collection($projects), $page, $perPage, $projectsCount);
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
+    }
+
+    
+    public function export(Request $request, $projectTypeId)
+    {
+        try {
+            if (!is_numeric($projectTypeId) || !ctype_digit($projectTypeId)) return Utilities::error402("Invalid parameter projectTypeID");
+            // Get projects with necessary relations
+            $projects = $this->projectService->projects($projectTypeId);
+
+            $type = ($request->query('type')) ?? null;
+            if(!$type) return Utilities::error402("Type is required");
+
+            // Custom heading configuration (optional)
+            $headingConfig = [
+                'headings' => [
+                    'Project ID',
+                    'Project Name',
+                    'Project Type',
+                    'Description',
+                    'Current Status',
+                    'Total Packages',
+                    'Creation Date'
+                ],
+                'columns' => [
+                    'identifier',
+                    'name',
+                    'project_type',
+                    'description',
+                    'status',
+                    'package_count',
+                    'created_at'
+                ]
+            ];
+
+            // Handle different export types
+            switch ($type) {
+                case 'excel':
+                    return $this->projectService->exportToExcel($projects, $headingConfig);
+                case 'pdf':
+                    return $this->projectService->exportToPDF($projects, $headingConfig);
+                default:
+                    return Utilities::error402("Invalid export type");
+            }
+        } catch (\Exception $e) {
+            return Utilities::error($e, 'An error occurred during export');
         }
     }
 

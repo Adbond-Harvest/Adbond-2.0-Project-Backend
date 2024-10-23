@@ -1,12 +1,9 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Min;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-
-use App\Http\Resources\FileResource;
-use App\Http\Resources\ProjectResource;
 
 class ProjectTypeResource extends JsonResource
 {
@@ -20,9 +17,7 @@ class ProjectTypeResource extends JsonResource
         return [
             "id" => $this->id,
             "name" => $this->name,
-            "description" => $this->description,
-            "photo" => new FileResource($this->photo),
-            "projects" => ProjectResource::collection($this->whenLoaded("projects"))
+            "projectsCount" => $this->projects->count()
         ];
     }
 }
