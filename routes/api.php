@@ -9,6 +9,7 @@ use App\Http\Middleware\UserAuth;
 
 use App\Http\Controllers\User\ProjectTypeController;
 use App\Http\Controllers\User\ProjectController;
+use App\Http\Controllers\User\PackageController;
 use App\Http\Controllers\User\IndexController;
 
 // Route::get('/user', function (Request $request) {
@@ -53,12 +54,32 @@ Route::group(['prefix' => '/v2',], function () {
         // Project
         Route::group(['prefix' => '/projects'], function () {
             Route::post('', [ProjectController::class, "save"]);
-            Route::post('/update', [ProjectController::class, "update"]);
+            Route::patch('', [ProjectController::class, "update"]);
             Route::post('/activate', [ProjectController::class, "activate"]);
             Route::post('/deactivate', [ProjectController::class, "deactivate"]);
-            Route::post('/filter', [ProjectController::class, "filter"]);
+            Route::post('/delete', [ProjectController::class, "delete"]);
+            Route::post('/filter/{projectTypeId}', [ProjectController::class, "filter"]);
+            Route::get('types', [ProjectController::class, "types"]);
+            Route::get('/summary/{projectTypeId}', [ProjectController::class, "summary"]);
             Route::get('/all/{projectTypeId}', [ProjectController::class, "projects"]);
+            Route::get('/search/{projectTypeId}', [ProjectController::class, "search"]);
+            Route::get('/export/{projectTypeId}', [ProjectController::class, "export"]);
             Route::get('/{id}', [ProjectController::class, "project"]);
+        });
+        // Package
+        Route::group(['prefix' => '/packages'], function () {
+            Route::post('', [PackageController::class, "save"]);
+            Route::patch('', [PackageController::class, "update"]);
+            Route::patch('/mark_as_sold_out', [PackageController::class, "markAsSoldOut"]);
+            Route::patch('/mark_as_in_stock', [PackageController::class, "markAsInStock"]);
+            Route::post('/activate', [PackageController::class, "activate"]);
+            Route::post('/deactivate', [PackageController::class, "deactivate"]);
+            Route::post('/delete', [PackageController::class, "delete"]);
+            Route::post('/filter/{projectId}', [PackageController::class, "filter"]);
+            Route::get('/all/{projectId}', [PackageController::class, "packages"]);
+            Route::get('/search/{projectId}', [PackageController::class, "search"]);
+            Route::get('/export/{projectId}', [PackageController::class, "export"]);
+            Route::get('/{id}', [PackageController::class, "package"]);
         });
     });
 

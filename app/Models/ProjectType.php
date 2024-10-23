@@ -29,4 +29,9 @@ class ProjectType extends Model
         return $this->projects()->where("active", false);
     }
 
+    public function packages()
+    {
+        return $this->hasManyThrough(Package::class, Project::class, 'project_type_id', 'project_id', 'id', 'id');
+    }
+
 }

@@ -22,14 +22,24 @@ class Project extends Model
         'created_at' => 'datetime',
     ];
 
+    public function canDelete()
+    {
+        return ($this->packages->count() == 0);
+    }
+
     public function projectType()
     {
         return $this->belongsTo("App\Models\ProjectType");
     }
 
-    public function locations()
+    // public function locations()
+    // {
+    //     return $this->hasMany("App\Models\ProjectLocation");
+    // }
+
+    public function packages()
     {
-        return $this->hasMany("App\Models\ProjectLocation");
+        return $this->hasMany(Package::class);
     }
 
 
