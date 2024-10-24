@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\User;
+namespace app\Http\Controllers\User;
 
-use App\Http\Controllers\Controller;
+use app\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Http\Resources\ProjectResource;
-use App\Http\Resources\ProjectTypeResource;
+use app\Http\Resources\ProjectResource;
+use app\Http\Resources\ProjectTypeResource;
 
-use App\Services\ProjectTypeService;
-use App\Services\ProjectService;
+use app\Services\ProjectTypeService;
+use app\Services\ProjectService;
 
-use App\Utilities;
+use app\Utilities;
 
 class IndexController extends Controller
 {

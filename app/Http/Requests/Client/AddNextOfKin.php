@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\client;
+namespace app\Http\Requests\client;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Requests\BaseRequest;
+use app\Http\Requests\BaseRequest;
 use Illuminate\Validation\Rule;
 
-use App\EnumClass;
+use app\EnumClass;
 
 class AddNextOfKin extends BaseRequest
 {

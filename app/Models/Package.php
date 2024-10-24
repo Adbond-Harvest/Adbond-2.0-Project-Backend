@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace app\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,7 +32,7 @@ class Package extends Model
 
     public function state()
     {
-        return $this->belongsTo("App\Models\State");
+        return $this->belongsTo("app\Models\State");
     }
 
     public function brochure()

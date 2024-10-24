@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Services;
+namespace app\Services;
 
-use App\Models\Project;
-use App\Models\ProjectType;
-use App\Models\ProjectLocation;
+use app\Models\Project;
+use app\Models\ProjectType;
+use app\Models\ProjectLocation;
 
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use PDF;
 
-use App\Enums\ProjectFilter;
-use App\Exports\ProjectExport;
+use app\Enums\ProjectFilter;
+use app\Exports\ProjectExport;
 
 class ProjectService
 {

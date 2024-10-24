@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Requests\Client;
+namespace app\Http\Requests\Client;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Requests\BaseRequest;
+use app\Http\Requests\BaseRequest;
 
 class Register extends BaseRequest
 {

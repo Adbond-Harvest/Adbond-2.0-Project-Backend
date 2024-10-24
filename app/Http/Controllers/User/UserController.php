@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\User;
+namespace app\Http\Controllers\User;
 
-use App\Http\Controllers\Controller;
+use app\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Http\Resources\UserResource;
+use app\Http\Resources\UserResource;
 
-use App\Services\UserService;
+use app\Services\UserService;
 
 class UserController extends Controller
 {

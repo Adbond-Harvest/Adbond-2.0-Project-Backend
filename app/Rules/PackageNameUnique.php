@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Rules;
+namespace app\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
-use App\Models\Package;
+use app\Models\Package;
 
 class PackageNameUnique implements ValidationRule
 {

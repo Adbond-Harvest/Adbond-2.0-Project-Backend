@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Services;
+namespace app\Services;
 
-use App\Exceptions\UserNotFoundException;
+use app\Exceptions\UserNotFoundException;
 
 use Carbon\Carbon;
 
 use Illuminate\Support\Facades\DB;
 
-use App\Services\AgeGroupService;
+use app\Services\AgeGroupService;
 
-use App\Models\Client;
-use App\Models\ClientNextOfKin;
+use app\Models\Client;
+use app\Models\ClientNextOfKin;
 
-use App\Enums\KYCStatus;
-use App\Helpers;
+use app\Enums\KYCStatus;
+use app\Helpers;
 
 /**
  * client service class

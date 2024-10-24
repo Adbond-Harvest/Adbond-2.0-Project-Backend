@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Services;
+namespace app\Services;
 
-use App\Notifications\APIPasswordResetNotification;
-use App\Exceptions\UserNotFoundException;
+use app\Notifications\APIPasswordResetNotification;
+use app\Exceptions\UserNotFoundException;
 
-use App\Models\AgeGroup;
+use app\Models\AgeGroup;
 
-use App\Helpers;
+use app\Helpers;
 
 /**
  * AgeGroup service class

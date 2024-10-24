@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace app\Services;
 
 use Mail;
 use Hash;
@@ -8,10 +8,10 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 
 
-use App\Models\Customer;
-use App\Models\PasswordResetToken;
-use App\Models\ClientPasswordResetToken;
-use App\Enums\PasswordTypes;
+use app\Models\Customer;
+use app\Models\PasswordResetToken;
+use app\Models\ClientPasswordResetToken;
+use app\Enums\PasswordTypes;
 
 /**
  * password service class

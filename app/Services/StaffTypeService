@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Services;
+namespace app\Services;
 
-use App\Notifications\APIPasswordResetNotification;
-use App\Exceptions\UserNotFoundException;
+use app\Notifications\APIPasswordResetNotification;
+use app\Exceptions\UserNotFoundException;
 
-use App\Models\User;
-use App\Models\Staff_type;
+use app\Models\User;
+use app\Models\Staff_type;
 
 /**
  * Staff type service class

@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Services;
+namespace app\Services;
 
-use App\Notifications\APIPasswordResetNotification;
-use App\Exceptions\UserNotFoundException;
+use app\Notifications\APIPasswordResetNotification;
+use app\Exceptions\UserNotFoundException;
 
-use App\Models\User;
-// use App\Models\Role;
-// use App\Models\Staff_type;
-use App\Models\Client;
+use app\Models\User;
+// use app\Models\Role;
+// use app\Models\Staff_type;
+use app\Models\Client;
 
-// use App\Services\StaffTypeService;
+// use app\Services\StaffTypeService;
 
 use Illuminate\Support\Facades\DB;
 
-use App\Helpers;
-use App\Utilities;
+use app\Helpers;
+use app\Utilities;
 
 /**
  * user service class

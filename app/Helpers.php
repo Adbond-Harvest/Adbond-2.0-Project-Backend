@@ -1,31 +1,31 @@
 <?php
 
-namespace App;
+namespace app;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 
-use App\Models\HybridStaffDraw;
-use App\Models\User;
-use App\Models\Notification;
-use App\Models\Company_info;
-use App\Models\Payment;
-use App\Models\SalesOfferPayment;
-use App\Models\Client_package;
+use app\Models\HybridStaffDraw;
+use app\Models\User;
+use app\Models\Notification;
+use app\Models\Company_info;
+use app\Models\Payment;
+use app\Models\SalesOfferPayment;
+use app\Models\Client_package;
 
 use Illuminate\Support\Facades\Http;
-use App\Services\HybridStaffDrawService;
-use App\Services\UserService;
-usE aPP\Services\LoyaltyService;
+use app\Services\HybridStaffDrawService;
+use app\Services\UserService;
+usE app\Services\LoyaltyService;
 
-use App\Http\Resources\MonthlyWeekDaysResource; 
-use App\Http\Resources\InspectionDayMinResource;
-use App\Http\Resources\VirtualStaffAssessmentResource;
-use App\Http\Resources\OfferMinResource;
-use App\Http\Resources\OfferBidMinResource;
-use App\Http\Resources\PaymentMinResource;
-use App\Http\Resources\OfferPaymentResource;
-use App\Http\Resources\OrderMinResource;
+use app\Http\Resources\MonthlyWeekDaysResource; 
+use app\Http\Resources\InspectionDayMinResource;
+use app\Http\Resources\VirtualStaffAssessmentResource;
+use app\Http\Resources\OfferMinResource;
+use app\Http\Resources\OfferBidMinResource;
+use app\Http\Resources\PaymentMinResource;
+use app\Http\Resources\OfferPaymentResource;
+use app\Http\Resources\OrderMinResource;
 
 use PDF;
 

@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Services;
+namespace app\Services;
 
 use Maatwebsite\Excel\Facades\Excel;
 use PDF;
 
-use App\Models\Package;
-use App\Models\PackageSize;
-use App\Models\PackagePhoto;
+use app\Models\Package;
+use app\Models\PackageSize;
+use app\Models\PackagePhoto;
 
-use App\Enums\ProjectFilter;
+use app\Enums\ProjectFilter;
 
-use App\Exports\PackageExport;
+use app\Exports\PackageExport;
 
 class PackageService
 {

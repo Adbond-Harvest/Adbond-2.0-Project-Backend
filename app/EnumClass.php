@@ -1,14 +1,14 @@
 <?php
 
-namespace App;
+namespace app;
 
-use App\Enums\EmploymentStatus;
-use App\Enums\MaritalStatus;
-use App\Enums\KYCStatus;
-use App\Enums\Genders;
-use App\Enums\StaffTypes;
-use App\Enums\FileTypes;
-use App\Enums\FilePurpose;
+use app\Enums\EmploymentStatus;
+use app\Enums\MaritalStatus;
+use app\Enums\KYCStatus;
+use app\Enums\Genders;
+use app\Enums\StaffTypes;
+use app\Enums\FileTypes;
+use app\Enums\FilePurpose;
 
 class EnumClass
 {

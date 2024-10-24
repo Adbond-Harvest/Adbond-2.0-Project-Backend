@@ -3,14 +3,14 @@
 use Doctrine\DBAL\Driver\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\ClientAuth;
-use App\Http\Middleware\UserAuth;
+use app\Http\Middleware\ClientAuth;
+use app\Http\Middleware\UserAuth;
 
 
-use App\Http\Controllers\User\ProjectTypeController;
-use App\Http\Controllers\User\ProjectController;
-use App\Http\Controllers\User\PackageController;
-use App\Http\Controllers\User\IndexController;
+use app\Http\Controllers\User\ProjectTypeController;
+use app\Http\Controllers\User\ProjectController;
+use app\Http\Controllers\User\PackageController;
+use app\Http\Controllers\User\IndexController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();

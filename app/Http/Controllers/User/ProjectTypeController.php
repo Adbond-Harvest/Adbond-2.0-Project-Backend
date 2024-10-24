@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\User;
+namespace app\Http\Controllers\User;
 
-use App\Http\Controllers\Controller;
+use app\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-use App\Http\Resources\ProjectTypeResource;
+use app\Http\Resources\ProjectTypeResource;
 
-use App\Http\Requests\User\UpdateProjectType;
+use app\Http\Requests\User\UpdateProjectType;
 
-use App\Services\ProjectTypeService;
-use App\Services\FileService;
+use app\Services\ProjectTypeService;
+use app\Services\FileService;
 
-use App\Enums\FilePurpose;
-use App\Utilities;
+use app\Enums\FilePurpose;
+use app\Utilities;
 
 class ProjectTypeController extends Controller
 {
@@ -39,7 +39,7 @@ class ProjectTypeController extends Controller
                 if(!$file) return Utilities::error402("File not found");
                 // dd($file->purpose." == ".FilePurpose::PROJECT_TYPE_PHOTO);
                 if($file->purpose != FilePurpose::PROJECT_TYPE_PHOTO->value) return Utilities::error402("Sorry, you are attempting to save the wrong Photo");
-                $fileMeta = ["belongsId"=>$data["id"], "belongsType"=>"App\Models\ProjectType"];
+                $fileMeta = ["belongsId"=>$data["id"], "belongsType"=>"app\Models\ProjectType"];
             }
             $projectType = $this->projectTypeService->update($data, $projectType);
             if(isset($data['photoId'])) $this->fileService->updateFileObj($fileMeta, $file);

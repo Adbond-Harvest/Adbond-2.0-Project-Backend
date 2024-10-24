@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace app\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +16,7 @@ class ProjectType extends Model
 
     public function projects()
     {
-        return $this->hasMany("App\Models\Project");
+        return $this->hasMany("app\Models\Project");
     }
 
     public function activeProjects()

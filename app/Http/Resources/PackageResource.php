@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Resources;
+namespace app\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-use App\Http\Resources\ProjectResource;
-use App\Http\Resources\StateResource;
-use App\Http\Resources\FileResource;
+use app\Http\Resources\ProjectResource;
+use app\Http\Resources\StateResource;
+use app\Http\Resources\FileResource;
 
 class PackageResource extends JsonResource
 {

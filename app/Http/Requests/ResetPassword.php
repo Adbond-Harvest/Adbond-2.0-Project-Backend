@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Requests;
+namespace app\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Requests\BaseRequest;
+use app\Http\Requests\BaseRequest;
 
 class ResetPassword extends BaseRequest
 {

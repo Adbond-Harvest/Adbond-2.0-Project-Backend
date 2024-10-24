@@ -1,24 +1,24 @@
 <?php
 
-namespace App\Http\Controllers\Client;
+namespace appHttp\Controllers\Client;
 
-use App\Http\Controllers\Controller;
+use appHttp\Controllers\Controller;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
-use App\Http\Resources\ClientBriefResource;
-use App\Http\Resources\ClientNextOfKinResource;
+use appHttp\Resources\ClientBriefResource;
+use appHttp\Resources\ClientNextOfKinResource;
 
-use App\Http\Requests\client\AddNextOfKin;
-use App\Http\Requests\Client\UpdateClient;
+use appHttp\Requests\client\AddNextOfKin;
+use appHttp\Requests\Client\UpdateClient;
 
-use App\Services\ClientService;
-use App\Services\FileService;
+use appServices\ClientService;
+use appServices\FileService;
 
-use App\Enums\FilePurpose;
-use App\Utilities;
+use appEnums\FilePurpose;
+use appUtilities;
 
 class ClientController extends Controller
 {
@@ -41,7 +41,7 @@ class ClientController extends Controller
                 $file = $this->fileService->getFile($data['photoId']);
                 if(!$file) return Utilities::error402("File not found");
                 if($file->purpose != FilePurpose::CLIENT_PROFILE_PHOTO) return Utilities::error402("Sorry, you are attempting to save the wrong Photo");
-                $fileMeta = ["belongsId"=>Auth::guard('client')->user()->id, "belongsType"=>"App\Models\CLient"];
+                $fileMeta = ["belongsId"=>Auth::guard('client')->user()->id, "belongsType"=>"appModels\CLient"];
             }
 
             $client = $this->clientService->update($data, Auth::guard('client')->user());

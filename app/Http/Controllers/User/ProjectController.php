@@ -1,25 +1,25 @@
 <?php
 
-namespace App\Http\Controllers\User;
+namespace app\Http\Controllers\User;
 
-use App\Http\Controllers\Controller;
+use app\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-use App\Http\Requests\User\SaveProject;
-use App\Http\Requests\User\UpdateProject;
-use App\Http\Requests\User\AddProjectLocation;
-use App\Http\Requests\User\ToggleProjectActivate;
-use App\Http\Requests\User\FilterProject;
+use app\Http\Requests\User\SaveProject;
+use app\Http\Requests\User\UpdateProject;
+use app\Http\Requests\User\AddProjectLocation;
+use app\Http\Requests\User\ToggleProjectActivate;
+use app\Http\Requests\User\FilterProject;
 
-use App\Http\Resources\ProjectResource;
-use App\Http\Resources\Min\ProjectTypeResource;
+use app\Http\Resources\ProjectResource;
+use app\Http\Resources\Min\ProjectTypeResource;
 
-use App\Services\ProjectService;
-use App\Services\FileService;
-use App\Services\ProjectTypeService;
+use app\Services\ProjectService;
+use app\Services\FileService;
+use app\Services\ProjectTypeService;
 
-use App\Utilities;
+use app\Utilities;
 
 class ProjectController extends Controller
 {

@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace app\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Requests\BaseRequest;
+use app\Http\Requests\BaseRequest;
 
-use App\Rules\ValidPackageBrochureFile;
-use App\Rules\ValidPackagePhotoFile;
-use App\Rules\PackageNameUnique;
+use app\Rules\ValidPackageBrochureFile;
+use app\Rules\ValidPackagePhotoFile;
+use app\Rules\PackageNameUnique;
 
 class UpdatePackage extends BaseRequest
 {
