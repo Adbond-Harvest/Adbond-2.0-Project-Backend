@@ -17,7 +17,7 @@ use app\Http\Requests\Client\UpdateClient;
 use appServices\ClientService;
 use appServices\FileService;
 
-use appEnums\FilePurpose;
+use app\Enums\FilePurpose;
 use appUtilities;
 
 class ClientController extends Controller
