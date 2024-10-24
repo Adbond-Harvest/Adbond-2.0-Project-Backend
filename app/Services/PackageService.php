@@ -78,7 +78,9 @@ class PackageService
         if(isset( $data['infrastructureFee'])) $package->infrastructure_fee = $data['infrastructureFee'];
 
         if(isset($data['description'])) $package->description = $data['description'];
-        if(isset($data['benefits'])) $package->benefits = $data['benefits'];
+        if(isset($data['benefits'])) {
+            $package->benefits = json_encode($data['benefits']);
+        }
         if(isset($data['brochureFileId'])) $package->brochure_file_id = $data['brochureFileId'];
         if(isset($data['installmentOption'])) $package->installment_option = $data['installmentOption'];
         if(isset($data['vrUrl'])) $package->vr_url = $data['vrUrl'];  
@@ -144,9 +146,12 @@ class PackageService
         return Package::with($with)->where("id", $id)->first();
     }
 
-    public function getByName($name, $with=[])
+    public function getByName($name, $projectId=null, $with=[])
     {
-        return Package::with($with)->where("name", $name)->first();
+        $query = Package::with($with)->where("name", $name);
+        if($projectId) $query = $query->where("project_id", $projectId);
+
+        return $query->first();
     }
 
     public function getPackagePhotoIds($package)

@@ -86,6 +86,11 @@ class ProjectService
         return Project::with($with)->where("id", $id)->first();
     }
 
+    public function getProjectByName($name, $projectTypeId)
+    {
+        return Project::where("project_type_id", $projectTypeId)->whereName($name)->first();
+    }
+
     public function filter($filter, $with=[], $offset=0, $perPage=null)
     {
         $query = Project::with($with);

@@ -37,10 +37,13 @@ jobs:
         php artisan migrate --force
 
         # Run migrations for the tenants database
-        php artisan tenants:migrate --force
+        # php artisan tenants:migrate --force
 
-        # Seed The datas
-        # php artisan db:seed
+        # Seed The data
+        php artisan db:seed
+
+        # Create Request Docs
+        php artisan laravel-request-docs:export
 
         # Install Composer dependencies
         composer install --no-dev --optimize-autoloader
