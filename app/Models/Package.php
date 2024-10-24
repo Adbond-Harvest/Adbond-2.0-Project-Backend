@@ -9,6 +9,22 @@ class Package extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'benefits' => 'array',
+        'active' => 'boolean',
+        'installment_option' => 'boolean',
+        'size' => 'double',
+        'amount' => 'double',
+        'discount' => 'double',
+        'min_price' => 'double',
+        'infrastructure_fee' => 'double'
+    ];
+
     public function project()
     {
         return $this->belongsTo(Project::class);

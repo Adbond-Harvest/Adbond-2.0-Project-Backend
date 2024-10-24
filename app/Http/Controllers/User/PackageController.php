@@ -244,4 +244,20 @@ class PackageController extends Controller
             return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }
     }
+
+    public function delete(TogglePackageActivate $request)
+    {
+        try{
+            $id = $request->validated("id");
+            $package = $this->packageService->package($id);
+            if(!$package) return Utilities::error402("Package not found");
+
+            if($package->active) return Utilities::error402("Cannot delete an active Package");
+            if(!$package->canDelete()) return Utilities::error402("Cannot delete this Package");
+            $this->packageService->delete($package);
+
+        } catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
+    }
 }
