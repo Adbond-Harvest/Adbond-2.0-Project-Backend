@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use app\Http\Resources\ClientBriefResource;
 use app\Http\Resources\ClientNextOfKinResource;
 
-use app\Http\Requests\client\AddNextOfKin;
+use app\Http\Requests\Client\AddNextOfKin;
 use app\Http\Requests\Client\UpdateClient;
 
 use appServices\ClientService;
