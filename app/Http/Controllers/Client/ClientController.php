@@ -1,18 +1,18 @@
 <?php
 
-namespace appHttp\Controllers\Client;
+namespace app\Http\Controllers\Client;
 
-use appHttp\Controllers\Controller;
+use app\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
-use appHttp\Resources\ClientBriefResource;
-use appHttp\Resources\ClientNextOfKinResource;
+use app\Http\Resources\ClientBriefResource;
+use app\Http\Resources\ClientNextOfKinResource;
 
-use appHttp\Requests\client\AddNextOfKin;
-use appHttp\Requests\Client\UpdateClient;
+use app\Http\Requests\client\AddNextOfKin;
+use app\Http\Requests\Client\UpdateClient;
 
 use appServices\ClientService;
 use appServices\FileService;

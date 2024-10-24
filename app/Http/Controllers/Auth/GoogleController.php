@@ -1,13 +1,13 @@
 <?php
 
-namespace appHttp\Controllers\Auth;
+namespace app\Http\Controllers\Auth;
 
-use appHttp\Controllers\Controller;
+use app\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use appServices\ClientService;
 
-use appHttp\Resources\ClientBriefResource;
+use app\Http\Resources\ClientBriefResource;
 
 class GoogleController extends Controller
 {

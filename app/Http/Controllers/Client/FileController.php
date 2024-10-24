@@ -1,15 +1,15 @@
 <?php
 
-namespace appHttp\Controllers\Client;
+namespace app\Http\Controllers\Client;
 
-use appHttp\Controllers\Controller;
+use app\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Auth;
 
-use appHttp\Requests\SavePhoto;
+use app\Http\Requests\SavePhoto;
 use Illuminate\Http\Request;
 
-use appHttp\Resources\FileResource;
+use app\Http\Resources\FileResource;
 
 use appServices\FileService;
 
