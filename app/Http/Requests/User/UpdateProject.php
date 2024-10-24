@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace app\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Http\Requests\BaseRequest;
+use app\Http\Requests\BaseRequest;
 
 class UpdateProject extends BaseRequest
 {

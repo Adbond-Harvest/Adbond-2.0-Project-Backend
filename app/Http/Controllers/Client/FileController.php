@@ -1,23 +1,23 @@
 <?php
 
-namespace App\Http\Controllers\Client;
+namespace appHttp\Controllers\Client;
 
-use App\Http\Controllers\Controller;
+use appHttp\Controllers\Controller;
 
 use Illuminate\Support\Facades\Auth;
 
-use App\Http\Requests\SavePhoto;
+use appHttp\Requests\SavePhoto;
 use Illuminate\Http\Request;
 
-use App\Http\Resources\FileResource;
+use appHttp\Resources\FileResource;
 
-use App\Services\FileService;
+use appServices\FileService;
 
-use App\Utilities;
+use appUtilities;
 
 class FileController extends Controller
 {
-    private static $userType = "App\Models\Client";
+    private static $userType = "appModels\Client";
     private $fileService;
 
     public function __construct()

@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         then: function ($router) {
             Route::prefix('api')
                 ->name('api.v2.')
-                ->namespace('App\Http\Controllers')
+                ->namespace('app\Http\Controllers')
                 ->group(base_path('routes/api.php'));
         }
     )

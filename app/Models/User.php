@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace app\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -67,21 +67,21 @@ class User extends Authenticatable implements JWTSubject
 
     public function staffType()
     {
-        return $this->belongsTo("App\Models\StaffType");
+        return $this->belongsTo("app\Models\StaffType");
     }
 
     public function role()
     {
-        return $this->belongsTo("App\Models\Role");
+        return $this->belongsTo("app\Models\Role");
     }
 
     public function photo()
     {
-        return $this->belongsTo("App\Models\File");
+        return $this->belongsTo("app\Models\File");
     }
 
     public function registerer()
     {
-        return $this->belongsTo("App\Models\User");
+        return $this->belongsTo("app\Models\User");
     }
 }

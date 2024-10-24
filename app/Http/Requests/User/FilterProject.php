@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace app\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Http\Requests\BaseRequest;
-use App\Enums\ProjectFilter;
+use app\Http\Requests\BaseRequest;
+use app\Enums\ProjectFilter;
 
 class FilterProject extends BaseRequest
 {

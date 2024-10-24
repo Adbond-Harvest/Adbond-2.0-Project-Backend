@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace app\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,11 +11,11 @@ class ProjectLocation extends Model
 
     public function project()
     {
-        return $this->belongsTo("App\Models\Project");
+        return $this->belongsTo("app\Models\Project");
     }
 
     public function state()
     {
-        return $this->belongsTo("App\Models\State");
+        return $this->belongsTo("app\Models\State");
     }
 }

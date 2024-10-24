@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace app\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use App\Enums\Roles;
+use app\Enums\Roles;
 
 class Role extends Model
 {

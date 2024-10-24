@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exports;
+namespace appExports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -8,7 +8,7 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-use App\Models\Package;
+use appModels\Package;
 
 class PackageExport implements FromCollection, WithHeadings, WithMapping, WithStyles
 {

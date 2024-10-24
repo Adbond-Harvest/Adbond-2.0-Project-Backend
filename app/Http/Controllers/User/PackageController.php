@@ -1,25 +1,25 @@
 <?php
 
-namespace App\Http\Controllers\User;
+namespace app\Http\Controllers\User;
 
-use App\Http\Controllers\Controller;
+use app\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-use App\Http\Resources\PackageResource;
+use app\Http\Resources\PackageResource;
 
-use App\Http\Requests\User\SavePackage;
-use App\Http\Requests\User\UpdatePackage;
-use App\Http\Requests\User\TogglePackageActivate;
-use App\Http\Requests\User\FilterPackage;
+use app\Http\Requests\User\SavePackage;
+use app\Http\Requests\User\UpdatePackage;
+use app\Http\Requests\User\TogglePackageActivate;
+use app\Http\Requests\User\FilterPackage;
 
 
-use App\Services\PackageService;
-use App\Services\FileService;
-use App\Services\ProjectService;
+use app\Services\PackageService;
+use app\Services\FileService;
+use app\Services\ProjectService;
 
-use App\Utilities;
+use app\Utilities;
 
 
 class PackageController extends Controller

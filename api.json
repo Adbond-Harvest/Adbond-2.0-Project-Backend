@@ -2230,7 +2230,7 @@
                                     },
                                     "gender": {
                                         "type": "string",
-                                        "nullable": true,
+                                        "nullable": false,
                                         "format": "string"
                                     },
                                     "accountNumber": {
@@ -7258,7 +7258,7 @@
                                     },
                                     "gender": {
                                         "type": "string",
-                                        "nullable": true,
+                                        "nullable": false,
                                         "format": "string"
                                     },
                                     "phoneNumber": {
@@ -7278,12 +7278,12 @@
                                     },
                                     "maritalStatus": {
                                         "type": "string",
-                                        "nullable": true,
+                                        "nullable": false,
                                         "format": "string"
                                     },
                                     "employmentStatus": {
                                         "type": "string",
-                                        "nullable": true,
+                                        "nullable": false,
                                         "format": "string"
                                     },
                                     "occupation": {

@@ -5,8 +5,8 @@ namespace App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
-use App\Services\AuthService;
-use App\Models\User;
+use appServices\AuthService;
+use appModels\User;
 
 
 class Utilities

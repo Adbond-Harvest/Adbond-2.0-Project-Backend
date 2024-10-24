@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Http\Resources;
+namespace app\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-use App\Http\Resources\UserBriefResource;
-use App\Http\Resources\ClientBriefResource;
-use App\Http\Resources\StaffTypeResource;
-use App\Http\Resources\RoleResource;
-use App\Http\Resources\FileResource;
+use app\Http\Resources\UserBriefResource;
+use app\Http\Resources\ClientBriefResource;
+use app\Http\Resources\StaffTypeResource;
+use app\Http\Resources\RoleResource;
+use app\Http\Resources\FileResource;
 
-use App\Models\Role;
+use app\Models\Role;
 
-use App\Helpers;
-use App\Utilities;
+use app\Helpers;
+use app\Utilities;
 
 class UserResource extends JsonResource
 {

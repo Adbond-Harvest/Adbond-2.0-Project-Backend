@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums;
+namespace appEnums;
 
 enum FilePurpose: string
     {

@@ -1,28 +1,28 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace app\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
+use app\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
-use App\Mail\EmailVerification;
+use app\Mail\EmailVerification;
 
-use App\Services\ClientService;
-use App\Services\EmailService;
+use app\Services\ClientService;
+use app\Services\EmailService;
 
-use App\Http\Resources\ClientBriefResource;
+use app\Http\Resources\ClientBriefResource;
 
-use App\Http\Requests\Client\Register;
-use App\Http\Requests\Client\VerifyEmail;
+use app\Http\Requests\Client\Register;
+use app\Http\Requests\Client\VerifyEmail;
 use Illuminate\Http\Request;
 
-use App\Helpers;
-use App\Http\Requests\Login;
-use App\Http\Requests\Client\ValidateEmailToken;
-use App\Utilities;
+use app\Helpers;
+use app\Http\Requests\Login;
+use app\Http\Requests\Client\ValidateEmailToken;
+use app\Utilities;
 
 class ClientAuthController extends Controller
 {

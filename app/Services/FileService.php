@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Services;
+namespace app\Services;
 
-use App\Models\Profile;
+use app\Models\Profile;
 
 //use Cloudinary;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 use Illuminate\Support\Facades\Storage;
 
-use App\Models\File;
+use app\Models\File;
 
 class FileService 
 {
 
-    private static $userType = "App\Models\Client";
+    private static $userType = "app\Models\Client";
 
     public function getFile($id)
     {

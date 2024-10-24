@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace app\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\http\Requests\BaseRequest;
+use app\http\Requests\BaseRequest;
 
 class VerifyPasswordResetToken extends BaseRequest
 {

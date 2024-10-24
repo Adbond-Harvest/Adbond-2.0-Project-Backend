@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Services;
+namespace app\Services;
 
-use App\Models\ProjectType;
+use app\Models\ProjectType;
 
 class ProjectTypeService
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace app\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
+use app\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
@@ -10,24 +10,24 @@ use Illuminate\Support\Facades\Log;
 
 use Illuminate\Http\Request;
 
-use App\Mail\EmailVerification;
-use App\Mail\SendPasswordResetCode as sendPasswordResetCodeMail;
+use app\Mail\EmailVerification;
+use app\Mail\SendPasswordResetCode as sendPasswordResetCodeMail;
 
-use App\Http\Resources\UserBriefResource;
+use app\Http\Resources\UserBriefResource;
 
-use App\Services\UserService;
-use App\Services\StaffEmailService;
-use App\Services\PasswordService;
-use App\Services\UserProfileService;
+use app\Services\UserService;
+use app\Services\StaffEmailService;
+use app\Services\PasswordService;
+use app\Services\UserProfileService;
 
-use App\Http\Requests\Login;
-use App\Http\Requests\SendPasswordResetCode;
-use App\Http\Requests\ResetPassword;
-use App\Http\Requests\User\VerifyPasswordResetToken;
+use app\Http\Requests\Login;
+use app\Http\Requests\SendPasswordResetCode;
+use app\Http\Requests\ResetPassword;
+use app\Http\Requests\User\VerifyPasswordResetToken;
 
-use App\Enums\PasswordTypes;
+use app\Enums\PasswordTypes;
 
-use App\Utilities;
+use app\Utilities;
 
 class UserAuthController extends Controller
 {

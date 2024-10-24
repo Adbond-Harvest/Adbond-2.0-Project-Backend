@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace app\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -44,6 +44,6 @@ class Client extends Authenticatable implements JWTSubject
 
     public function photo()
     {
-        return $this->belongsTo("App\Models\File");
+        return $this->belongsTo("app\Models\File");
     }
 }

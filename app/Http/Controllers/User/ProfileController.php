@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Http\Controllers\User;
+namespace app\Http\Controllers\User;
 
-use App\Http\Controllers\Controller;
+use app\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-use App\Http\Requests\SetPassword;
-use App\Http\Requests\User\SetPassword as UserSetPassword;
-use App\Http\Requests\User\UpdateProfile;
-use App\Http\Resources\UserBriefResource;
+use app\Http\Requests\SetPassword;
+use app\Http\Requests\User\SetPassword as UserSetPassword;
+use app\Http\Requests\User\UpdateProfile;
+use app\Http\Resources\UserBriefResource;
 
-use App\Services\UserProfileService;
-use App\Services\FileService;
+use app\Services\UserProfileService;
+use app\Services\FileService;
 
-use App\Enums\FilePurpose;
-use App\Utilities;
+use app\Enums\FilePurpose;
+use app\Utilities;
 
 class ProfileController extends Controller
 {
-    private static $userType = "App\Models\User";
+    private static $userType = "app\Models\User";
     private $userProfileService;
     private $fileService;
 
@@ -51,7 +51,7 @@ class ProfileController extends Controller
                 $file = $this->fileService->getFile($data['photoId']);
                 if(!$file) return Utilities::error402("File not found");
                 if($file->purpose != FilePurpose::USER_PROFILE_PHOTO) return Utilities::error402("Sorry, you are attempting to save the wrong Photo");
-                $fileMeta = ["belongsId"=>Auth::user()->id, "belongsType"=>"App\Models\User"];
+                $fileMeta = ["belongsId"=>Auth::user()->id, "belongsType"=>"app\Models\User"];
             }
             $user = $this->userProfileService->update($data, Auth::user());
             if(isset($data['photoId'])) $this->fileService->updateFileObj($fileMeta, $file);

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace app\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,12 +29,12 @@ class Project extends Model
 
     public function projectType()
     {
-        return $this->belongsTo("App\Models\ProjectType");
+        return $this->belongsTo("app\Models\ProjectType");
     }
 
     // public function locations()
     // {
-    //     return $this->hasMany("App\Models\ProjectLocation");
+    //     return $this->hasMany("app\Models\ProjectLocation");
     // }
 
     public function packages()
