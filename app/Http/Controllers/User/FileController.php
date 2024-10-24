@@ -1,19 +1,19 @@
 <?php
 
-namespace appHttp\Controllers\User;
+namespace app\Http\Controllers\User;
 
-use appHttp\Controllers\Controller;
+use app\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Http\Request;
-use appHttp\Requests\SavePhoto;
+use app\Http\Requests\SavePhoto;
 
-use appHttp\Resources\FileResource;
+use app\Http\Resources\FileResource;
 
-use appServices\FileService;
+use app\Services\FileService;
 
-use appEnums\FilePurpose;
-use appUtilities;
+use app\Enums\FilePurpose;
+use app\Utilities;
 
 class FileController extends Controller
 {
