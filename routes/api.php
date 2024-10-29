@@ -6,11 +6,15 @@ use Illuminate\Support\Facades\Route;
 use app\Http\Middleware\ClientAuth;
 use app\Http\Middleware\UserAuth;
 
+//User Controllers
+use app\Http\Controllers\User\ProjectTypeController as UserProjectTypeController;
+use app\Http\Controllers\User\ProjectController as UserProjectController;
+use app\Http\Controllers\User\PackageController as UserPackageController;
+use app\Http\Controllers\User\IndexController as UserIndexController;
 
-use app\Http\Controllers\User\ProjectTypeController;
-use app\Http\Controllers\User\ProjectController;
-use app\Http\Controllers\User\PackageController;
-use app\Http\Controllers\User\IndexController;
+//Public Controllers
+use app\Http\Controllers\ProjectController;
+use app\Http\Controllers\PackageController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -37,7 +41,7 @@ Route::group(['prefix' => '/v2',], function () {
 
     //User/Admin/Staff Routes
     Route::group(['middleware' => UserAuth::class, 'prefix' => '/user', 'namespace' => 'User',], function () {
-        Route::get('/dashboard', [IndexController::class, "dashboard"]);
+        Route::get('/dashboard', [UserIndexController::class, "dashboard"]);
 
         Route::group(['prefix' => '/profile'], function () {
             Route::post('/set_password', 'ProfileController@setPassword');
@@ -47,41 +51,58 @@ Route::group(['prefix' => '/v2',], function () {
 
         //Project Types
         Route::group(['prefix' => '/project_types'], function () {
-            Route::post('/update', [ProjectTypeController::class, "update"]);
-            Route::get('', [ProjectTypeController::class, "projectTypes"]);
-            Route::get('/{id}', [ProjectTypeController::class, "projectType"]);
+            Route::post('/update', [UserProjectTypeController::class, "update"]);
+            Route::get('', [UserProjectTypeController::class, "projectTypes"]);
+            Route::get('/{id}', [UserProjectTypeController::class, "projectType"]);
         });
         // Project
         Route::group(['prefix' => '/projects'], function () {
-            Route::post('', [ProjectController::class, "save"]);
-            Route::patch('', [ProjectController::class, "update"]);
-            Route::post('/activate', [ProjectController::class, "activate"]);
-            Route::post('/deactivate', [ProjectController::class, "deactivate"]);
-            Route::post('/delete', [ProjectController::class, "delete"]);
-            Route::post('/filter/{projectTypeId}', [ProjectController::class, "filter"]);
-            Route::get('types', [ProjectController::class, "types"]);
-            Route::get('/summary/{projectTypeId}', [ProjectController::class, "summary"]);
-            Route::get('/all/{projectTypeId}', [ProjectController::class, "projects"]);
-            Route::get('/search/{projectTypeId}', [ProjectController::class, "search"]);
-            Route::get('/export/{projectTypeId}', [ProjectController::class, "export"]);
-            Route::get('/{id}', [ProjectController::class, "project"]);
+            Route::post('', [UserProjectController::class, "save"]);
+            Route::patch('', [UserProjectController::class, "update"]);
+            Route::post('/activate', [UserProjectController::class, "activate"]);
+            Route::post('/deactivate', [UserProjectController::class, "deactivate"]);
+            Route::post('/delete', [UserProjectController::class, "delete"]);
+            Route::post('/filter/{projectTypeId}', [UserProjectController::class, "filter"]);
+            Route::get('/types', [UserProjectController::class, "types"]);
+            Route::get('/summary/{projectTypeId}', [UserProjectController::class, "summary"]);
+            Route::get('/all/{projectTypeId}', [UserProjectController::class, "projects"]);
+            Route::get('/search/{projectTypeId}', [UserProjectController::class, "search"]);
+            Route::get('/export/{projectTypeId}', [UserProjectController::class, "export"]);
+            Route::get('/{id}', [UserProjectController::class, "project"]);
         });
         // Package
         Route::group(['prefix' => '/packages'], function () {
-            Route::post('', [PackageController::class, "save"]);
-            Route::patch('', [PackageController::class, "update"]);
-            Route::patch('/mark_as_sold_out', [PackageController::class, "markAsSoldOut"]);
-            Route::patch('/mark_as_in_stock', [PackageController::class, "markAsInStock"]);
-            Route::post('/activate', [PackageController::class, "activate"]);
-            Route::post('/deactivate', [PackageController::class, "deactivate"]);
-            Route::post('/delete', [PackageController::class, "delete"]);
-            Route::post('/filter/{projectId}', [PackageController::class, "filter"]);
-            Route::get('/all/{projectId}', [PackageController::class, "packages"]);
-            Route::get('/search/{projectId}', [PackageController::class, "search"]);
-            Route::get('/export/{projectId}', [PackageController::class, "export"]);
-            Route::get('/{id}', [PackageController::class, "package"]);
+            Route::post('', [UserPackageController::class, "save"]);
+            Route::patch('', [UserPackageController::class, "update"]);
+            Route::patch('/mark_as_sold_out', [UserPackageController::class, "markAsSoldOut"]);
+            Route::patch('/mark_as_in_stock', [UserPackageController::class, "markAsInStock"]);
+            Route::post('/activate', [UserPackageController::class, "activate"]);
+            Route::post('/deactivate', [UserPackageController::class, "deactivate"]);
+            Route::post('/delete', [UserPackageController::class, "delete"]);
+            Route::post('/filter/{projectId}', [UserPackageController::class, "filter"]);
+            Route::get('/all/{projectId}', [UserPackageController::class, "packages"]);
+            Route::get('/search/{projectId}', [UserPackageController::class, "search"]);
+            Route::get('/export/{projectId}', [UserPackageController::class, "export"]);
+            Route::get('/{id}', [UserPackageController::class, "package"]);
         });
     });
+
+    //Public Routes
+    Route::group(['prefix' => '/projects'], function () {
+        // Project Routes
+        Route::get('', [ProjectController::class, 'getProjects']);
+        Route::get('/{projectTypeId}', [ProjectController::class, 'getProjects']);
+        Route::get('/types', [ProjectController::class, 'getTypes']);
+        Route::get('/view/{projectId}', [ProjectController::class, 'getProject']);
+    });
+
+    Route::group(['prefix' => '/packages'], function () {
+        // Package Routes
+        Route::get('{projectId}', [PackageController::class, 'getPackages']);
+        // Route::get('/types', [ProjectController::class, 'getTypes']);
+        Route::get('/view/{packageId}', [PackageController::class, 'getPackage']);
+    });
+
 
     // Client Routes
     Route::group(['middleware' => ClientAuth::class, 'prefix' => '/client', 'namespace' => 'Client',], function () {

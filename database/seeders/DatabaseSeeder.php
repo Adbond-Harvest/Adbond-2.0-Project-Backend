@@ -13,6 +13,9 @@ use Database\Seeders\Roles;
 use Database\Seeders\StaffTypes;
 use Database\Seeders\States;
 use Database\Seeders\Users;
+use Database\Seeders\Projects;
+use Database\Seeders\Packages;
+use Database\Seeders\Promos;
 
 class DatabaseSeeder extends Seeder
 {
@@ -34,7 +37,10 @@ class DatabaseSeeder extends Seeder
             new Roles,
             new StaffTypes,
             new States,
-            new Users
+            new Users,
+            new Projects,
+            new Packages,
+            new Promos
         ];
 
         foreach($seeders as $seeder) $seeder->run();

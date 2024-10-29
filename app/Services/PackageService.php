@@ -132,9 +132,10 @@ class PackageService
 
     // }
 
-    public function packages($projectId, $with=[], $offset=0, $perPage=null)
+    public function packages($with=[], $offset=0, $perPage=null)
     {
-        $query = Package::with($with)->where("project_id", $projectId);
+        $query = Package::with($with);
+        if($this->projectId) $query = $query->where("project_id", $this->projectId);
         if($this->count) return $query->count();
 
         if($perPage==null) $perPage=env('PAGINATION_PER_PAGE');
@@ -146,10 +147,10 @@ class PackageService
         return Package::with($with)->where("id", $id)->first();
     }
 
-    public function getByName($name, $projectId=null, $with=[])
+    public function getByName($name, $with=[])
     {
         $query = Package::with($with)->where("name", $name);
-        if($projectId) $query = $query->where("project_id", $projectId);
+        if($this->projectId) $query = $query->where("project_id", $this->projectId);
 
         return $query->first();
     }
@@ -169,9 +170,10 @@ class PackageService
         return $query->orderBy("created_at", "DESC")->offset($offset)->limit($perPage)->get();
     }
 
-    public function search($text, $projectId, $offset=0, $perPage=null)
+    public function search($text, $offset=0, $perPage=null)
     {
-        $query = Package::where("project_id", $projectId);
+        $query = Package::query();
+        if($this->projectId) $query = Package::where("project_id", $this->projectId);
         if($text != null) $query = $query->where("identifier", "LIKE", "%".$text."%")->orWhere("name", "LIKE", "%".$text."%");
         
         if($this->count) return $query->count();

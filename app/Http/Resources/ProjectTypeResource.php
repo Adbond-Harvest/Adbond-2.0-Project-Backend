@@ -21,7 +21,7 @@ class ProjectTypeResource extends JsonResource
             "id" => $this->id,
             "name" => $this->name,
             "description" => $this->description,
-            "photo" => new FileResource($this->photo),
+            "photo" => new FileResource($this->whenLoaded('photo')),
             "projects" => ProjectResource::collection($this->whenLoaded("projects"))
         ];
     }
