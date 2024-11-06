@@ -36,14 +36,8 @@ jobs:
         # Run migrations for the main database
         php artisan migrate --force
 
-        # Run migrations for the tenants database
-        # php artisan tenants:migrate --force
-
         # Seed The data
         php artisan db:seed
-
-        # Create Request Docs
-        php artisan laravel-request-docs:export
 
         # Install Composer dependencies
         composer install --no-dev --optimize-autoloader
@@ -53,4 +47,8 @@ jobs:
         php artisan config:clear
         php artisan cache:clear
         php artisan view:clear
+
+        # Create Request Docs
+        php artisan laravel-request-docs:export
+
         EOF

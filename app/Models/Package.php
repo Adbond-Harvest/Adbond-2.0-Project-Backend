@@ -54,4 +54,12 @@ class Package extends Model
     {
         return $this->belongsToMany(File::class, "package_photos", "package_id", "photo_id", "id");
     }
+
+    /**
+     * Get all promos for this package
+     */
+    public function promos()
+    {
+        return $this->morphMany(PromoProduct::class, 'product');
+    }
 }

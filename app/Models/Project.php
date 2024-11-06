@@ -42,5 +42,13 @@ class Project extends Model
         return $this->hasMany(Package::class);
     }
 
+    /**
+     * Get all promos for this project
+     */
+    public function promos()
+    {
+        return $this->morphMany(PromoProduct::class, 'product');
+    }
+
 
 }

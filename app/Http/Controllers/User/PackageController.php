@@ -38,6 +38,7 @@ class PackageController extends Controller
     public function packages(Request $request, $projectId)
     {
         if (!is_numeric($projectId) || !ctype_digit($projectId)) return Utilities::error402("Invalid parameter projectID");
+        $this->packageService->projectId = $projectId;
 
         $page = ($request->query('page')) ?? 1;
         $perPage = ($request->query('perPage'));
@@ -45,9 +46,9 @@ class PackageController extends Controller
         if(!is_int((int) $perPage) || $perPage==null) $perPage = env('PAGINATION_PER_PAGE');
         $offset = $perPage * ($page-1);
 
-        $packages = $this->packageService->packages($projectId, [], $offset, $perPage);
+        $packages = $this->packageService->packages([], $offset, $perPage);
         $this->packageService->count = true;
-        $packagesCount = $this->packageService->packages($projectId);
+        $packagesCount = $this->packageService->packages();
 
         return Utilities::paginatedOkay(PackageResource::collection($packages), $page, $perPage, $packagesCount);
     }
@@ -136,6 +137,9 @@ class PackageController extends Controller
     public function search(Request $request, $projectId)
     {
         try{
+            if (!is_numeric($projectId) || !ctype_digit($projectId)) return Utilities::error402("Invalid parameter projectID");
+            $this->packageService->projectId = $projectId;
+
             $page = ($request->query('page')) ?? 1;
             $perPage = ($request->query('perPage'));
             if(!is_int((int) $page) || $page <= 0) $page = 1;
@@ -143,9 +147,9 @@ class PackageController extends Controller
             $offset = $perPage * ($page-1);
 
             $text = ($request->query('text')) ?? null;
-            $packages = $this->packageService->search($text, $projectId, $offset, $perPage);
+            $packages = $this->packageService->search($text, $offset, $perPage);
             $this->packageService->count = true;
-            $packagesCount = $this->packageService->search($text, $projectId);
+            $packagesCount = $this->packageService->search($text);
 
             return Utilities::paginatedOkay(PackageResource::collection($packages), $page, $perPage, $packagesCount);
         }catch(\Exception $e){
@@ -158,11 +162,12 @@ class PackageController extends Controller
     {
         try {
             if (!is_numeric($projectId) || !ctype_digit($projectId)) return Utilities::error402("Invalid parameter projectID");
+            $this->packageService->projectId = $projectId;
             $project  = $this->projectService->project($projectId);
 
             if(!$project) return Utilities::error402("Project not found, Project Id provided is invalid");
 
-            $packages = $this->packageService->packages($projectId);
+            $packages = $this->packageService->packages();
 
             $type = ($request->query('type')) ?? null;
             if(!$type) return Utilities::error402("Type is required");

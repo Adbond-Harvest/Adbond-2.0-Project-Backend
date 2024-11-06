@@ -5,12 +5,12 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-use App\Models\User;
-use App\Helpers;
-use App\Utilities;
+use app\Models\User;
+use app\Helpers;
+use app\Utilities;
 
-use App\Models\StaffType;
-use App\Models\Role;
+use app\Models\StaffType;
+use app\Models\Role;
 
 class Users extends Seeder
 {

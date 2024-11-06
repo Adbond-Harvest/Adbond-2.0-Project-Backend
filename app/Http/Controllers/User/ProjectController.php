@@ -113,14 +113,15 @@ class ProjectController extends Controller
     public function projects(Request $request, $projectTypeId)
     {
         if (!is_numeric($projectTypeId) || !ctype_digit($projectTypeId)) return Utilities::error402("Invalid parameter projectTypeID");
+        $this->projectService->typeId = $projectTypeId;
         $page = ($request->query('page')) ?? 1;
         $perPage = ($request->query('perPage'));
         if(!is_int((int) $page) || $page <= 0) $page = 1;
         if(!is_int((int) $perPage) || $perPage==null) $perPage = env('PAGINATION_PER_PAGE');
         $offset = $perPage * ($page-1);
-        $projects = $this->projectService->projects($projectTypeId, [], $offset, $perPage);
+        $projects = $this->projectService->projects([], $offset, $perPage);
         $this->projectService->count = true;
-        $projectsCount = $this->projectService->projects($projectTypeId);
+        $projectsCount = $this->projectService->projects();
 
         return Utilities::paginatedOkay(ProjectResource::collection($projects), $page, $perPage, $projectsCount);
     }
@@ -207,6 +208,7 @@ class ProjectController extends Controller
     {
         try{
             if (!is_numeric($projectTypeId) || !ctype_digit($projectTypeId)) return Utilities::error402("Invalid parameter projectTypeID");
+            $this->projectService->typeId = $projectTypeId;
             $page = ($request->query('page')) ?? 1;
             $perPage = ($request->query('perPage'));
             if(!is_int((int) $page) || $page <= 0) $page = 1;
@@ -214,9 +216,9 @@ class ProjectController extends Controller
             $offset = $perPage * ($page-1);
 
             $text = ($request->query('text')) ?? null;
-            $projects = $this->projectService->search($text, $projectTypeId, $offset, $perPage);
+            $projects = $this->projectService->search($text, $offset, $perPage);
             $this->projectService->count = true;
-            $projectsCount = $this->projectService->search($text, $projectTypeId);
+            $projectsCount = $this->projectService->search($text);
 
             return Utilities::paginatedOkay(ProjectResource::collection($projects), $page, $perPage, $projectsCount);
         }catch(\Exception $e){

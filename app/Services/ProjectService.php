@@ -73,9 +73,10 @@ class ProjectService
         }
     }
 
-    public function projects($projectTypeId, $with=[], $offset=0, $perPage=null)
+    public function projects($with=[], $offset=0, $perPage=null)
     {
-        $query = Project::with($with)->where("project_type_id", $projectTypeId);
+        $query = Project::with($with);
+        if($this->typeId) $query = $query->where("project_type_id", $this->typeId);
         if($this->count) return $query->count();
         if($perPage==null) $perPage=env('PAGINATION_PER_PAGE');
         return $query->orderBy("created_at", "DESC")->offset($offset)->limit($perPage)->get();
@@ -101,9 +102,10 @@ class ProjectService
         return $query->orderBy("created_at", "DESC")->offset($offset)->limit($perPage)->get();
     }
 
-    public function search($text, $projectTypeId, $offset=0, $perPage=null)
+    public function search($text, $offset=0, $perPage=null)
     {
-        $query = Project::where("project_type_id", $projectTypeId);
+        $query = Project::query();
+        if($this->typeId) $query = Project::where("project_type_id", $this->typeId);
         if($text != null) {
             $query = $query->where(function($q) use($text) { 
                 $q->where("identifier", "LIKE", "%".$text."%")->orWhere("name", "LIKE", "%".$text."%");
