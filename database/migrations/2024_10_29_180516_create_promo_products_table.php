@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('promo_products', function (Blueprint $table) {
             $table->id();
-            $table->morphs("product");
+            $table->string('product_type', 191); 
+            $table->bigInteger('product_id');
             $table->foreignId("promo_id");
             $table->timestamps();
         });
