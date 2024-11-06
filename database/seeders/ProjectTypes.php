@@ -4,9 +4,10 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\ProjectType;
 
-use App\Enums\ProjectType as ProjectTypeEnum;
+use app\Models\ProjectType;
+
+use app\Enums\ProjectType as ProjectTypeEnum;
 
 class ProjectTypes extends Seeder
 {
