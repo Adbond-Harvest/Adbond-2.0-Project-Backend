@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId("promo_id")->references("id")->on("promos");
             $table->string("code");
+            $table->boolean("active")->default(true);
             $table->date("expiry")->nullable();
             $table->integer("usage_count")->default(0);
             $table->integer("max_usage")->nullable();
-            $table->boolean("package_limited")->nullable();
+            $table->boolean("package_limited")->default(false);
             $table->timestamps();
         });
     }

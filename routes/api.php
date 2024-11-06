@@ -12,6 +12,10 @@ use app\Http\Controllers\User\ProjectController as UserProjectController;
 use app\Http\Controllers\User\PackageController as UserPackageController;
 use app\Http\Controllers\User\IndexController as UserIndexController;
 
+// Client Controllers
+use app\Http\Controllers\Client\PromoController;
+use app\Http\Controllers\Client\OrderController;
+
 //Public Controllers
 use app\Http\Controllers\ProjectController;
 use app\Http\Controllers\PackageController;
@@ -112,6 +116,11 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/save_next_of_kin', 'ClientController@addNextOfKin');
         });
         Route::post('/upload_photo', 'FileController@savePhoto');
+
+        Route::group(['prefix' => '/order',], function () {
+            Route::post('/validate_promo_code', [PromoController::class, 'validate']);
+            Route::post('/prepare', [OrderController::class, 'prepareOrder']);
+        });
     });
 
 });

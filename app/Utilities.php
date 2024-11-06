@@ -4,9 +4,10 @@ namespace App;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
-use appServices\AuthService;
-use appModels\User;
+use app\Services\AuthService;
+use app\Models\User;
 
 
 class Utilities
@@ -170,6 +171,14 @@ class Utilities
         }
     }
 
+    public static function getDiscountedAmount($amount, $discount)
+    {
+        if(($discount <= 0) || $discount > 100) return $amount;
+        if($discount == 100) return 0;
+        $discounted =  ($discount/100) * $amount;
+        return $amount - $discounted;
+    }
+
     /*
     * Gets the total value, from the percentage of the total value and the discount gotten by subtracting the percentage value from the total value
     i.e where, total value = 100 and percentage = 10% thus discount = 90. if only percentage and discount is given, the function calculates the initial total value 
@@ -187,6 +196,15 @@ class Utilities
             $exists = User::where('referer_code', $code)->first();
         }while($exists);
         return $code;
+    }
+
+    public static function getOrderProcessingId()
+    {
+        do{
+            $processingId  = rand(10000, 99999);
+            $exists = Cache::has('order_processing_' . $processingId);
+        }while($exists);
+        return $processingId;
     }
 
     public static function convertTo12HrsTimeFormat($time)

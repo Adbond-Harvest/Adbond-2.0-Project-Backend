@@ -19,6 +19,8 @@ return new class extends Migration
             $table->date("end")->nullable();
             $table->boolean("active")->default(true);
             $table->text("description")->nullable();
+            $table->boolean("package_limited")->default(false);
+            $table->boolean("has_promo_code")->default(false);
             $table->foreignId("user_id");
             $table->timestamps();
         });

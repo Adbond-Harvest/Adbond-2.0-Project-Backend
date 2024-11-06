@@ -11,7 +11,7 @@ use App\Services\PackageService;
 use Illuminate\Support\Facades\Log;
 use Faker\Factory as Faker;
 
-class Packages2 extends Seeder
+class Packages extends Seeder
 {
     private $packageTypes = [
         'Premium', 'Standard', 'Deluxe', 'Executive', 'Classic',
@@ -89,18 +89,18 @@ class Packages2 extends Seeder
                     "projectId" => $project->id,
                     "stateId" => $state->id
                 ];
-
-                $existingPackage = $packageService->getByName($packageData['name'], $project->id);
+                $packageService->projectId = $project->id;
+                $existingPackage = $packageService->getByName($packageData['name']);
                 
                 if (!$existingPackage) {
                     $packageService->save($packageData);
-                    $this->command->info("Created package: {$packageData['name']}");
+                    // $this->command->info("Created package: {$packageData['name']}");
                 } else {
-                    $this->command->info("Package already exists: {$packageData['name']}");
+                    // $this->command->info("Package already exists: {$packageData['name']}");
                 }
             } catch (\Exception $e) {
                 Log::error("Error seeding package " . ($packageData['name'] ?? 'Unknown') . ": " . $e->getMessage());
-                $this->command->error("Failed to create package: " . ($packageData['name'] ?? 'Unknown'));
+                // $this->command->error("Failed to create package: " . ($packageData['name'] ?? 'Unknown'));
             }
         }
 
@@ -135,11 +135,12 @@ class Packages2 extends Seeder
                 $packageData['projectId'] = $project->id;
                 $packageData['stateId'] = $state->id;
 
-                $existingPackage = $packageService->getByName($packageData['name'], $project->id);
+                $packageService->projectId = $project->id;
+                $existingPackage = $packageService->getByName($packageData['name']);
                 
                 if (!$existingPackage) {
                     $packageService->save($packageData);
-                    $this->command->info("Created specific package: {$packageData['name']}");
+                    // $this->command->info("Created specific package: {$packageData['name']}");
                 }
             } catch (\Exception $e) {
                 Log::error("Error seeding specific package {$packageData['name']}: " . $e->getMessage());

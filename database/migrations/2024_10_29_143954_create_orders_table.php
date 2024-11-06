@@ -24,8 +24,6 @@ return new class extends Migration
             $table->foreignId("payment_status_id");
             $table->date("order_date");
             $table->date("payment_due_date")->nullable();
-            $table->foreignId("happiness_letter_file_id")->nullable()->references("id")->on("files");
-            $table->foreignId("contract_file_id")->nullable()->references("id")->on("files");
             $table->date("grace_period_end_date")->nullable();
             $table->date("penalty_period_end_date")->nullable();
             $table->foreignId("payment_period_status_id");

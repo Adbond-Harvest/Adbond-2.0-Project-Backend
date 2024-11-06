@@ -18,7 +18,7 @@ class PromoCodes extends Seeder
         $codes = [
             [
                 "promo" => "Welcome Promo",
-                "code" => "AB426",
+                "code" => "ADBONDREFTIMI22",
                 "expiry" => "2024-12-31",
                 "maxUsage" => 1
             ]

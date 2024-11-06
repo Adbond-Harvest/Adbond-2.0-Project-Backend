@@ -9,6 +9,7 @@ use app\Enums\Genders;
 use app\Enums\StaffTypes;
 use app\Enums\FileTypes;
 use app\Enums\FilePurpose;
+use app\Enums\PaymentMode;
 
 class EnumClass
 {
@@ -71,6 +72,15 @@ class EnumClass
             FilePurpose::PROJECT_PHOTO->value,
             FilePurpose::PACKAGE_PHOTO->value,
             FilePurpose::PACKAGE_BROCHURE->value
+        ];
+    }
+
+    public static function paymentModes()
+    {
+        return [
+            PaymentMode::BANK_TRANSFER->value,
+            PaymentMode::CARD_PAYMENT->value,
+            PaymentMode::CASH->value
         ];
     }
 }
