@@ -4,12 +4,13 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Project;
-use App\Models\State;
-use App\Models\User;
-use App\Services\PackageService;
 use Illuminate\Support\Facades\Log;
 use Faker\Factory as Faker;
+
+use app\Models\Project;
+use app\Models\State;
+use app\Models\User;
+use app\Services\PackageService;
 
 class Packages extends Seeder
 {

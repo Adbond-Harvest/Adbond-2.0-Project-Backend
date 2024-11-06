@@ -5,10 +5,10 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-use App\Models\ProjectType;
-use App\Services\ProjectService;
+use app\Models\ProjectType;
+use app\Services\ProjectService;
 
-use App\Enums\ProjectType as ProjectTypeEnum;
+use app\Enums\ProjectType as ProjectTypeEnum;
 
 class Projects extends Seeder
 {

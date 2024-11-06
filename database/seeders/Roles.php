@@ -5,8 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-use App\Models\Role;
-use App\Enums\Roles as RoleEnum;
+use app\Models\Role;
+use app\Enums\Roles as RoleEnum;
 
 class Roles extends Seeder
 {

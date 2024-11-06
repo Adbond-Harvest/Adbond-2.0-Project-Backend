@@ -5,8 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-use App\Models\StaffType;
-use App\Enums\StaffTypes as Type;
+use app\Models\StaffType;
+use app\Enums\StaffTypes as Type;
 
 class StaffTypes extends Seeder
 {
