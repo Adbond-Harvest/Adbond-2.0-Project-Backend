@@ -5,7 +5,7 @@ namespace app\Http\Controllers\Client;
 use Illuminate\Http\Request;
 use app\Http\Controllers\Controller;
 
-use app\Http\Requests\client\ValidatePromoCode;
+use app\Http\Requests\Client\ValidatePromoCode;
 
 use app\Services\PromoCodeService;
 use app\Services\PackageService;
