@@ -99,11 +99,21 @@ class ClientAuthController extends Controller
             $client = $this->clientService->save($post);
             $client?->referer;
             $this->emailService->delete_email_tokens($post['email']);
+            $credentials = $request->only('email', 'password');
+            if (! $token = Auth::guard('client')->attempt($credentials)) {
+                return response()->json([
+                    'statusCode' => 200,
+                    'client' => new ClientBriefResource($client)
+                ], 200);
+            }
 
             // $this->_save_and_send_email_verification_token($client);
             return response()->json([
                 'statusCode' => 200,
-                'data' => new ClientBriefResource($client)
+                'token' => $token,
+                'token_type' => 'bearer',
+                'token_expires_in' => Auth::factory()->getTTL(), 
+                'client' => new ClientBriefResource($client)
             ], 200);
         }catch(\Exception $e){
             if(isset($client)) {
