@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('bank_accounts', function (Blueprint $table) {
             $table->id();
+            $table->string("number");
+            $table->string("name");
+            $table->foreignId("bank_id")->references("id")->on("banks");
             $table->timestamps();
         });
     }

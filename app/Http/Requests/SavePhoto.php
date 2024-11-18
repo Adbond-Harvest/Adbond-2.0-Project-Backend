@@ -26,8 +26,7 @@ class SavePhoto extends BaseRequest
     public function rules(): array
     {
         return [
-            'photo' => 'required|image|max:10000|mimes:jpeg,png,jpg,gif',
-            'purpose' => ["required", Rule::in(EnumClass::filePurposes())]
+            'photo' => 'required|image|max:10000|mimes:jpeg,png,jpg,gif'
         ];
     }
 }

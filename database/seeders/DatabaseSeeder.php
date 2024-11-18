@@ -21,6 +21,7 @@ use Database\Seeders\Discounts;
 use Database\Seeders\PaymentModes;
 use Database\Seeders\PaymentPeriodStatuses;
 use Database\Seeders\PaymentStatuses;
+use Database\Seeders\PaymentGateways;
 
 class DatabaseSeeder extends Seeder
 {
@@ -47,7 +48,11 @@ class DatabaseSeeder extends Seeder
             new Packages,
             new Promos,
             new PromoCodes,
-            new Discounts
+            new Discounts,
+            new PaymentModes,
+            new PaymentPeriodStatuses,
+            new PaymentStatuses,
+            new PaymentGateways
         ];
 
         foreach($seeders as $seeder) $seeder->run();

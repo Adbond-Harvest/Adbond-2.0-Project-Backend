@@ -171,12 +171,13 @@ class Utilities
         }
     }
 
-    public static function getDiscountedAmount($amount, $discount)
+    public static function getDiscount($amount, $discount)
     {
         if(($discount <= 0) || $discount > 100) return $amount;
         if($discount == 100) return 0;
         $discounted =  ($discount/100) * $amount;
-        return $amount - $discounted;
+        $discountedAmount = $amount - $discounted;
+        return ["amount" => $discountedAmount, "discountedAmount" => $discounted];
     }
 
     /*
