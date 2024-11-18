@@ -2,7 +2,7 @@
 
 namespace app\Enums;
 
-enum FilePurpose: string
+enum PaymentPurpose: string
     {
         case PACKAGE_FULL_PAYMENT = 'User Profile Photo';
         case INSTALLMENT_PAYMENT = 'Client Profile Photo';

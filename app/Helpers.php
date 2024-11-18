@@ -275,26 +275,9 @@ Class Helpers
         }
     }
 
-    public static function generateReceiptNo($payment)
+    public static function generateReceiptNo($orderId, $clientId, $processingId)
     {
-        $start = false;
-        $count = 1;
-        $receiptNo = 00;
-        do{
-            if(!$start) {
-                $receiptNo = $payment->order_id.$payment->id;
-                $start = true;
-            }else{
-                $zeros = '';
-                for($i=0; $i<$count; $i++) {
-                    $zeros += '0';
-                }
-                $receiptNo = (int)$payment->order_id.$zeros.$payment->id;
-                $count++;
-            }
-            $exists = Payment::where('receipt_no', $receiptNo)->first();
-        }while($exists);
-        return $receiptNo;
+        return $orderId.$processingId.$clientId;
     }
 
     public static function generateOfferReceiptNo($payment)
@@ -504,39 +487,62 @@ Class Helpers
 
 
 
+    private static function prepareContract($order)
+    {
+        // $itemPrice = Helpers::item_price($order->packageItem);
+        $data['package'] = $order->package?->name;
+        $data['project'] = $order?->package?->project?->name;
+        $data['client'] =  ucfirst($order->client->full_name);
+        $data['address'] = $order->client->address;
+        // $data['location'] = $order?->packageItem?->package?->project_location?->location?->name;
+        $projectAddress = $order?->package?->address;
+        $state = $order?->package?->state?->name.' State';
+        $data['location'] = ($projectAddress) ? $projectAddress.', '.$state : $state;
+        $data['state'] = $state;
+        $data['price'] = $order->amount;
+        $data['installment'] = ($order->installment == 1) ? true : false;
+        $data['installment_duration'] = $order?->package->installment_duration;
+        // if the units ordered is more than 1, multiply by units
+        if($order->units && $order->units > 1) $data['price'] = $data['price'] * $order->units; 
+        $data['size'] = ($order?->package?->size && $order->units > 0) ? $order?->package?->size * $order->units : null;
+        // Helpers::wordDoc($data);
+        // return Helpers::generateContract($data);
+        return $data;
+        // dd($data);
+    }
 
-
-    // public static function generateContract($data)
-    // {
-    //     if(!isset($data['project']) || $data['project']==null) $data['project'] = '';
-    //     if(!isset($data['package']) || $data['package']==null) $data['package'] = '';
-    //     if(!isset($data['client']) || $data['client']==null) $data['client'] = '';
-    //     if(!isset($data['address']) || $data['address']==null) $data['address'] = '';
-    //     if(!isset($data['state']) || $data['state']==null) $data['state'] = '';
-    //     if(!isset($data['size']) || $data['size']==null) $data['size'] = '';
-    //     if(!isset($data['price']) || $data['price']==null) $data['price'] = '';
-    //     if(!isset($data['installment_duration']) || $data['installment_duration']==null) $data['installment_duration'] = 12;
-    //     $data['location'] = (!isset($data['location']) || $data['location']==null) ? '' : $data['location'];
-    //     $pdfData = [
-    //         'image' => public_path('images/logo.PNG'),
-    //         'day' => date('jS'),
-    //         'month' => date('F'),
-    //         'year' => date('Y'),
-    //         'project' => $data['project'],
-    //         'package' => $data['package'],
-    //         'client' => $data['client'],
-    //         'state' => $data['state'],
-    //         'address' => $data['address'],
-    //         'price' => $data['price'],
-    //         'size' => $data['size'],
-    //         'location' => $data['location'],
-    //         'installment_duration' => $data['installment_duration'],
-    //         'installment' => $data['installment']
-    //     ];
-    //     $pdf = PDF::loadView('pdf/contract', $pdfData);
-    //     // return $pdf->stream('contract.pdf');
-    //     $pdf->save('files/contract.pdf');
-    // }
+    public static function generateContract($order)
+    {
+        $data = self::prepareContract($order);
+        if(!isset($data['project']) || $data['project']==null) $data['project'] = '';
+        if(!isset($data['package']) || $data['package']==null) $data['package'] = '';
+        if(!isset($data['client']) || $data['client']==null) $data['client'] = '';
+        if(!isset($data['address']) || $data['address']==null) $data['address'] = '';
+        if(!isset($data['state']) || $data['state']==null) $data['state'] = '';
+        if(!isset($data['size']) || $data['size']==null) $data['size'] = '';
+        if(!isset($data['price']) || $data['price']==null) $data['price'] = '';
+        if(!isset($data['installment_duration']) || $data['installment_duration']==null) $data['installment_duration'] = 12;
+        $data['location'] = (!isset($data['location']) || $data['location']==null) ? '' : $data['location'];
+        $pdfData = [
+            'image' => public_path('images/logo.PNG'),
+            'day' => date('jS'),
+            'month' => date('F'),
+            'year' => date('Y'),
+            'project' => $data['project'],
+            'package' => $data['package'],
+            'client' => $data['client'],
+            'state' => $data['state'],
+            'address' => $data['address'],
+            'price' => $data['price'],
+            'size' => $data['size'],
+            'location' => $data['location'],
+            'installment_duration' => $data['installment_duration'],
+            'installment' => $data['installment']
+        ];
+        $pdf = PDF::loadView('pdf/contract', $pdfData);
+        // return $pdf->stream('contract.pdf');
+        $pdf->save('files/contract.pdf');
+    }
 
     // public static function generateReceipt1($payment)
     // {
@@ -605,54 +611,54 @@ Class Helpers
     //     // dd('done');
     // }
 
-    // public static function generateReceipt($payment)
-    // {
-    //     $address1 = '';
-    //     $address2 = '';
-    //     $address3 = '';
-    //     $addressArr = self::formatAddress($payment?->client?->address);
-    //     if(count($addressArr) > 0) {
-    //         if(isset($addressArr[0])) $address1 = $addressArr[0];
-    //         if(isset($addressArr[1])) $address2 = $addressArr[1];
-    //         if(isset($addressArr[2])) $address3 = $addressArr[2];
-    //     }
-    //     $discount = 0;
-    //     if($payment?->order->discounts && $payment?->order->discounts->count() > 0) {
-    //         foreach($payment?->order->discounts as $orderDiscount) {
-    //             $discount += $orderDiscount->discount;
-    //         }
-    //     }
-    //     $unitSize = $payment?->order?->packageItem->size;
-    //     $size = ($unitSize != null && $payment?->order?->units != null && $payment?->order?->units > 0) ? $unitSize * $payment?->order?->units : $unitSize;
-    //     $pdfData = [
-    //         'image' => 'logo.jpg', 
-    //         'name' => ucfirst($payment?->client?->full_name),
-    //         'receiptNo' => $payment->receipt_no,
-    //         'address1' => $address1,
-    //         'address2' => $address2,
-    //         'address3' => $address3,
-    //         'date' => date('jS F, Y'),
-    //         'package' => $payment?->order?->packageItem?->package?->name,
-    //         'project' => $payment?->order?->packageItem?->package?->projectLocation?->project?->name,
-    //         'paymentMethod' => ucfirst($payment?->mode?->name),
-    //         'price' => $payment?->order?->packageItem->price,
-    //         'amount' => $payment->order->amount_payable,
-    //         'currentAmount' => $payment->amount,
-    //         'amountPaid' => $payment->order->amount_payed,
-    //         'units' => $payment?->order?->units,
-    //         'size' => $size,
-    //         'discount' => $discount,
-    //         'balance' => $payment?->order->balance,
-    //     ];
+    public static function generateReceipt($payment)
+    {
+        $address1 = '';
+        $address2 = '';
+        $address3 = '';
+        $addressArr = self::formatAddress($payment?->client?->address);
+        if(count($addressArr) > 0) {
+            if(isset($addressArr[0])) $address1 = $addressArr[0];
+            if(isset($addressArr[1])) $address2 = $addressArr[1];
+            if(isset($addressArr[2])) $address3 = $addressArr[2];
+        }
+        $discount = 0;
+        if($payment?->order->discounts && $payment?->order->discounts->count() > 0) {
+            foreach($payment?->order->discounts as $orderDiscount) {
+                $discount += $orderDiscount->discount;
+            }
+        }
+        $unitSize = $payment?->order?->package?->size;
+        $size = ($unitSize != null && $payment?->order?->units != null && $payment?->order?->units > 0) ? $unitSize * $payment?->order?->units : $unitSize;
+        $pdfData = [
+            'image' => 'logo.jpg', 
+            'name' => ucfirst($payment?->client?->full_name),
+            'receiptNo' => $payment->receipt_no,
+            'address1' => $address1,
+            'address2' => $address2,
+            'address3' => $address3,
+            'date' => date('jS F, Y'),
+            'package' => $payment?->order?->package?->name,
+            'project' => $payment?->order?->package?->project?->name,
+            'paymentMethod' => ucfirst($payment?->paymentMode?->name),
+            'price' => $payment?->order?->package?->amount,
+            'amount' => $payment->order->amount_payable,
+            'currentAmount' => $payment->amount,
+            'amountPaid' => $payment->order->amount_payed,
+            'units' => $payment?->order?->units,
+            'size' => $size,
+            'discount' => $discount,
+            'balance' => $payment?->order->balance,
+        ];
 
-    //     // dd($pdfData);
-    //     $pdf = PDF::loadView('pdf/receipt', $pdfData);
+        // dd($pdfData);
+        $pdf = PDF::loadView('pdf/receipt', $pdfData);
 
-    //     $pdf->setOptions(array('isRemoteEnabled' => true));
-    //     // return $pdf->stream('receipt.pdf');
-    //     $pdf->save('files/receipt'.$payment->receipt_no.'.pdf');
-    //     // dd('done');
-    // }
+        $pdf->setOptions(array('isRemoteEnabled' => true));
+        // return $pdf->stream('receipt.pdf');
+        $pdf->save('files/receipt'.$payment->receipt_no.'.pdf');
+        // dd('done');
+    }
 
     // public static function generateOfferContract($data)
     // {
@@ -756,29 +762,29 @@ Class Helpers
     //     $pdf->save('files/receipt'.$payment->receipt_no.'.pdf');
     // }
 
-    // private static function formatAddress($address)
-    // {
-    //     $res = [];
-    //     $addressArr = explode(' ', $address);
-    //     $cutOff = 2;
-    //     $reset = 0;
-    //     $string = '';
-    //     for($i=0; $i < count($addressArr); $i++) {
-    //         $string .= $addressArr[$i];
-    //         if($reset < $cutOff) {
-    //             $string .= ' ';
-    //         }
-    //         if($reset >= $cutOff || $i == count($addressArr)) {
-    //             $string .= ',';
-    //             $res[] = $string;
-    //             $string = '';
-    //             $reset = 0;
-    //         }
-    //         // dd($string);
-    //         $reset++;
-    //     }
-    //     return $res;
-    // }
+    private static function formatAddress($address)
+    {
+        $res = [];
+        $addressArr = explode(' ', $address);
+        $cutOff = 2;
+        $reset = 0;
+        $string = '';
+        for($i=0; $i < count($addressArr); $i++) {
+            $string .= $addressArr[$i];
+            if($reset < $cutOff) {
+                $string .= ' ';
+            }
+            if($reset >= $cutOff || $i == count($addressArr)) {
+                $string .= ',';
+                $res[] = $string;
+                $string = '';
+                $reset = 0;
+            }
+            // dd($string);
+            $reset++;
+        }
+        return $res;
+    }
 
     public static function curl($url, $options=[], $posts=[])
     {

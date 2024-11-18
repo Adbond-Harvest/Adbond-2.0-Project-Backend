@@ -8,6 +8,9 @@ use app\Models\Profile;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File as FileFacade;
+
+use app\Enums\FilePurpose;
 
 use app\Models\File;
 
@@ -28,7 +31,7 @@ class FileService
 
     public function save($file, $fileType, $user_id, $purpose, $user_type = null, $folder=null)
     {
-        $uploadedFile = ($fileType=='image' || $fileType=='video') ? $this->uploadMedia($file, $fileType, $folder) : $this->uploadDoc($file, $folder);
+        $uploadedFile = ($fileType=='image' || $fileType=='video') ? $this->uploadMedia($file, $fileType, $folder) : $this->uploadDoc($file, $purpose, $folder);
         if($uploadedFile) {
             $status = $this->getStatus($uploadedFile);
             //dd($uploadedFile->offsetGet('secure_url'));
@@ -55,9 +58,9 @@ class FileService
                 $fileObj->user_id = $user_id;
                 if($user_type) $fileObj->user_type = $user_type;
                 $fileObj->file_type = $fileType;
-                $fileObj->mime_type = $file->getMimeType();;
-                $fileObj->original_filename = $file->getClientOriginalName();
-                $fileObj->extension = $file->getClientOriginalExtension();
+                $fileObj->mime_type = (is_string($file)) ? File::mimeType($file) : $file->getMimeType();
+                $fileObj->original_filename = (is_string($file)) ? pathinfo($file, PATHINFO_FILENAME) : $file->getClientOriginalName();
+                $fileObj->extension = (is_string($file)) ? pathinfo($file, PATHINFO_EXTENSION) : $file->getClientOriginalExtension();
                 $fileObj->save();
                 return ['status'=>200, 'file'=>$fileObj];
             }else{
@@ -264,10 +267,15 @@ class FileService
         return $uploadedFile;
     }
 
-    private function uploadDoc($file, $folder=null)
+    private function uploadDoc($file, $purpose, $folder=null)
     {
-        $filename = time().$file->getClientOriginalName();
-        $upload = Storage::disk('local')->putFileAs('files', $file, $filename);
+        $uploaded = in_array($purpose, [FilePurpose::CONTRACT->value, FilePurpose::LETTER_OF_HAPPINESS->value, FilePurpose::PAYMENT_RECEIPT->value]);
+        if(!$uploaded) {
+            $filename = time().$file->getClientOriginalName();
+            $upload = Storage::disk('local')->putFileAs('files', $file, $filename);
+        }else{
+            $upload = $file;
+        }
         if($upload) {
             $uploadFolder = ($folder==null) ? env("CLOUDINARY_DOCS") : env("CLOUDINARY_DOCS")."/".$folder;
             $uploadedFile = cloudinary()->uploadApi()->upload(

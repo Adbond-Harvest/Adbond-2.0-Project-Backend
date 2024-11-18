@@ -61,4 +61,14 @@ class PromoCodeService
         return false;
     }
 
+    public function promoCode($code)
+    {
+        return PromoCode::whereCode($code)->first();
+    }
+
+    public function promoCodeById($id)
+    {
+        return PromoCode::find($id);
+    }
+
 }

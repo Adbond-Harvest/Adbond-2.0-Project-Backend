@@ -15,6 +15,7 @@ use app\Http\Controllers\User\IndexController as UserIndexController;
 // Client Controllers
 use app\Http\Controllers\Client\PromoController;
 use app\Http\Controllers\Client\OrderController;
+use app\Http\Controllers\Client\PaymentController;
 
 //Public Controllers
 use app\Http\Controllers\ProjectController;
@@ -115,11 +116,18 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/update', 'ClientController@update');
             Route::post('/save_next_of_kin', 'ClientController@addNextOfKin');
         });
-        Route::post('/upload_photo', 'FileController@savePhoto');
+        Route::group(['prefix' => '/file',], function () {
+            Route::post('/upload_profile_photo', 'FileController@saveProfilePhoto');
+            Route::post('/upload_payment_evidence', 'FileController@savePaymentEvidence');
+        });
 
         Route::group(['prefix' => '/order',], function () {
             Route::post('/validate_promo_code', [PromoController::class, 'validate']);
             Route::post('/prepare', [OrderController::class, 'prepareOrder']);
+        });
+        Route::group(['prefix' => '/payment',], function () {
+            Route::post('/initialize_card_payment', [PaymentController::class, 'initializeCardPayment']);
+            Route::post('/save', [PaymentController::class, 'save']);
         });
     });
 

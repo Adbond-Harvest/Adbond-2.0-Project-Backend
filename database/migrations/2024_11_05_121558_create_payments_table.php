@@ -26,7 +26,7 @@ return new class extends Migration
             $table->boolean("success")->nullable();
             $table->text("failure_message")->nullable();
             $table->boolean("flag")->nullable();
-            $table->text("flag_message");
+            $table->text("flag_message")->nullable();
             $table->foreignId("bank_account_id")->nullable()->references("id")->on("bank_accounts");
             $table->date("payment_date");
             $table->foreignId("receipt_file_id")->nullable()->references("id")->on("files");

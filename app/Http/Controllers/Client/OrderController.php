@@ -39,6 +39,8 @@ class OrderController extends Controller
             $package = $this->packageService->package($data['packageId']);
             if(!$package) return Utilities::error402("Package was not found");
 
+            if($package->available_units < $data['units']) return Utilities::error402("Available Units is not up to ".$data['units']);
+
             $promoCodeDiscount = (isset($data['promoCode'])) ? $this->promoCodeService->validatePromoCode($data['code'], $package)['discount'] : null;
             $promos = $this->promoService->getPromos($package, Auth::guard('client')->user());
             $processingData = ["amount" => ($package->amount * $data['units']), "isInstallment" => $data['isInstallment']];
