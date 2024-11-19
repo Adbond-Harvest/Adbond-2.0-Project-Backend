@@ -101,17 +101,12 @@ class PaymentController extends Controller
                         Helpers::generateReceipt($payment->load('paymentMode'));
                         // dd('generate receipt');
                         $uploadedReceipt = 'files/receipt'.$payment->receipt_no.'.pdf';
-                        if (file_exists($uploadedReceipt)) {
-                            $uploadRes = $this->fileService->save($uploadedReceipt, FileTypes::PDF->value, Auth::guard('client')->user()->id, 
-                                                        FilePurpose::PAYMENT_RECEIPT->value, self::$userType, "client-receipts");
-                            if($uploadRes['status'] == 200) {
-                                $this->paymentService->update(['receiptFileId' => $uploadRes['file']->id], $payment);
-                            }else{
-                                Utilities::logStuff("Receipt could not be uploaded... ".$uploadRes['message']);
-                            }
-                            unlink($uploadedReceipt);
-                        } else {
-                            Utilities::logStuff("receipt generated cannot be found");
+                        
+                        $response = Helpers::moveUploadedFileToCloud($uploadedReceipt, FileTypes::PDF->value, Auth::guard('client')->user()->id, 
+                        FilePurpose::PAYMENT_RECEIPT->value, self::$userType, "client-receipts");
+                        
+                        if($response['success']) {
+                            $this->paymentService->update(['receiptFileId' => $response['upload']['file']->id], $payment);
                         }
                     }catch(\Exception $e) {
                         Utilities::logStuff("Error Occurred while attempting to generate and upload receipt..".$e);

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Http;
 use app\Services\HybridStaffDrawService;
 use app\Services\UserService;
 usE app\Services\LoyaltyService;
+use app\Services\FileService;
 
 use app\Http\Resources\MonthlyWeekDaysResource; 
 use app\Http\Resources\InspectionDayMinResource;
@@ -377,6 +378,24 @@ Class Helpers
         return (env('PAYSTACK_COMMISSION', 1.5)/100) * $amount;
     }
 
+    public static function moveUploadedFileToCloud($filePath, $fileType, $userId, $purpose, $userType, $folder)
+    {
+        $fileService = new FileService;
+        $success = false;
+        if (file_exists($filePath)) {
+            $uploadRes = $fileService->save($filePath, $fileType, $userId, $purpose, $userType, $folder);
+            if($uploadRes['status'] == 200) {
+                $success = true;;
+            }else{
+                Utilities::logStuff("Receipt could not be uploaded... ".$uploadRes['message']);
+            }
+            unlink($filePath);
+        } else {
+            Utilities::logStuff("receipt generated cannot be found");
+        }
+        return ($success) ? ['success'=>$success, 'upload' => $uploadRes] : ['success' => $success];
+    }
+
     /*
         // $ical = " BEGIN:VCALENDAR VERSION:2.0 CALSCALE:GREGORIAN BEGIN:VEVENT UID:" 
         //         . md5(uniqid(mt_rand(), true)) ."".$domain." DTSTAMP:" . gmdate('Ymd').'T'. gmdate('His') 
@@ -543,46 +562,6 @@ Class Helpers
         // return $pdf->stream('contract.pdf');
         $pdf->save('files/contract.pdf');
     }
-
-    // public static function generateReceipt1($payment)
-    // {
-    //     // dd($payment->order->amount_payable);
-    //     $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor("files/receipt sample template.docx");
-    //     $address1 = '';
-    //     $address2 = '';
-    //     $address3 = '';
-    //     $addressArr = self::formatAddress($payment?->client?->address);
-    //     if(count($addressArr) > 0) {
-    //         if(isset($addressArr[0])) $address1 = $addressArr[0];
-    //         if(isset($addressArr[1])) $address2 = $addressArr[1];
-    //         if(isset($addressArr[2])) $address3 = $addressArr[2];
-    //     }
-    //     $discount = 0;
-    //     if($payment?->order->discounts && $payment?->order->discounts->count() > 0) {
-    //         foreach($payment?->order->discounts as $orderDiscount) {
-    //             $discount += $orderDiscount->discount;
-    //         }
-    //     }
-    //     $unitSize = $payment?->order?->packageItem->size;
-    //     $size = ($unitSize != null && $payment?->order?->units != null && $payment?->order?->units > 0) ? $unitSize * $payment?->order?->units : $unitSize; 
-    //     $templateProcessor->setValue('name', ucfirst($payment?->client->full_name));
-    //     $templateProcessor->setValue('date', date('jS F, Y'));
-    //     $templateProcessor->setValue('receiptNo', $payment->receipt_no);
-    //     $templateProcessor->setValue('address1', $address1);
-    //     $templateProcessor->setValue('address2', $address2);
-    //     $templateProcessor->setValue('address3', $address3);
-    //     $templateProcessor->setValue('paymentMethod', $payment?->mode?->name);
-    //     $templateProcessor->setValue('project', $payment?->order?->packageItem?->package?->projectLocation?->project?->name);
-    //     $templateProcessor->setValue('package', $payment?->order?->packageItem?->package?->name);
-    //     $templateProcessor->setValue('size', $size);
-    //     $templateProcessor->setValue('amount', number_format($payment->order->amount_payable));
-    //     $templateProcessor->setValue('amountPaid', number_format($payment->order->amount_payed));
-    //     $templateProcessor->setValue('currentAmount', number_format($payment->amount));
-    //     $templateProcessor->setValue('balance', number_format($payment?->order->balance));
-    //     $templateProcessor->setValue('discount', $discount);
-    //     $templateProcessor->setValue('price', number_format($payment?->order?->packageItem->price));
-    //     $templateProcessor->saveAs('files/receipt.docx');
-    // } 
 
     // public static function generateLetterOfHappiness($payment)
     // {

@@ -102,7 +102,7 @@ class OrderService
     public function completeOrder($order, $payment)
     {
         // generate and save contract
-
+        Helpers::generateContract($order);
 
         // generate and save letter of happiness
         
