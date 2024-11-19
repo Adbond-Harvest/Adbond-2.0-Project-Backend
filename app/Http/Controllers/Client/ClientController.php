@@ -14,11 +14,11 @@ use app\Http\Resources\ClientNextOfKinResource;
 use app\Http\Requests\Client\AddNextOfKin;
 use app\Http\Requests\Client\UpdateClient;
 
-use appServices\ClientService;
-use appServices\FileService;
+use app\Services\ClientService;
+use app\Services\FileService;
 
 use app\Enums\FilePurpose;
-use appUtilities;
+use app\Utilities;
 
 class ClientController extends Controller
 {
