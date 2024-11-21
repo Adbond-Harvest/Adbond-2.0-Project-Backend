@@ -12,6 +12,7 @@ use app\Mail\EmailVerification;
 
 use app\Services\ClientService;
 use app\Services\EmailService;
+use app\Services\UserService;
 
 use app\Http\Resources\ClientBriefResource;
 
@@ -28,6 +29,7 @@ class ClientAuthController extends Controller
 {
     private $clientService;
     private $emailService;
+    private $userService;
 
     /**
      * Create a new AuthController instance.
@@ -38,6 +40,7 @@ class ClientAuthController extends Controller
         //$this->middleware('auth:api', ['except' => ['login', 'register']]);
         $this->clientService = new ClientService;
         $this->emailService = new EmailService;
+        $this->userService = new UserService;
         // $this->emailService = new EmailService;
         // $this->authService = new AuthService;
     }
@@ -89,10 +92,10 @@ class ClientAuthController extends Controller
     public function register(Register $request) {
         try{
             $post = $request->all();
-            // if(isset($post['referal_code'])) {
-            //     $user = $this->userService->getUserByRefererCode($post['referal_code']);
-            //     if($user) $post['referer_id'] = $user->id;
-            // }
+            if(isset($post['referalCode'])) {
+                $user = $this->userService->getUserByRefererCode($post['referalCode']);
+                if($user) $post['refererId'] = $user->id;
+            }
             $emailVerification = $this->emailService->emailExists($post['email']);
             if(!$emailVerification || !$emailVerification->verified) return Utilities::error402('Email has not been verified');
             $post['emailVerifiedAt'] = $emailVerification->updated_at;
