@@ -14,6 +14,8 @@ class Client extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    public static $userType = "app\Models\Client";
+
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
@@ -45,5 +47,15 @@ class Client extends Authenticatable implements JWTSubject
     public function photo()
     {
         return $this->belongsTo("app\Models\File");
+    }
+
+    public function referer()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function nextOfKins()
+    {
+        return $this->hasMany(ClientNextOfKin::class, "client_id", "id");
     }
 }

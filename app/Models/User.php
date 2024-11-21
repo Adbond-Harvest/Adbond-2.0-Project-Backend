@@ -65,6 +65,8 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
+    public static $userType = "app\Models\User";
+
     public function staffType()
     {
         return $this->belongsTo("app\Models\StaffType");
@@ -82,6 +84,30 @@ class User extends Authenticatable implements JWTSubject
 
     public function registerer()
     {
-        return $this->belongsTo("app\Models\User");
+        return $this->belongsTo("app\Models\User", "registered_by", "id");
+    }
+
+    /**
+     * Get all commission earnings for the user
+     */
+    public function commissionEarnings()
+    {
+        return $this->hasMany(StaffCommissionEarning::class);
+    }
+
+    /**
+     * Get all commission redemptions for the user
+     */
+    public function commissionRedemptions()
+    {
+        return $this->hasMany(StaffCommissionRedemption::class);
+    }
+
+    /**
+     * Get all commission transactions for the user
+     */
+    public function commissionTransactions()
+    {
+        return $this->hasMany(StaffCommissionTransaction::class);
     }
 }

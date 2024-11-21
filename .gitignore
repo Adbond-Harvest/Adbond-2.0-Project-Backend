@@ -21,3 +21,4 @@ yarn-error.log
 google-config.json
 ToDo.txt
 README.txt
+/resources/views/emails/new_order1.blade.php

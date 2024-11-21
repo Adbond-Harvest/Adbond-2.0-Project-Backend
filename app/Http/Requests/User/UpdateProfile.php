@@ -28,7 +28,8 @@ class UpdateProfile extends BaseRequest
         return [
             "firstname" => "nullable|string",
             "lastname" => "nullable|string",
-            "photoId" => "nullable|integer",
+            // "photoId" => "nullable|integer",
+            'photo' => 'nullable|image|max:10000|mimes:jpeg,png,jpg,gif',
             "phoneNumber" => "nullable|string",
             "postalCode" => "nullable|string",
             "gender" => ["nullable","string", Rule::in(EnumClass::genders())],

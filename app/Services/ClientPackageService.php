@@ -12,7 +12,7 @@ use app\Enums\ProjectFilter;
 
 use app\Exports\PackageExport;
 
-class PackageService
+class ClientPackageService
 {
     public $count = false;
 
@@ -21,9 +21,9 @@ class PackageService
         $clientPackage = new ClientPackage;
         $clientPackage->client_id = $data['clientId'];
         $clientPackage->package_id = $data['packageId'];
-        $clientPackage->contract_file_id = $data['contractFileId'];
-        $clientPackage->happiness_letter_file_id = $data['happinessLetterFileId'];
-        $clientPackage->doa_file_id = $data['doaFileId'];
+        if(isset($data['contractFileId'])) $clientPackage->contract_file_id = $data['contractFileId'];
+        if(isset($data['happinessLetterFileId'])) $clientPackage->happiness_letter_file_id = $data['happinessLetterFileId'];
+        if(isset($data['doaFileId'])) $clientPackage->doa_file_id = $data['doaFileId'];
         $clientPackage->origin = $data['origin'];
         $clientPackage->purchase_id = $data['purchaseId'];
         $clientPackage->purchase_type = $data['purchaseType'];

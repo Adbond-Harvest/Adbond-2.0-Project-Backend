@@ -88,7 +88,7 @@ class ClientService
         // if(isset($data['email'])) $client->email = $data['email'];
         if(isset($data['photoId'])) $client->photo_id = $data['photoId'];
         if(isset($data['gender'])) $client->gender = $data['gender'];
-        if(isset($data['phoneNumber'])) $client->phone_number = $data['phone_number'];
+        if(isset($data['phoneNumber'])) $client->phone_number = $data['phoneNumber'];
         if(isset($data['address'])) $client->address = $data['address'];
         if(isset($data['countryId'])) $client->country_id = $data['countryId'];
         if(isset($data['stateId'])) $client->state_id = $data['stateId'];

@@ -10,6 +10,8 @@ use app\Enums\StaffTypes;
 use app\Enums\FileTypes;
 use app\Enums\FilePurpose;
 use app\Enums\PaymentMode;
+use app\Enums\CommissionTransactionType;
+use app\Enums\StaffCommissionType;
 
 class EnumClass
 {
@@ -81,6 +83,22 @@ class EnumClass
             PaymentMode::BANK_TRANSFER->value,
             PaymentMode::CARD_PAYMENT->value,
             PaymentMode::CASH->value
+        ];
+    }
+
+    public static function commissionTransactionTypes()
+    {
+        return [
+            CommissionTransactionType::EARNING->value,
+            CommissionTransactionType::REDEMPTION->value
+        ];
+    }
+
+    public static function staffCommissionTypes()
+    {
+        return [
+            StaffCommissionType::DIRECT->value,
+            StaffCommissionType::INDIRECT->value
         ];
     }
 }

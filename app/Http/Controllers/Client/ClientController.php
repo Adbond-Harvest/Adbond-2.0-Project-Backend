@@ -17,6 +17,8 @@ use app\Http\Requests\Client\UpdateClient;
 use app\Services\ClientService;
 use app\Services\FileService;
 
+use app\Models\Client;
+
 use app\Enums\FilePurpose;
 use app\Utilities;
 
@@ -37,21 +39,28 @@ class ClientController extends Controller
             DB::beginTransaction();
             $data = $request->validated();
             if(count($data) == 0) return Utilities::error402(' enter at least one valid field');
-            if(isset($data['photoId'])) {
-                $file = $this->fileService->getFile($data['photoId']);
-                if(!$file) return Utilities::error402("File not found");
-                if($file->purpose != FilePurpose::CLIENT_PROFILE_PHOTO) return Utilities::error402("Sorry, you are attempting to save the wrong Photo");
-                $fileMeta = ["belongsId"=>Auth::guard('client')->user()->id, "belongsType"=>"appModels\CLient"];
+            $oldPhotoId = null;
+            if($request->hasFile('photo')) {
+                $purpose = FilePurpose::CLIENT_PROFILE_PHOTO->value;
+                if(Auth::guard('client')->user()->photo_id) $oldPhotoId = Auth::guard('client')->user()->photo_id;
+                $res = $this->fileService->save($request->file('photo'), 'image', Auth::guard('client')->user()->id, $purpose, Client::$userType, 'client-profile-photos');
+                if($res['status'] != 200) return Utilities::error402('Sorry Photo could not be uploaded '.$res['message']);
+
+                $data['photoId'] = $res['file']->id;
+                $fileMeta = ["belongsId"=>Auth::guard('client')->user()->id, "belongsType"=>"app\Models\CLient"];
+                $this->fileService->updateFileObj($fileMeta, $res['file']);
             }
 
             $client = $this->clientService->update($data, Auth::guard('client')->user());
-            if(isset($data['photoId'])) $this->fileService->updateFileObj($fileMeta, $file);
+
+            // delete the old photo if it exists
+            if($oldPhotoId) $this->fileService->deleteFile($oldPhotoId);
 
             DB::commit();
             return Utilities::okay("Profile Updated Successfully", new ClientBriefResource($client));
         }catch(\Exception $e){
             DB::rollBack();
-            return Utilities::error($e, 'An error occured while trying to send verification mail, Please try again later or contact support');
+            return Utilities::error($e, 'An error occured while trying to Perform this operation, Please try again later or contact support');
         }
     }
 

@@ -45,7 +45,8 @@ class FileService
                 if($fileType=='image') $height = $uploadedFile->offsetGet('height');
                 $size = $uploadedFile->offsetGet('bytes'); // Get the size of the uploaded file in bytes
                 $rSize = $this->convertSize($size); // Get the size of the uploaded file in bytes, megabytes, gigabytes or terabytes. E.g 1.5 MB
-
+                
+                // if(is_string($file)) dd($file);
                 $fileObj = new File;
                 $fileObj->filename = $filename;
                 $fileObj->url = $secureUrl;
@@ -58,7 +59,7 @@ class FileService
                 $fileObj->user_id = $user_id;
                 if($user_type) $fileObj->user_type = $user_type;
                 $fileObj->file_type = $fileType;
-                $fileObj->mime_type = (is_string($file)) ? File::mimeType($file) : $file->getMimeType();
+                $fileObj->mime_type = (is_string($file)) ? FileFacade::mimeType($file) : $file->getMimeType();
                 $fileObj->original_filename = (is_string($file)) ? pathinfo($file, PATHINFO_FILENAME) : $file->getClientOriginalName();
                 $fileObj->extension = (is_string($file)) ? pathinfo($file, PATHINFO_EXTENSION) : $file->getClientOriginalExtension();
                 $fileObj->save();
@@ -278,6 +279,7 @@ class FileService
         }
         if($upload) {
             $uploadFolder = ($folder==null) ? env("CLOUDINARY_DOCS") : env("CLOUDINARY_DOCS")."/".$folder;
+            
             $uploadedFile = cloudinary()->uploadApi()->upload(
                 $upload,  
                 [
@@ -290,7 +292,7 @@ class FileService
                     // "format" => "pdf"
                 ]
             );
-            unlink($upload);
+            // unlink($upload);
             return $uploadedFile;
         }else{
             return false;
@@ -300,9 +302,14 @@ class FileService
     public function deleteFiles($filesIds)
     {
         foreach($filesIds as $fileId) {
-            $file = File::find($fileId);
-            if($file) $file->delete();
+            $this->deleteFile($fileId);
         }
+    }
+
+    public function deleteFile($fileId)
+    {
+        $file = File::find($fileId);
+        if($file) $file->delete();
     }
 
     private function getStatus($uploadedFile)

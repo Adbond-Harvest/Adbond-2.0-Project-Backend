@@ -382,14 +382,16 @@ Class Helpers
     {
         $fileService = new FileService;
         $success = false;
+        $uploadRes = null;
         if (file_exists($filePath)) {
+            // dd($filePath);
             $uploadRes = $fileService->save($filePath, $fileType, $userId, $purpose, $userType, $folder);
             if($uploadRes['status'] == 200) {
-                $success = true;;
+                $success = true;
+                // unlink($filePath);
             }else{
                 Utilities::logStuff("Receipt could not be uploaded... ".$uploadRes['message']);
             }
-            unlink($filePath);
         } else {
             Utilities::logStuff("receipt generated cannot be found");
         }
@@ -552,43 +554,43 @@ Class Helpers
             'client' => $data['client'],
             'state' => $data['state'],
             'address' => $data['address'],
-            'price' => $data['price'],
-            'size' => $data['size'],
+            'price' => (float)$data['price'],
+            'size' => (float)$data['size'],
             'location' => $data['location'],
             'installment_duration' => $data['installment_duration'],
             'installment' => $data['installment']
         ];
         $pdf = PDF::loadView('pdf/contract', $pdfData);
         // return $pdf->stream('contract.pdf');
-        $pdf->save('files/contract.pdf');
+        $pdf->save("files/contract_{$order->id}.pdf");
     }
 
-    // public static function generateLetterOfHappiness($payment)
-    // {
-    //     $addressArr = [];
-    //     $addressArr = self::formatAddress($payment?->client?->address);
-    //     $unitSize = $payment?->order?->packageItem->size;
-    //     $size = ($unitSize != null && $payment?->order?->units != null && $payment?->order?->units > 0) ? $unitSize * $payment?->order?->units : $unitSize;
-    //     $pdfData = [
-    //         'image' => 'logo.jpg',
-    //         'name' => $payment?->client?->full_name,
-    //         'addressArr' => $addressArr,
-    //         'date' => date('jS F, Y'),
-    //         'package' => $payment?->order?->packageItem?->package?->name,
-    //         'project' => $payment?->order?->packageItem?->package?->projectLocation?->project?->name,
-    //         'location' => $payment?->order?->packageItem?->package?->projectLocation?->location?->name,
-    //         'price' => $payment?->order?->amount_payable,
-    //         'amount_paid' => $payment->amount,
-    //         'units' => $payment?->order?->units,
-    //         'size' => $size,
-    //         'payment_date' => date('d/m/Y', strtotime($payment->payment_date))
-    //     ];
-    //     // dd($pdfData);
-    //     $pdf = PDF::loadView('pdf/letter_of_happiness', $pdfData);
-    //     // return $pdf->stream('letter_of_happiness.pdf');
-    //     $pdf->save('files/letter_of_happiness.pdf');
-    //     // dd('done');
-    // }
+    public static function generateLetterOfHappiness($payment)
+    {
+        $addressArr = [];
+        $addressArr = self::formatAddress($payment?->client?->address);
+        $unitSize = $payment?->order?->package->size;
+        $size = ($unitSize != null && $payment?->order?->units != null && $payment?->order?->units > 0) ? $unitSize * $payment?->order?->units : $unitSize;
+        $pdfData = [
+            'image' => 'logo.jpg',
+            'name' => $payment?->client?->full_name,
+            'addressArr' => $addressArr,
+            'date' => date('jS F, Y'),
+            'package' => $payment?->order?->package?->package?->name,
+            'project' => $payment?->order?->package?->package?->project?->project?->name,
+            'location' => $payment?->order?->package?->package?->project?->location?->name,
+            'price' => $payment?->order?->amount_payable,
+            'amount_paid' => $payment->amount,
+            'units' => $payment?->order?->units,
+            'size' => $size,
+            'payment_date' => date('d/m/Y', strtotime($payment->payment_date))
+        ];
+        // dd($pdfData);
+        $pdf = PDF::loadView('pdf/letter_of_happiness', $pdfData);
+        // return $pdf->stream('letter_of_happiness.pdf');
+        $pdf->save("files/letter_of_happiness_{$payment->order->id}.pdf");
+        // dd('done');
+    }
 
     public static function generateReceipt($payment)
     {

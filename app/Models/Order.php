@@ -11,6 +11,13 @@ class Order extends Model
 {
     use HasFactory;
 
+    public static $type = "app\Models\Order";
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
+
     public function package()
     {
         return $this->belongsTo(Package::class);

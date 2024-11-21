@@ -26,7 +26,7 @@ class ClientBriefResource extends JsonResource
             'address' => $this->address,
             'country' => ($this->country) ? $this->country->name : null,
             'kycStatus' => $this->kyc_status,
-            'passwordSet' => ($this->password_set)
+            // 'passwordSet' => ($this->password_set)
             // 'kyc_completed' => Helpers::kycCompleted($this),
         ];
     }

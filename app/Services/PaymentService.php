@@ -154,7 +154,7 @@ class PaymentService
             if(($payedAmount == $amount) || abs($payedAmount - $amount) < 1) {// The payed amount is equal to what should be paid or difference not up to 1
                 return ["success" => true, "amount" => $payedAmount];
             }else{
-                dd($payedAmount .' == '. $amount . ' || ' . abs($payedAmount - $amount) . ' < 1');
+                // dd($payedAmount .' == '. $amount . ' || ' . abs($payedAmount - $amount) . ' < 1');
                 $res['message'] = "The amount to be paid doesn't match the amount that was paid";
             }
         }else{

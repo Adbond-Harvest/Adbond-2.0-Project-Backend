@@ -32,7 +32,8 @@ class SavePayment extends BaseRequest
             "reference" => "required_if:cardPayment,true",
             "paymentDate" => "required_if:cardPayment,false",
             "amountPayed" => "required_if:cardPayment,false",
-            "evidenceFileId" => ["required_if:cardPayment,false", new ValidFile(FilePurpose::PAYMENT_EVIDENCE->value)]
+            'evidence' => 'required_if:cardPayment,false|file|max:10000|mimes:jpeg,png,jpg,gif,pdf',
+            // "evidenceFileId" => ["required_if:cardPayment,false", new ValidFile(FilePurpose::PAYMENT_EVIDENCE->value)]
         ];
     }
 }
