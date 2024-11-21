@@ -8,15 +8,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 use app\Http\Requests\Client\SavePayment;
 use app\Http\Requests\Client\InitializeCardPayment;
+
+use app\Mail\NewOrder;
+use app\Mail\NewPayment;
 
 use app\Services\PackageService;
 use app\Services\PromoCodeService;
 use app\Services\OrderService;
 use app\Services\PaymentService;
 use app\Services\FileService;
+use app\Services\CommissionService;
 
 use app\Models\PaymentStatus;
 use app\Models\PaymentMode;
@@ -39,6 +44,7 @@ class PaymentController extends Controller
     private $promoCodeService;
     private $orderService;
     private $fileService;
+    private $commissionService;
 
     private static $userType = "app\Models\Client";
 
@@ -49,6 +55,7 @@ class PaymentController extends Controller
         $this->promoCodeService = new PromoCodeService;
         $this->orderService = new OrderService;
         $this->fileService = new FileService;
+        $this->commissionService = new CommissionService;
     }
 
     public function initializeCardPayment(InitializeCardPayment $request)
@@ -95,27 +102,19 @@ class PaymentController extends Controller
 
                 // Save the payment
                 $payment = $this->savePayment($order, $data, $processedData, $res);
-                if($res['success']==true) {
-                    // generate receipt if the card payment was successful
-                    try{
-                        Helpers::generateReceipt($payment->load('paymentMode'));
-                        // dd('generate receipt');
-                        $uploadedReceipt = 'files/receipt'.$payment->receipt_no.'.pdf';
-                        
-                        $response = Helpers::moveUploadedFileToCloud($uploadedReceipt, FileTypes::PDF->value, Auth::guard('client')->user()->id, 
-                        FilePurpose::PAYMENT_RECEIPT->value, self::$userType, "client-receipts");
-                        
-                        if($response['success']) {
-                            $this->paymentService->update(['receiptFileId' => $response['upload']['file']->id], $payment);
-                        }
-                    }catch(\Exception $e) {
-                        Utilities::logStuff("Error Occurred while attempting to generate and upload receipt..".$e);
-                    }
-                }
                 // dd('success false');
                 // Send email to client about the receipt
 
             }else{ // if its a bank payment
+                // Save Payment evidence
+                $purpose = FilePurpose::PAYMENT_EVIDENCE->value;
+                $fileType = (str_starts_with($request->file('evidence')->getMimeType(), 'image/')) ? 'image' : 'pdf';
+                // dd(str_starts_with($request->file('evidence')->getMimeType(), 'image/'));
+                // dd($request->file('evidence')->isValid());
+                $res = $this->fileService->save($request->file('evidence'), $fileType, Auth::guard('client')->user()->id, $purpose, self::$userType, 'payment-evidences');
+                if($res['status'] != 200) return Utilities::error402('Sorry Payment Evidence could not be uploaded '.$res['message']);
+
+                $data['evidenceFileId'] = $res['file']->id;
                 $data['paymentStatusId'] = PaymentStatus::pending()->id;
                 $order = $this->saveOrder($data, $processedData, $package);
                 $payment = $this->savePayment($order, $data, $processedData);
@@ -123,6 +122,7 @@ class PaymentController extends Controller
 
             DB::commit();
             $order->load("package")->load("discounts")->load("paymentStatus");
+        
             return Utilities::ok(new OrderResource($order));
         // }catch(\Exception $e){
         //     DB::rollBack();
@@ -147,9 +147,20 @@ class PaymentController extends Controller
         if($data['isInstallment'] && $package->installment_duration) $data['paymentDueDate'] = now()->addMonths($package->installment_duration);
 
         $order = $this->orderService->save($data);
+        $order->order_number = $order->id.$data['processingId'];
+        $order->update();
 
         if($processedData['amountDetail']['appliedDiscounts'] && count($processedData['amountDetail']['appliedDiscounts']) > 0) {
             $this->orderService->saveOrderDiscounts($order, $processedData['amountDetail']['appliedDiscounts']);
+        }
+
+        $order->load("client")->load("package")->load("discounts");
+
+        // Send email to client
+        try{
+            Mail::to($order->client->email)->send(new NewOrder($order));
+        }catch(\Exception $e) {
+            Utilities::logStuff("Error Occurred while attempting to send Order Email..".$e);
         }
 
         return $order;
@@ -159,8 +170,8 @@ class PaymentController extends Controller
     {
         $paymentData['clientId'] = Auth::guard('client')->user()->id;
         $paymentData['purpose'] = ($processedData['isInstallment']) ? PaymentPurpose::INSTALLMENT_PAYMENT->value : PaymentPurpose::PACKAGE_FULL_PAYMENT->value;
+        $paymentData['paymentModeId'] = ($data['cardPayment']) ? PaymentMode::cardPayment()->id : PaymentMode::bankTransfer()->id;
         if($data['cardPayment']) {
-            $paymentData['paymentModeId'] = PaymentMode::cardPayment()->id;
             if($gatewayRes['success']) {
                 $paymentData['success'] = true;
                 $paymentData['confirmed'] = true;
@@ -176,6 +187,7 @@ class PaymentController extends Controller
                     $paymentData['flagMessage'] = $gatewayRes['message'];
                 }
             }
+
             $paymentData['amount'] = $order->amount_payed;
         }else{
             if($data['amountPayed'] != $order->amount_payed) {
@@ -192,7 +204,49 @@ class PaymentController extends Controller
         $paymentData['paymentGatewayId'] = ($data['cardPayment']) ? PaymentMode::cardPayment()->id : PaymentMode::bankTransfer()->id;
         $payment = $this->paymentService->save($paymentData);
 
+        // if the payment gateway marked the payment as a success, deduct the units
+        if($order?->package && (!$data['cardPayment'] || ($data['cardPayment'] && !$gatewayRes['paymentError']))) {
+            $this->packageService->deductUnits($order->units, $order?->package);
+
+            // if the client was referred to by a staff, add commission to the staff
+            if(Auth::guard('client')->user()->referer) {
+                // calculate the bonus/commission for the referer and save it
+                $commission = $this->commissionService->save(Auth::guard("client")->user()->referer, $order);
+            }
+            if($data['cardPayment']) {
+                $this->uploadReceipt($payment);  
+
+                if(!$gatewayRes['paymentError']) $this->orderService->completeOrder($order, $payment);
+            }
+        }
+
         return $payment;
+    }
+
+    private function uploadReceipt($payment)
+    {
+        // generate receipt if the card payment was successful
+        try{
+            Helpers::generateReceipt($payment->load('paymentMode'));
+            // dd('generate receipt');
+            $uploadedReceipt = 'files/receipt'.$payment->receipt_no.'.pdf';
+            // dd('time to move..'.$uploadedReceipt);
+            $response = Helpers::moveUploadedFileToCloud($uploadedReceipt, FileTypes::PDF->value, Auth::guard('client')->user()->id, 
+            FilePurpose::PAYMENT_RECEIPT->value, self::$userType, "client-receipts");
+            
+            if($response['success']) {
+                $this->paymentService->update(['receiptFileId' => $response['upload']['file']->id], $payment);
+                // dd("got here");
+                try{
+                    // Send Payment Mail
+                    Mail::to($payment->client->email)->send(new NewPayment($payment, $uploadedReceipt));
+                }catch(\Exception $e) {
+                    Utilities::logStuff("Error Occurred while attempting to send Payment Email..".$e);
+                }
+            }
+        }catch(\Exception $e) {
+            Utilities::logStuff("Error Occurred while attempting to generate and upload receipt..".$e);
+        }
     }
     
 }

@@ -131,4 +131,7 @@ Route::group(['prefix' => '/v2',], function () {
         });
     });
 
+    Route::get('/orders-mail', function() {
+        return view('emails/new_order');
+    });
 });

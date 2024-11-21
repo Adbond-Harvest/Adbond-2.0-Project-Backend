@@ -96,6 +96,14 @@ class PackageService
         return $package;
     }
 
+    public function deductUnits($units, $package)
+    {
+        $package->units = $package->units - $units;
+        if($package->units < 0) $package->units = 0;
+        $package->update();
+        return $package;
+    }
+
     public function markAsBackInStock($package)
     {
         $package->sold_out = false;

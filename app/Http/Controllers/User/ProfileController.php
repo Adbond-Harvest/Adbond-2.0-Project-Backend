@@ -12,6 +12,8 @@ use app\Http\Requests\User\SetPassword as UserSetPassword;
 use app\Http\Requests\User\UpdateProfile;
 use app\Http\Resources\UserBriefResource;
 
+use app\Models\User;
+
 use app\Services\UserProfileService;
 use app\Services\FileService;
 
@@ -47,14 +49,21 @@ class ProfileController extends Controller
         try{
             DB::beginTransaction();
             $data = $request->validated();
-            if(isset($data['photoId'])) {
-                $file = $this->fileService->getFile($data['photoId']);
-                if(!$file) return Utilities::error402("File not found");
-                if($file->purpose != FilePurpose::USER_PROFILE_PHOTO) return Utilities::error402("Sorry, you are attempting to save the wrong Photo");
+            $oldPhotoId = null;
+            if($request->hasFile('photo')) {
+                $purpose = FilePurpose::USER_PROFILE_PHOTO->value;
+                if(Auth::user()->photo_id) $oldPhotoId = Auth::user()->photo_id;
+                $res = $this->fileService->save($request->file('photo'), 'image', Auth::user()->id, $purpose, User::$userType, 'user-profile-photos');
+                if($res['status'] != 200) return Utilities::error402('Sorry Photo could not be uploaded '.$res['message']);
+
+                $data['photoId'] = $res['file']->id;
                 $fileMeta = ["belongsId"=>Auth::user()->id, "belongsType"=>"app\Models\User"];
+                $this->fileService->updateFileObj($fileMeta, $res['file']);
             }
             $user = $this->userProfileService->update($data, Auth::user());
-            if(isset($data['photoId'])) $this->fileService->updateFileObj($fileMeta, $file);
+
+            // delete the old photo if it exists
+            if($oldPhotoId) $this->fileService->deleteFile($oldPhotoId);
 
             DB::commit();
             return Utilities::ok(new UserBriefResource($user));

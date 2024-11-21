@@ -7,9 +7,15 @@ use app\Models\Discount;
 use app\Models\OrderDiscount;
 
 use app\Enums\OrderDiscountType;
+use app\Enums\FilePurpose;
+use app\Enums\ClientPackageOrigin;
+use app\Enums\FileTypes;
 
 use app\Helpers;
 use app\Utilities;
+
+use app\Services\ClientPackageService;
+use app\Services\CommissionService;
 
 /**
  * Order service class
@@ -101,19 +107,54 @@ class OrderService
 
     public function completeOrder($order, $payment)
     {
-        // generate and save contract
-        Helpers::generateContract($order);
-
+        $contractFileId = null;
+        $letterOfHappinessFileId = null;
+        try{
+            // generate and save contract
+            Helpers::generateContract($order);
+            // dd('generate receipt');
+            $uploadedContract = "files/contract_{$order->id}.pdf";
+            
+            $response = Helpers::moveUploadedFileToCloud($uploadedContract, FileTypes::PDF->value, $order->client->id, 
+            FilePurpose::CONTRACT->value, "app\Models\Client", "client-contracts");
+            
+            if($response['success']) $contractFileId = $response['upload']['file']->id;
+            
+        }catch(\Exception $e) {
+            Utilities::logStuff("Error Occurred while attempting to generate and upload contract..".$e);
+        }
         // generate and save letter of happiness
-        
-
-        // calculate the bonus/commission for the referer and save it
-
+        try{
+            // generate and save contract
+            Helpers::generateLetterOfHappiness($payment);
+            // dd('generate receipt');
+            $uploadedLetter = "files/letter_of_happiness_{$payment->order->id}.pdf";
+            
+            $response = Helpers::moveUploadedFileToCloud($uploadedLetter, FileTypes::PDF->value, $order->client->id, 
+            FilePurpose::LETTER_OF_HAPPINESS->value, "app\Models\Client", "client-letter_of_happiness");
+            
+            if($response['success']) $letterOfHappinessFileId = $response['upload']['file']->id;
+            
+        }catch(\Exception $e) {
+            Utilities::logStuff("Error Occurred while attempting to generate and upload letter of happiness..".$e);
+        }
 
         // mark the order as complete
-
+        $order->completed = true;
+        $order->update();
 
         // save the clientPackage and return it
+        $clientPackageService = new ClientPackageService;
+        $data['clientId'] = $order->client->id;
+        $data['packageId'] = $order->package_id;
+        $data['origin'] = ClientPackageOrigin::ORDER->value;
+        $data['purchaseId'] = $order->id;
+        $data['purchaseType'] = Order::$type;
+        if($contractFileId) $data['contractFileId'] = $contractFileId;
+        if($letterOfHappinessFileId) $data['happinessLetterFileId'] = $letterOfHappinessFileId;
+        $clientPackage = $clientPackageService->save($data);
+
+        return $clientPackage;
     }
 
 }
