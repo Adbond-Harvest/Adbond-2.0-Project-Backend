@@ -79,7 +79,8 @@ class ProjectService
         if($this->typeId) $query = $query->where("project_type_id", $this->typeId);
         if($this->count) return $query->count();
         if($perPage==null) $perPage=env('PAGINATION_PER_PAGE');
-        return $query->offset($offset)->orderBy("created_at", "DESC")->limit($perPage)->get();
+        $projects = $query->offset($offset)->orderBy("created_at", "DESC")->limit($perPage)->toSql();
+        dd($projects);
     }
 
     public function project($id, $with=[])
