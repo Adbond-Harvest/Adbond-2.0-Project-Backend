@@ -24,7 +24,8 @@ class UpdateProjectType extends BaseRequest
     {
         return [
             "id" => "required|integer|exists:project_types,id",
-            "photoId" => "nullable|integer",
+            // "photoId" => "nullable|integer",
+            "photo" => 'image|max:10000|mimes:jpeg,png,jpg,gif',
             "description" => "nullable|string",
             "order" => "nullable|integer"
         ];
