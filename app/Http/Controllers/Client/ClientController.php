@@ -48,7 +48,7 @@ class ClientController extends Controller
                 if($res['status'] != 200) return Utilities::error402('Sorry Photo could not be uploaded '.$res['message']);
 
                 $data['photoId'] = $res['file']->id;
-                $fileMeta = ["belongsId"=>Auth::guard('client')->user()->id, "belongsType"=>"app\Models\CLient"];
+                $fileMeta = ["belongsId"=>Auth::guard('client')->user()->id, "belongsType"=>"app\Models\Client"];
                 $this->fileService->updateFileObj($fileMeta, $res['file']);
             }
 

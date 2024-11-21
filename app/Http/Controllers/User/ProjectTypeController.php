@@ -10,6 +10,8 @@ use app\Http\Resources\ProjectTypeResource;
 
 use app\Http\Requests\User\UpdateProjectType;
 
+use app\Models\User;
+
 use app\Services\ProjectTypeService;
 use app\Services\FileService;
 
@@ -34,15 +36,22 @@ class ProjectTypeController extends Controller
             DB::beginTransaction();
             $projectType = $this->projectTypeService->projectType($data['id']);
             if(!isset($projectType)) return Utilities::error402("Project Type not found");
-            if(isset($data['photoId'])) {
-                $file = $this->fileService->getFile($data['photoId']);
-                if(!$file) return Utilities::error402("File not found");
-                // dd($file->purpose." == ".FilePurpose::PROJECT_TYPE_PHOTO);
-                if($file->purpose != FilePurpose::PROJECT_TYPE_PHOTO->value) return Utilities::error402("Sorry, you are attempting to save the wrong Photo");
-                $fileMeta = ["belongsId"=>$data["id"], "belongsType"=>"app\Models\ProjectType"];
+
+            // upload photo if it exists
+            if($request->hasFile('photo')) {
+                $purpose = FilePurpose::PROJECT_TYPE_PHOTO->value;
+                if(Auth::guard('client')->user()->photo_id) $oldPhotoId = $projectType->file_id;
+                $res = $this->fileService->save($request->file('photo'), 'image', Auth::user()->id, $purpose, User::$userType, 'project_type-photos');
+                if($res['status'] != 200) return Utilities::error402('Sorry Photo could not be uploaded '.$res['message']);
+
+                $data['photoId'] = $res['file']->id;
+                $fileMeta = ["belongsId"=>$projectType->id, "belongsType"=>"app\Models\ProjectType"];
+                $this->fileService->updateFileObj($fileMeta, $res['file']);
             }
             $projectType = $this->projectTypeService->update($data, $projectType);
-            if(isset($data['photoId'])) $this->fileService->updateFileObj($fileMeta, $file);
+
+            // delete the old photo if it exists
+            if($oldPhotoId) $this->fileService->deleteFile($oldPhotoId);
 
             DB::commit();
             return Utilities::okay("Project Type Updated Successfully", new ProjectTypeResource($projectType));
