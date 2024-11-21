@@ -14,7 +14,7 @@ use app\Models\StaffEmailVerificationToken;
 /**
  * email service class
  */
-class EmailService
+class StaffEmailService
 {
     private $error;
 
