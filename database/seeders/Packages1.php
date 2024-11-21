@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Services\PackageService;
 use Illuminate\Support\Facades\Log;
 
-class Packages extends Seeder
+class Packages1 extends Seeder
 {
     private $packageTypes = [
         'Premium', 'Standard', 'Deluxe', 'Executive', 'Classic',
