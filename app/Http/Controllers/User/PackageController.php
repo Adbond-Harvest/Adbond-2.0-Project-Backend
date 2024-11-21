@@ -14,10 +14,13 @@ use app\Http\Requests\User\UpdatePackage;
 use app\Http\Requests\User\TogglePackageActivate;
 use app\Http\Requests\User\FilterPackage;
 
+use app\Models\User;
 
 use app\Services\PackageService;
 use app\Services\FileService;
 use app\Services\ProjectService;
+
+use app\Enums\FilePurpose;
 
 use app\Utilities;
 
@@ -67,7 +70,21 @@ class PackageController extends Controller
             DB::beginTransaction();
             $data = $request->validated();
             $data['userId'] = Auth::user()->id;
+            // if brochure file is uploaded
+            if($request->hasFile('brochureFile')) { 
+                $brochureUpload = $this->uploadBrochure($request->file('brochureFile'));
+                if($brochureUpload['success']) {
+                    $data['brochureFileId'] = $brochureUpload['file']->id;
+                }else{
+                    Utilities::logStuff("unable to upload brochure.. ".$brochureUpload['message']);
+                }
+            }
             $package = $this->packageService->save($data);
+
+            // update the file object
+            $fileMeta = ["belongsId"=>$package->id, "belongsType"=>"app\Models\Package"];
+            $this->fileService->updateFileObj($fileMeta, $brochureUpload['file']);
+
             if(isset($data['packagePhotoIds'])) $this->packageService->savePhotos($data['packagePhotoIds'], $package);
             $package = $this->packageService->package($package->id);
             DB::commit();
@@ -86,6 +103,16 @@ class PackageController extends Controller
             $data = $request->validated();
             // Get The package being updated
             $package = $this->packageService->package($data['id']);
+
+            // if brochure file is uploaded
+            if($request->hasFile('brochureFile')) { 
+                $brochureUpload = $this->uploadBrochure($request->file('brochureFile'), $package);
+                if($brochureUpload['success']) {
+                    $data['brochureFileId'] = $brochureUpload['file']->id;
+                }else{
+                    Utilities::logStuff("unable to upload brochure.. ".$brochureUpload['message']);
+                }
+            }
 
             $package = $this->packageService->update($data, $package);
 
@@ -264,5 +291,27 @@ class PackageController extends Controller
         } catch(\Exception $e){
             return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }
+    }
+
+    private function uploadBrochure($file, $package=null)
+    {
+        $oldFileId = null;
+        $purpose = FilePurpose::PACKAGE_BROCHURE->value;
+        $message = null;
+        if($package) {
+            if($package && $package->brochure_file_id) $oldFileId = $package->brochure_file_id;
+            $this->fileService->belongsId = $package->id;
+            $this->fileService->belongsType = "app\Models\Package";
+        }
+        $mimeType = $file->getMimeType;
+        $fileType = explode('/', $mimeType)[0]; 
+        
+        $res = $this->fileService->save($file, $fileType, Auth::user()->id, $purpose, User::$userType, 'package-brochures');
+        if($res['status'] != 200) $message = $res['message'];
+
+        // delete the old file if it exists
+        if($oldFileId) $this->fileService->deleteFile($oldFileId);
+
+        return ($message) ? ["success" => false, "message" => $message] : [ "success" => true, "file" => $res['file']];
     }
 }
