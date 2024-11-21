@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 use app\Http\Resources\ClientBriefResource;
+use app\Http\Resources\ClientResource;
 use app\Http\Resources\ClientNextOfKinResource;
 
 use app\Http\Requests\Client\AddNextOfKin;
