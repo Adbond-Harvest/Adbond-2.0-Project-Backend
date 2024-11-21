@@ -40,7 +40,7 @@ class ProjectTypeController extends Controller
             // upload photo if it exists
             if($request->hasFile('photo')) {
                 $purpose = FilePurpose::PROJECT_TYPE_PHOTO->value;
-                if(Auth::guard('client')->user()->photo_id) $oldPhotoId = $projectType->file_id;
+                if($projectType->file_id) $oldPhotoId = $projectType->file_id;
                 $res = $this->fileService->save($request->file('photo'), 'image', Auth::user()->id, $purpose, User::$userType, 'project_type-photos');
                 if($res['status'] != 200) return Utilities::error402('Sorry Photo could not be uploaded '.$res['message']);
 

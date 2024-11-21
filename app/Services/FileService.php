@@ -18,6 +18,8 @@ class FileService
 {
 
     private static $userType = "app\Models\Client";
+    public $belongsId = null;
+    public $belongsType = null;
 
     public function getFile($id)
     {
@@ -62,6 +64,8 @@ class FileService
                 $fileObj->mime_type = (is_string($file)) ? FileFacade::mimeType($file) : $file->getMimeType();
                 $fileObj->original_filename = (is_string($file)) ? pathinfo($file, PATHINFO_FILENAME) : $file->getClientOriginalName();
                 $fileObj->extension = (is_string($file)) ? pathinfo($file, PATHINFO_EXTENSION) : $file->getClientOriginalExtension();
+                if($this->belongsId) $fileObj->belongs_id = $this->belongsId;
+                if($this->belongsType) $fileObj->belongs_type = $this->belongsType;
                 $fileObj->save();
                 return ['status'=>200, 'file'=>$fileObj];
             }else{
