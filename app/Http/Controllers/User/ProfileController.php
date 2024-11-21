@@ -69,7 +69,7 @@ class ProfileController extends Controller
             return Utilities::ok(new UserBriefResource($user));
         }catch(\Exception $e){
             DB::rollBack();
-            return Utilities::error($e, 'An error occured while trying to process the request, Please try again later or contact support');
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }
     }
 }

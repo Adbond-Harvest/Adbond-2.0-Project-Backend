@@ -11,7 +11,7 @@ use App\Models\PromoProduct;
 
 use app\Helpers;
 
-class OrderService
+class DiscountService
 {
     
 
