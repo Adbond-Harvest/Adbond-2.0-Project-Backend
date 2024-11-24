@@ -22,6 +22,7 @@ use app\Services\OrderService;
 use app\Services\PaymentService;
 use app\Services\FileService;
 use app\Services\CommissionService;
+use app\Services\ClientPackageService;
 
 use app\Models\PaymentStatus;
 use app\Models\PaymentMode;
@@ -45,6 +46,7 @@ class PaymentController extends Controller
     private $orderService;
     private $fileService;
     private $commissionService;
+    private $clientPackageService;
 
     private static $userType = "app\Models\Client";
 
@@ -56,6 +58,7 @@ class PaymentController extends Controller
         $this->orderService = new OrderService;
         $this->fileService = new FileService;
         $this->commissionService = new CommissionService;
+        $this->clientPackageService = new ClientPackageService;
     }
 
     public function initializeCardPayment(InitializeCardPayment $request)
@@ -215,8 +218,7 @@ class PaymentController extends Controller
             }
             if($data['cardPayment']) {
                 $this->uploadReceipt($payment);  
-
-                if(!$gatewayRes['paymentError']) $this->orderService->completeOrder($order, $payment);
+                ($order->installment == 0) ? $this->orderService->completeOrder($order, $payment) : $this->clientPackageService->saveClientPackageOrder($order);
             }
         }
 

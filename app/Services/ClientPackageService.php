@@ -7,8 +7,11 @@ use PDF;
 
 use app\Models\Package;
 use app\Models\ClientPackage;
+use app\Models\Order;
+use app\Models\Offer;
 
 use app\Enums\ProjectFilter;
+use app\Enums\ClientPackageOrigin;
 
 use app\Exports\PackageExport;
 
@@ -29,6 +32,18 @@ class ClientPackageService
         $clientPackage->purchase_type = $data['purchaseType'];
         $clientPackage->save();
 
+        return $clientPackage;
+    }
+
+    public function saveClientPackageOrder($order, $files=[]) {
+        $data['clientId'] = $order->client->id;
+        $data['packageId'] = $order->package_id;
+        $data['origin'] = ClientPackageOrigin::ORDER->value;
+        $data['purchaseId'] = $order->id;
+        $data['purchaseType'] = Order::$type;
+        if($files['contractFileId']) $data['contractFileId'] = $files['contractFileId'];
+        if($files['letterOfHappinessFileId']) $data['happinessLetterFileId'] = $files['letterOfHappinessFileId'];
+        $clientPackage = $this->save($data);
         return $clientPackage;
     }
 

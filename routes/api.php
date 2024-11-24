@@ -16,6 +16,7 @@ use app\Http\Controllers\User\IndexController as UserIndexController;
 use app\Http\Controllers\Client\PromoController;
 use app\Http\Controllers\Client\OrderController;
 use app\Http\Controllers\Client\PaymentController;
+use app\Http\Controllers\Client\DashboardController;
 
 //Public Controllers
 use app\Http\Controllers\ProjectController;
@@ -111,6 +112,9 @@ Route::group(['prefix' => '/v2',], function () {
 
     // Client Routes
     Route::group(['middleware' => ClientAuth::class, 'prefix' => '/client', 'namespace' => 'Client',], function () {
+        Route::group(['prefix' => '/dashboard',], function () {
+            Route::get('', [DashboardController::class, 'index']);
+        });
         // Client Profile
         Route::group(['prefix' => '/profile',], function () {
             Route::post('/update', 'ClientController@update');
