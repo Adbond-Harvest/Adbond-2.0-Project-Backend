@@ -4,6 +4,7 @@ namespace app\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 use app\Models\PaymentPeriodStatus;
 
@@ -36,6 +37,14 @@ class Order extends Model
     public function discounts()
     {
         return $this->hasMany(OrderDiscount::class);
+    }
+
+    /**
+     * Get all client packages for this order
+     */
+    public function clientPackages(): MorphMany
+    {
+        return $this->morphMany(ClientPackage::class, 'purchase');
     }
 
     protected static function boot()

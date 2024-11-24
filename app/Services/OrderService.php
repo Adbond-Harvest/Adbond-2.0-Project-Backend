@@ -145,14 +145,10 @@ class OrderService
 
         // save the clientPackage and return it
         $clientPackageService = new ClientPackageService;
-        $data['clientId'] = $order->client->id;
-        $data['packageId'] = $order->package_id;
-        $data['origin'] = ClientPackageOrigin::ORDER->value;
-        $data['purchaseId'] = $order->id;
-        $data['purchaseType'] = Order::$type;
-        if($contractFileId) $data['contractFileId'] = $contractFileId;
-        if($letterOfHappinessFileId) $data['happinessLetterFileId'] = $letterOfHappinessFileId;
-        $clientPackage = $clientPackageService->save($data);
+        $files = [];
+        if($contractFileId) $files['contractFileId'] = $contractFileId;
+        if($letterOfHappinessFileId) $files['happinessLetterFileId'] = $letterOfHappinessFileId;
+        $clientPackage = $clientPackageService->saveClientPackageOrder($order, $files);
 
         return $clientPackage;
     }

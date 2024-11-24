@@ -131,6 +131,8 @@ class ProjectController extends Controller
         $project = $this->projectService->project($id);
         if(!$project) return Utilities::error402("Project not found");
 
+        $project->load("projectType");
+
         return Utilities::ok(new ProjectResource($project));
     }
 
