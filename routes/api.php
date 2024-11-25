@@ -68,11 +68,11 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/activate', [UserProjectController::class, "activate"]);
             Route::post('/deactivate', [UserProjectController::class, "deactivate"]);
             Route::post('/delete', [UserProjectController::class, "delete"]);
-            Route::post('/filter/{projectTypeId}', [UserProjectController::class, "filter"]);
+            // Route::post('/filter/{projectTypeId}', [UserProjectController::class, "filter"]);
             Route::get('/types', [UserProjectController::class, "types"]);
-            Route::get('/summary/{projectTypeId}', [UserProjectController::class, "summary"]);
+            // Route::get('/summary/{projectTypeId}', [UserProjectController::class, "summary"]);
             Route::get('/all/{projectTypeId}', [UserProjectController::class, "projects"]);
-            Route::get('/search/{projectTypeId}', [UserProjectController::class, "search"]);
+            // Route::get('/search/{projectTypeId}', [UserProjectController::class, "search"]);
             Route::get('/export/{projectTypeId}', [UserProjectController::class, "export"]);
             Route::get('/{id}', [UserProjectController::class, "project"]);
         });
