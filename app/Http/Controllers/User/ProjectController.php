@@ -119,7 +119,7 @@ class ProjectController extends Controller
         if(!is_int((int) $page) || $page <= 0) $page = 1;
         if(!is_int((int) $perPage) || $perPage==null) $perPage = env('PAGINATION_PER_PAGE');
         $offset = $perPage * ($page-1);
-        $projects = $this->projectService->projects([], $offset, $perPage);
+        $projects = $this->projectService->projects(["projectType"], $offset, $perPage);
         $this->projectService->count = true;
         $projectsCount = $this->projectService->projects();
 
