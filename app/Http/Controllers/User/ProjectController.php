@@ -113,17 +113,40 @@ class ProjectController extends Controller
     public function projects(Request $request, $projectTypeId)
     {
         if (!is_numeric($projectTypeId) || !ctype_digit($projectTypeId)) return Utilities::error402("Invalid parameter projectTypeID");
+
+        $summaryData = $this->summary($projectTypeId);
+
         $this->projectService->typeId = $projectTypeId;
         $page = ($request->query('page')) ?? 1;
         $perPage = ($request->query('perPage'));
         if(!is_int((int) $page) || $page <= 0) $page = 1;
         if(!is_int((int) $perPage) || $perPage==null) $perPage = env('PAGINATION_PER_PAGE');
         $offset = $perPage * ($page-1);
-        $projects = $this->projectService->projects(["projectType"], $offset, $perPage);
-        $this->projectService->count = true;
-        $projectsCount = $this->projectService->projects();
 
-        return Utilities::paginatedOkay(ProjectResource::collection($projects), $page, $perPage, $projectsCount);
+        $filter = [];
+        if($request->query('text')) $filter["text"] = $request->query('text');
+        if($request->query('date')) $filter["date"] = $request->query('date');
+        if($request->query('status')) $filter["status"] = $request->query('status');
+
+
+        $projects = $this->projectService->filter($filter, ["projectType"], $offset, $perPage);
+
+        // $projects = $this->projectService->projects(["projectType"], $offset, $perPage);
+        $this->projectService->count = true;
+        $projectsCount = $this->projectService->filter($filter);
+
+        $meta = [
+            "page" => $page,
+            "perPage" => $perPage,
+            "total" => $projectsCount
+        ];
+
+        return Utilities::ok([
+            "summary" => $summaryData,
+            "projects" => ProjectResource::collection($projects),
+            "meta" => $meta
+        ]);
+        // return Utilities::paginatedOkay(ProjectResource::collection($projects), $page, $perPage, $projectsCount);
     }
 
     public function project($id)

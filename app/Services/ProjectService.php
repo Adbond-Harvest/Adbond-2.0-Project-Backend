@@ -107,6 +107,11 @@ class ProjectService
     {
         $query = Project::with($with);
         if($this->typeId) $query = $query->where("project_type_id", $this->typeId);
+        if(isset($filter['text'])) {
+            $query = $query->where(function($q) use($filter) { 
+                $q->where("identifier", "LIKE", "%".$filter['text']."%")->orWhere("name", "LIKE", "%".$filter['text']."%");
+            });
+        }
         if(isset($filter['date'])) $query = $query->where("created_at", $filter['date']);
         if(isset($filter['status'])) $query = ($filter['status'] == ProjectFilter::ACTIVE->value) ? $query->where("active", true) : $query->where("active", false);
         if($this->count) return $query->count();
