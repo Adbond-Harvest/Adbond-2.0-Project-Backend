@@ -176,7 +176,7 @@ class ProjectController extends Controller
             if(!$project) return Utilities::error402("Project not found");
 
             if($project->active) return Utilities::error402("Cannot delete an active Project");
-            if(!$project->canDelete()) return Utilities::error402("Cannot delete this Project");
+            if(!$project->canDelete()) return Utilities::error402("Cannot delete a Project with Packages");
             $this->projectService->delete($project);
 
         } catch(\Exception $e){
@@ -234,7 +234,8 @@ class ProjectController extends Controller
         try {
             if (!is_numeric($projectTypeId) || !ctype_digit($projectTypeId)) return Utilities::error402("Invalid parameter projectTypeID");
             // Get projects with necessary relations
-            $projects = $this->projectService->projects($projectTypeId);
+            $this->projectService->typeId = $projectTypeId;
+            $projects = $this->projectService->projects();
 
             $type = ($request->query('type')) ?? null;
             if(!$type) return Utilities::error402("Type is required");
