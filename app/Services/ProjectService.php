@@ -112,7 +112,7 @@ class ProjectService
                 $q->where("identifier", "LIKE", "%".$filter['text']."%")->orWhere("name", "LIKE", "%".$filter['text']."%");
             });
         }
-        if(isset($filter['date'])) $query = $query->where("created_at", $filter['date']);
+        if(isset($filter['date'])) $query = $query->whereDate("created_at", $filter['date']);
         if(isset($filter['status'])) $query = ($filter['status'] == ProjectFilter::ACTIVE->value) ? $query->where("active", true) : $query->where("active", false);
         if($this->count) return $query->count();
         return $query->orderBy("created_at", "DESC")->offset($offset)->limit($perPage)->get();
