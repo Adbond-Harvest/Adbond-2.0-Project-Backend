@@ -19,6 +19,8 @@ use app\Services\ProjectService;
 use app\Services\FileService;
 use app\Services\ProjectTypeService;
 
+use app\Enums\ProjectFilter;
+
 use app\Utilities;
 
 class ProjectController extends Controller
@@ -126,7 +128,11 @@ class ProjectController extends Controller
         $filter = [];
         if($request->query('text')) $filter["text"] = $request->query('text');
         if($request->query('date')) $filter["date"] = $request->query('date');
-        if($request->query('status')) $filter["status"] = $request->query('status');
+        if($request->query('status')) {
+            $validStatus = ["active" => ProjectFilter::ACTIVE->value, "inactive" => ProjectFilter::INACTIVE->value];
+            if(!in_array($request->query('status'), $validStatus)) return Utilities::error402("Valid Status are: ".$validStatus['active']." and ".$validStatus['inactive']);
+            $filter["status"] = $request->query('status');
+        }
 
 
         $projects = $this->projectService->filter($filter, ["projectType"], $offset, $perPage);
