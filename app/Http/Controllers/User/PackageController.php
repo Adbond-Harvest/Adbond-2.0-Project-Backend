@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 use app\Http\Resources\PackageResource;
+use app\Http\Resources\FileResource;
 
 use app\Http\Requests\User\SavePackage;
 use app\Http\Requests\User\UpdatePackage;
@@ -21,7 +22,7 @@ use app\Services\FileService;
 use app\Services\ProjectService;
 
 use app\Enums\FilePurpose;
-
+use app\Http\Requests\SaveMedia;
 use app\Utilities;
 
 
@@ -60,7 +61,8 @@ class PackageController extends Controller
     {
         if (!is_numeric($id) || !ctype_digit($id)) return Utilities::error402("Invalid parameter iD");
 
-        $package = $this->packageService->package($id);
+        $package = $this->packageService->package($id, ['media']);
+
         return Utilities::ok(new PackageResource($package));
     }
 
@@ -81,12 +83,15 @@ class PackageController extends Controller
             }
             $package = $this->packageService->save($data);
 
-            // update the file object
-            $fileMeta = ["belongsId"=>$package->id, "belongsType"=>"app\Models\Package"];
-            $this->fileService->updateFileObj($fileMeta, $brochureUpload['file']);
+            if($request->hasFile('brochureFile')) { 
+                // update the file object
+                $fileMeta = ["belongsId"=>$package->id, "belongsType"=>"app\Models\Package"];
+                $this->fileService->updateFileObj($fileMeta, $brochureUpload['file']);
+            }
 
-            if(isset($data['packagePhotoIds'])) $this->packageService->savePhotos($data['packagePhotoIds'], $package);
+            // if(isset($data['packagePhotoIds'])) $this->packageService->savePhotos($data['packagePhotoIds'], $package);
             $package = $this->packageService->package($package->id);
+            // dd($package->benefits);
             DB::commit();
 
             return Utilities::ok(new PackageResource($package));
@@ -94,6 +99,24 @@ class PackageController extends Controller
             DB::rollBack();
             return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }
+    }
+
+    public function saveMedia(SaveMedia $request)
+    {
+        // dd($request->file('media')->getMimeType());
+        // phpinfo();
+        // try{
+            $mime = $request->file('media')->getMimeType();
+            $imageMimes = ['image/jpeg', 'image/jpg', 'image/gif', 'image/png'];
+            $fileType = (in_array($mime, $imageMimes)) ? "image" : "video";
+            $purpose = (in_array($mime, $imageMimes)) ? FilePurpose::PACKAGE_PHOTO->value : FilePurpose::PACKAGE_VIDEO->value;
+            $res = $this->fileService->save($request->file('media'), $fileType, Auth::user()->id, $purpose, User::$userType, 'package-media');  
+            if($res['status'] == 200) return Utilities::ok(new FileResource($res['file']));
+            
+            return Utilities::error402($res['message']);
+        // }catch(\Exception $e){
+        //     return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        // }
     }
 
     public function update(UpdatePackage $request)
@@ -126,7 +149,7 @@ class PackageController extends Controller
                 $removedPhotoIds = array_diff($currentPhotoIds, $data['packagePhotoIds']);
             }
             // Add and Delete files as necessary
-            if(!empty($newPhotoIds)) $this->packageService->savePhotos($newPhotoIds, $package);
+            // if(!empty($newPhotoIds)) $this->packageService->savePhotos($newPhotoIds, $package);
             if(!empty($removedPhotoIds)) $this->fileService->deleteFiles($removedPhotoIds);
 
             $package = $this->packageService->package($package->id, ['project', 'photos']);

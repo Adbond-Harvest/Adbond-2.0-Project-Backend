@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use app\Models\Benefit;
 use app\Models\DeductibleFee;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -25,6 +26,7 @@ use Database\Seeders\PaymentStatuses;
 use Database\Seeders\PaymentGateways;
 use Database\Seeders\CommissionRateSeeder;
 use Database\Seeders\DeductibleFees;
+use Database\Seeders\Benefits;
 
 class DatabaseSeeder extends Seeder
 {
@@ -57,7 +59,8 @@ class DatabaseSeeder extends Seeder
             new PaymentStatuses,
             new PaymentGateways,
             new CommissionRateSeeder,
-            new DeductibleFees
+            new DeductibleFees,
+            new Benefits
         ];
 
         foreach($seeders as $seeder) $seeder->run();

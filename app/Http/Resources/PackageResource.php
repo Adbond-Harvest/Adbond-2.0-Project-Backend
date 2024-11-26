@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use app\Http\Resources\ProjectResource;
 use app\Http\Resources\StateResource;
 use app\Http\Resources\FileResource;
+use app\Http\Resources\BenefitResource;
 
 class PackageResource extends JsonResource
 {
@@ -31,17 +32,17 @@ class PackageResource extends JsonResource
             "installmentDuration" => $this->installment_duration,
             "infrastructureFee" => $this->infrastructure_fee,
             "description" => $this->description,
-            "benefits" => $this->benefits,
+            "benefits" => BenefitResource::collection($this->benefits),
             "installmentOption" => $this->installment_option,
             "vrUrl" => $this->vr_url,
             "active" => ($this->active) ? true : false,
             "status" => ($this->units==0 || $this->sold_out) ? "Sold Out" : (($this->active) ? "Active" : "Inactive"),
             "soldOut" => ($this->units==0 || $this->sold_out) ? true : false,
-            "state" => new StateResource($this->whenLoaded("state")),
+            "state" => $this->state,
             "address" => $this->address,
-            "location" => $this->address." ".$this->state?->name,
+            "location" => $this->address." ".$this->state,
             "brochure" => new FileResource($this->whenLoaded("brochure")),
-            "photos" => FileResource::collection($this->whenLoaded("photos"))
+            "media" => FileResource::collection($this->whenLoaded("media"))
         ];
     }
 }

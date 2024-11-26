@@ -9,6 +9,7 @@ enum FilePurpose: string
         case PROJECT_TYPE_PHOTO = "Project Type Photo";
         case PROJECT_PHOTO = "Project Photo";
         case PACKAGE_PHOTO = "Package Photo";
+        case PACKAGE_VIDEO = "Package Video";
         case PACKAGE_BROCHURE = "Package Brochure";
         case PAYMENT_EVIDENCE = "Payment Evidence";
         case PAYMENT_RECEIPT = "Payment Receipt";
