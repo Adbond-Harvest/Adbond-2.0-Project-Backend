@@ -143,7 +143,7 @@ Route::group(['prefix' => '/v2',], function () {
         });
     });
 
-    Route::get('test/benefit', [TestController::class, 'benefit']);
+    // Route::get('test/benefit', [TestController::class, 'benefit']);
 
     // Route::get('/orders-mail', function() {
     //     return view('emails/new_order');
