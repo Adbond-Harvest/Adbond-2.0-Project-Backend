@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('packages', function (Blueprint $table) {
-            // $table->dropColumn("benefits");
-            // $table->dropConstrainedForeignId("state_id");
+            $table->dropColumn("benefits");
+            $table->dropConstrainedForeignId("state_id");
             $table->dropColumn("state_id");
             $table->string("state")->after("name");
         });
