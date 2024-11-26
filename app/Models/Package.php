@@ -15,7 +15,6 @@ class Package extends Model
      * @var array
      */
     protected $casts = [
-        'benefits' => 'array',
         'active' => 'boolean',
         'installment_option' => 'boolean',
         'size' => 'double',
@@ -50,9 +49,19 @@ class Package extends Model
         return $this->hasMany(PackagePhoto::class);
     }
 
-    public function photos()
+    public function benefits()
     {
-        return $this->belongsToMany(File::class, "package_photos", "package_id", "photo_id", "id");
+        return $this->belongsToMany(Benefit::class, "package_benefits", "package_id", "benefit_id", "id");
+    }
+
+    public function packageBenefits()
+    {
+        return $this->hasMany(PackageBenefit::class);
+    }
+
+    public function media()
+    {
+        return $this->belongsToMany(File::class, "package_media", "package_id", "file_id", "id");
     }
 
     /**

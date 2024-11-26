@@ -322,4 +322,19 @@ class Utilities
         return ["percentage" => $percentage, "amount" => $amount];
     }
 
+    // format seconds into minutes or just secs if its less than 1min
+    public static function formatSeconds($secs) 
+    {
+        $formatted = '';
+        if($secs >= 60) {
+            $minAppendum = 'Min';
+            $mins = floor($secs/60);
+            if($mins > 1) $minAppendum .= 's';
+            $secs = $secs%60;
+        } 
+        if(isset($mins)) $formatted .= $mins.$minAppendum;
+        if($secs > 0) $formatted .= ' '.$secs.'Secs';
+        return trim($formatted);
+    }
+
 }

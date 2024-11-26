@@ -24,3 +24,4 @@ README.txt
 /resources/views/emails/new_order1.blade.php
 /Database\Seeders/Packages1.php
 api.json
+/app/Http/Controllers/TestController.php

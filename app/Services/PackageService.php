@@ -7,7 +7,7 @@ use PDF;
 
 use app\Models\Package;
 use app\Models\PackageSize;
-use app\Models\PackagePhoto;
+use app\Models\PackageMedia;
 
 use app\Enums\ProjectFilter;
 
@@ -27,7 +27,7 @@ class PackageService
             $package->project_id = $data['projectId'];
             $package->user_id = $data['userId'];
 
-            $package->state_id = $data['stateId'];
+            $package->state = $data['state'];
             if(isset( $data['address'])) $package->address = $data['address'];
             $package->size = $data['size'];
             $package->amount = $data['amount'];
@@ -39,17 +39,20 @@ class PackageService
             if(isset( $data['infrastructureFee'])) $package->infrastructure_fee = $data['infrastructureFee'];
 
             if(isset($data['description'])) $package->description = $data['description'];
-            if(isset($data['benefits'])) $package->benefits = $data['benefits'];
+            // if(isset($data['benefits'])) $package->benefits = $data['benefits'];
             if(isset($data['brochureFileId'])) $package->brochure_file_id = $data['brochureFileId'];
             if(isset($data['installmentOption'])) $package->installment_option = $data['installmentOption'];
             if(isset($data['vrUrl'])) $package->vr_url = $data['vrUrl'];
             $package->save();
+
+            if(isset($data['benefits'])) $package->benefits()->attach($data['benefits']);
+            if(isset($data['packageMediaIds'])) $package->media()->attach($data['packageMediaIds']);
             return $package;
         }
         return null;
     }
 
-    public function savePhotos($fileIds, $package)
+    public function saveMedia($fileIds, $package)
     {
         foreach($fileIds as $fileId) {
             $packagePhoto = PackagePhoto::where("package_id", $package->id)->where("photo_id", $fileId)->first();
@@ -78,13 +81,13 @@ class PackageService
         if(isset( $data['infrastructureFee'])) $package->infrastructure_fee = $data['infrastructureFee'];
 
         if(isset($data['description'])) $package->description = $data['description'];
-        if(isset($data['benefits'])) {
-            $package->benefits = json_encode($data['benefits']);
-        }
         if(isset($data['brochureFileId'])) $package->brochure_file_id = $data['brochureFileId'];
         if(isset($data['installmentOption'])) $package->installment_option = $data['installmentOption'];
         if(isset($data['vrUrl'])) $package->vr_url = $data['vrUrl'];  
         $package->update();
+
+        if(isset($data['benefits'])) $package->benefits()->sync($data['benefits']);
+        if(isset($data['packageMediaIds'])) $package->media()->sync($data['packageMediaIds']);
 
         return $package;
     }

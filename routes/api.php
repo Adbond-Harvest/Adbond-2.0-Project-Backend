@@ -21,6 +21,9 @@ use app\Http\Controllers\Client\DashboardController;
 //Public Controllers
 use app\Http\Controllers\ProjectController;
 use app\Http\Controllers\PackageController;
+use app\Http\Controllers\UtilityController;
+
+use app\Http\Controllers\TestController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -79,6 +82,7 @@ Route::group(['prefix' => '/v2',], function () {
         // Package
         Route::group(['prefix' => '/packages'], function () {
             Route::post('', [UserPackageController::class, "save"]);
+            Route::post('/save_media', [UserPackageController::class, "saveMedia"]);
             Route::patch('', [UserPackageController::class, "update"]);
             Route::patch('/mark_as_sold_out', [UserPackageController::class, "markAsSoldOut"]);
             Route::patch('/mark_as_in_stock', [UserPackageController::class, "markAsInStock"]);
@@ -109,6 +113,10 @@ Route::group(['prefix' => '/v2',], function () {
         Route::get('/view/{packageId}', [PackageController::class, 'getPackage']);
     });
 
+    //Utitlity Routes
+    Route::group(['prefix' => '/'], function () {    
+        Route::get('benefits', [UtilityController::class, 'benefits']);
+    });
 
     // Client Routes
     Route::group(['middleware' => ClientAuth::class, 'prefix' => '/client', 'namespace' => 'Client',], function () {
@@ -135,7 +143,9 @@ Route::group(['prefix' => '/v2',], function () {
         });
     });
 
-    Route::get('/orders-mail', function() {
-        return view('emails/new_order');
-    });
+    Route::get('test/benefit', [TestController::class, 'benefit']);
+
+    // Route::get('/orders-mail', function() {
+    //     return view('emails/new_order');
+    // });
 });

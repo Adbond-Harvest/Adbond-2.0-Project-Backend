@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use app\Http\Requests\BaseRequest;
 
 use app\Rules\ValidPackageBrochureFile;
-use app\Rules\ValidPackagePhotoFile;
+use app\Rules\ValidPackageMediaFile;
 use app\Rules\PackageNameUnique;
 
 class SavePackage extends BaseRequest
@@ -29,7 +29,7 @@ class SavePackage extends BaseRequest
         return [
             "projectId" => "required|integer|exists:projects,id",
             "name" => ["required","string", new PackageNameUnique()],
-            "stateId" => "required|integer|exists:states,id",
+            "state" => "required|string",
             "address" => "nullable|string",
             "size" => "required|numeric",
             "amount" => "required|numeric",
@@ -40,13 +40,13 @@ class SavePackage extends BaseRequest
             "infrastructureFee" => "nullable|numeric",
             "description" => "nullable|string",
             "benefits" => "nullable|array",
-            "benefits.*" => "string",
+            "benefits.*" => "integer|exists:benefits,id",
             // "brochureFileId" => ["nullable", "integer", new ValidPackageBrochureFile()],
             "brochureFile" => "nullable|file|max:10000|mimes:jpeg,png,jpg,pdf,doc,docx",
             "installmentOption" => "nullable|boolean",
             "vrUrl" => "nullable|string",
-            "packagePhotoIds" => "nullable|array",
-            "packagePhotoIds.*" => ["integer", new ValidPackagePhotoFile()]
+            "packageMediaIds" => "nullable|array",
+            "packageMediaIds.*" => ["integer", new ValidPackageMediaFile()]
         ];
     }
 }
