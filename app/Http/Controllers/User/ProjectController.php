@@ -135,7 +135,7 @@ class ProjectController extends Controller
         }
 
 
-        $projects = $this->projectService->filter($filter, ["projectType"], $offset, $perPage);
+        $projects = $this->projectService->filter($filter, ["projectType", "packages"], $offset, $perPage);
 
         // $projects = $this->projectService->projects(["projectType"], $offset, $perPage);
         $this->projectService->count = true;
@@ -157,7 +157,7 @@ class ProjectController extends Controller
 
     public function project($id)
     {
-        $project = $this->projectService->project($id);
+        $project = $this->projectService->project($id, ['packages']);
         if(!$project) return Utilities::error402("Project not found");
 
         $project->load("projectType");
