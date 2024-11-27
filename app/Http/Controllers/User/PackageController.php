@@ -14,6 +14,8 @@ use app\Http\Requests\User\SavePackage;
 use app\Http\Requests\User\UpdatePackage;
 use app\Http\Requests\User\TogglePackageActivate;
 use app\Http\Requests\User\FilterPackage;
+use app\Http\Requests\SaveMedia;
+use app\Http\Requests\SaveMultipleMedia;
 
 use app\Models\User;
 
@@ -22,7 +24,6 @@ use app\Services\FileService;
 use app\Services\ProjectService;
 
 use app\Enums\FilePurpose;
-use app\Http\Requests\SaveMedia;
 use app\Utilities;
 
 
@@ -114,6 +115,37 @@ class PackageController extends Controller
             if($res['status'] == 200) return Utilities::ok(new FileResource($res['file']));
             
             return Utilities::error402($res['message']);
+        // }catch(\Exception $e){
+        //     return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        // }
+    }
+
+    public function saveMultipleMedia(SaveMultipleMedia $request)
+    {
+        // dd($request->file('media')->getMimeType());
+        // phpinfo();
+        // try{
+        $successfulIds = [];
+        $failedFiles = [];
+        foreach($request->file('media') as $file) {
+            $mime = $file->getMimeType();
+            $filename = $file->getClientOriginalName();
+            $imageMimes = ['image/jpeg', 'image/jpg', 'image/gif', 'image/png'];
+            $fileType = (in_array($mime, $imageMimes)) ? "image" : "video";
+            $purpose = (in_array($mime, $imageMimes)) ? FilePurpose::PACKAGE_PHOTO->value : FilePurpose::PACKAGE_VIDEO->value;
+            $res = $this->fileService->save($file, $fileType, Auth::user()->id, $purpose, User::$userType, 'package-media');  
+            if($res['status'] == 200) {
+                $successfulIds[] = $res['file']->id;
+            }else{
+                $failedFiles[] = $filename;
+                Utilities::logStuff("Error attempting to save Package media.. ".$res['message']);
+            }
+        }
+            
+        return Utilities::ok([
+            "successfulIds" => $successfulIds,
+            "failedFiles" => $failedFiles
+        ]);
         // }catch(\Exception $e){
         //     return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         // }
