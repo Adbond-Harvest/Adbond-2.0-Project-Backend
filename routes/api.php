@@ -83,6 +83,7 @@ Route::group(['prefix' => '/v2',], function () {
         Route::group(['prefix' => '/packages'], function () {
             Route::post('', [UserPackageController::class, "save"]);
             Route::post('/save_media', [UserPackageController::class, "saveMedia"]);
+            Route::post('/save_multiple_media', [UserPackageController::class, "saveMultipleMedia"]);
             Route::patch('', [UserPackageController::class, "update"]);
             Route::patch('/mark_as_sold_out', [UserPackageController::class, "markAsSoldOut"]);
             Route::patch('/mark_as_in_stock', [UserPackageController::class, "markAsInStock"]);
