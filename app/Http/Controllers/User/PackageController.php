@@ -24,6 +24,7 @@ use app\Services\FileService;
 use app\Services\ProjectService;
 
 use app\Enums\FilePurpose;
+use app\Enums\ProjectFilter;
 use app\Utilities;
 
 
@@ -51,9 +52,19 @@ class PackageController extends Controller
         if(!is_int((int) $perPage) || $perPage==null) $perPage = env('PAGINATION_PER_PAGE');
         $offset = $perPage * ($page-1);
 
-        $packages = $this->packageService->packages(['media'], $offset, $perPage);
+        $filter = [];
+        if($request->query('text')) $filter["text"] = $request->query('text');
+        if($request->query('date')) $filter["date"] = $request->query('date');
+        if($request->query('status')) {
+            $validStatus = ["active" => ProjectFilter::ACTIVE->value, "inactive" => ProjectFilter::INACTIVE->value];
+            if(!in_array($request->query('status'), $validStatus)) return Utilities::error402("Valid Status are: ".$validStatus['active']." and ".$validStatus['inactive']);
+            $filter["status"] = $request->query('status');
+        }
+
+        // $packages = $this->packageService->packages(['media'], $offset, $perPage);
+        $packages = $this->packageService->filter($filter, ['media'], $offset, $perPage);
         $this->packageService->count = true;
-        $packagesCount = $this->packageService->packages();
+        $packagesCount = $this->packageService->filter($filter);
 
         return Utilities::paginatedOkay(PackageResource::collection($packages), $page, $perPage, $packagesCount);
     }

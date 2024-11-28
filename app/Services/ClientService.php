@@ -21,7 +21,8 @@ use app\Helpers;
  */
 class ClientService
 {
-
+    public $count = false;
+    
     public function getClient($id)
     {
         return Client::find($id);
@@ -47,6 +48,16 @@ class ClientService
     public function searchClients($string)
     {
         return Client::where('firstname', 'like', '%'.$string.'%')->orWhere('lastname', 'like', '%'.$string.'%')->get();
+    }
+
+    public function filter($filter, $with=[], $offset=0, $perPage=null)
+    {
+        $query = Project::with($with);
+        if(isset($filter['text'])) $query->where("name", "LIKE", "%".$filter['text']."%");
+        if(isset($filter['date'])) $query = $query->whereDate("created_at", $filter['date']);
+        if(isset($filter['status'])) $query = ($filter['status'] == ProjectFilter::ACTIVE->value) ? $query->where("active", true) : $query->where("active", false);
+        if($this->count) return $query->count();
+        return $query->orderBy("created_at", "DESC")->offset($offset)->limit($perPage)->get();
     }
 
     public function totalClients()

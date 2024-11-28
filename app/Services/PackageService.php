@@ -175,7 +175,8 @@ class PackageService
     {
         $query = Package::with($with);
         if($this->projectId) $query = $query->where("project_id", $this->projectId);
-        if(isset($filter['date'])) $query = $query->where("created_at", $filter['date']);
+        if(isset($filter['text'])) $query->where("name", "LIKE", "%".$filter['text']."%");
+        if(isset($filter['date'])) $query = $query->whereDate("created_at", $filter['date']);
         if(isset($filter['status'])) $query = ($filter['status'] == ProjectFilter::ACTIVE->value) ? $query->where("active", true) : $query->where("active", false);
         if($this->count) return $query->count();
         return $query->orderBy("created_at", "DESC")->offset($offset)->limit($perPage)->get();
@@ -185,7 +186,7 @@ class PackageService
     {
         $query = Package::query();
         if($this->projectId) $query = Package::where("project_id", $this->projectId);
-        if($text != null) $query = $query->where("identifier", "LIKE", "%".$text."%")->orWhere("name", "LIKE", "%".$text."%");
+        if($text != null) $query = $query->where("name", "LIKE", "%".$text."%");
         
         if($this->count) return $query->count();
         return $query->orderBy("created_at", "DESC")->offset($offset)->limit($perPage)->get();

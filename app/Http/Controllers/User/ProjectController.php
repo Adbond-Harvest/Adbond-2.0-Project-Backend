@@ -144,6 +144,7 @@ class ProjectController extends Controller
         $meta = [
             "page" => $page,
             "perPage" => $perPage,
+            "pages" => ceil($projectsCount/$perPage),
             "total" => $projectsCount
         ];
 
