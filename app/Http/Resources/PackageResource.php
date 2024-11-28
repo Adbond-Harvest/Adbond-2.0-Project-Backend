@@ -42,7 +42,8 @@ class PackageResource extends JsonResource
             "address" => $this->address,
             "location" => $this->address." ".$this->state,
             "brochure" => new FileResource($this->whenLoaded("brochure")),
-            "media" => FileResource::collection($this->whenLoaded("media"))
+            "media" => FileResource::collection($this->whenLoaded("media")),
+            "createdAt" => $this->created_at->format('F j, Y'), 
         ];
     }
 }
