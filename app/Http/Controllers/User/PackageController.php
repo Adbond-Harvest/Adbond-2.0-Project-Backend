@@ -169,20 +169,21 @@ class PackageController extends Controller
                 }
             }
 
-            $package = $this->packageService->update($data, $package);
-
-            if(isset($data['packagePhotoIds']) && !empty($data['packagePhotoIds'])) {
-                // Get the Photo Ids of the Package
-                $currentPhotoIds = $this->packageService->getPackagePhotoIds($package);
+            if(isset($data['packageMediaIds']) && !empty($data['packageMediaIds'])) {
+                // Get the Media Ids of the Package
+                $currentMediaIds = $this->packageService->getPackageMediaIds($package);
 
                 // Get the Files that were added
-                $newPhotoIds = array_diff($data['packagePhotoIds'], $currentPhotoIds);
+                $newMediaIds = array_diff($data['packageMediaIds'], $currentMediaIds);
                 // Get the Files that were deleted
-                $removedPhotoIds = array_diff($currentPhotoIds, $data['packagePhotoIds']);
+                $removedMediaIds = array_diff($currentMediaIds, $data['packageMediaIds']);
+                $data['packageMediaIds'] = $newMediaIds;
             }
             // Add and Delete files as necessary
-            // if(!empty($newPhotoIds)) $this->packageService->savePhotos($newPhotoIds, $package);
-            if(!empty($removedPhotoIds)) $this->fileService->deleteFiles($removedPhotoIds);
+            // if(!empty($newMediaIds)) $this->packageService->saveMedias($newMediaIds, $package);
+
+            $package = $this->packageService->update($data, $package);
+            if(!empty($removedMediaIds)) $this->fileService->deleteFiles($removedMediaIds);
 
             $package = $this->packageService->package($package->id, ['project', 'photos']);
             DB::commit();

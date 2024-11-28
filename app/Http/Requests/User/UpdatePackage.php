@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use app\Http\Requests\BaseRequest;
 
 use app\Rules\ValidPackageBrochureFile;
-use app\Rules\ValidPackagePhotoFile;
+use app\Rules\ValidPackageMediaFile;
 use app\Rules\PackageNameUnique;
 
 class UpdatePackage extends BaseRequest
@@ -46,8 +46,8 @@ class UpdatePackage extends BaseRequest
             "brochureFile" => "nullable|file|max:10000|mimes:jpeg,png,jpg,pdf,doc,docx",
             "installmentOption" => "nullable|boolean",
             "vrUrl" => "nullable|string",
-            "packagePhotoIds" => "nullable|array",
-            "packagePhotoIds.*" => ["integer", new ValidPackagePhotoFile()]
+            "packageMediaIds" => "nullable|array",
+            "packageMediaIds.*" => ["integer", new ValidPackageMediaFile()]
         ];
     }
 }
