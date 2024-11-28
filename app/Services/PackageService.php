@@ -87,7 +87,7 @@ class PackageService
         $package->update();
 
         if(isset($data['benefits'])) $package->benefits()->sync($data['benefits']);
-        if(isset($data['packageMediaIds'])) $package->media()->sync($data['packageMediaIds']);
+        if(isset($data['packageMediaIds'])) $package->media()->attach($data['packageMediaIds']);
 
         return $package;
     }
@@ -150,7 +150,7 @@ class PackageService
         if($this->count) return $query->count();
 
         if($perPage==null) $perPage=env('PAGINATION_PER_PAGE');
-        return $query->offset($offset)->limit($perPage)->get();
+        return $query->offset($offset)->limit($perPage)->orderBy("created_at", "DESC")->get();
     }
 
     public function package($id, $with=[])
@@ -166,9 +166,9 @@ class PackageService
         return $query->first();
     }
 
-    public function getPackagePhotoIds($package)
+    public function getPackageMediaIds($package)
     {
-        return PackagePhoto::where("package_id", $package->id)->pluck("photo_id")->toArray();
+        return PackageMedia::where("package_id", $package->id)->pluck("media_id")->toArray();
     }
 
     public function filter($filter, $with=[], $offset=0, $perPage=null)
