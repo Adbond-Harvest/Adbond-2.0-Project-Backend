@@ -104,6 +104,7 @@ class Utilities
             'data' => $data,
             'page' => $page,
             'perPage' => $perPage,
+            'pages' => ceil($total/$perPage),
             'total' => $total,
             // 'token' => Utilities::refreshToken($this->guard)
         ], 200);

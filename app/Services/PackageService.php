@@ -175,6 +175,7 @@ class PackageService
     {
         $query = Package::with($with);
         if($this->projectId) $query = $query->where("project_id", $this->projectId);
+        if(isset($filter['text'])) $query->where("identifier", "LIKE", "%".$filter['text']."%")->orWhere("name", "LIKE", "%".$filter['text']."%");
         if(isset($filter['date'])) $query = $query->where("created_at", $filter['date']);
         if(isset($filter['status'])) $query = ($filter['status'] == ProjectFilter::ACTIVE->value) ? $query->where("active", true) : $query->where("active", false);
         if($this->count) return $query->count();
