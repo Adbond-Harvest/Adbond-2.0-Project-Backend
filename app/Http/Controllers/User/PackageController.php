@@ -162,13 +162,14 @@ class PackageController extends Controller
         // }
     }
 
-    public function update(UpdatePackage $request)
+    public function update(UpdatePackage $request, $packageId)
     {
         try{
             DB::beginTransaction();
             $data = $request->validated();
             // Get The package being updated
-            $package = $this->packageService->package($data['id']);
+            $package = $this->packageService->package($packageId);
+            if(!$package) return Utilities::error402("package not found");
 
             // if brochure file is uploaded
             if($request->hasFile('brochureFile')) { 
