@@ -19,6 +19,7 @@ class ClientResource extends JsonResource
             'title' => $this->title,
             'firstname' => $this->firstname,
             'lastname' => $this->lastname,
+            'othernames' => $this->othernames,
             'email' => $this->email,
             'photo' => new FileResource($this->photo),
             'phoneNumber' => $this->phone_number,
@@ -29,6 +30,8 @@ class ClientResource extends JsonResource
             'maritalStatus' => $this->marital_status,
             'occupation' => $this->occupation,
             'kycStatus' => $this->kyc_status,
+            'active' => ($this->activated && $this->activated == 1) ? true : false,
+            'joinedAt' => $this->created_at->format('F j, Y')
             // 'passwordSet' => ($this->password_set)
             // 'kyc_completed' => Helpers::kycCompleted($this),
         ];
