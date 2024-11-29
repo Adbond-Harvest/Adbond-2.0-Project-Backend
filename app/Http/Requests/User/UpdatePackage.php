@@ -41,7 +41,7 @@ class UpdatePackage extends BaseRequest
             "infrastructureFee" => "nullable|numeric",
             "description" => "nullable|string",
             "benefits" => "nullable|array",
-            "benefits.*" => "string",
+            "benefits.*" => "integer|exists:benefits,id",
             // "brochureFileId" => ["nullable", "integer", new ValidPackageBrochureFile()],
             "brochureFile" => "nullable|file|max:10000|mimes:jpeg,png,jpg,pdf,doc,docx",
             "installmentOption" => "nullable|boolean",
