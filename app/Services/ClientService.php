@@ -12,8 +12,10 @@ use app\Services\AgeGroupService;
 
 use app\Models\Client;
 use app\Models\ClientNextOfKin;
+use app\Models\ClientSummaryView;
 
 use app\Enums\KYCStatus;
+use app\Enums\ActiveToggle;
 use app\Helpers;
 
 /**
@@ -22,15 +24,15 @@ use app\Helpers;
 class ClientService
 {
     public $count = false;
-    
-    public function getClient($id)
+
+    public function getClient($id, $with=[])
     {
-        return Client::find($id);
+        return Client::with($with)->where("id", $id)->first();
     }
 
-    public function getClientByEmail($email)
+    public function getClientByEmail($email, $with=[])
     {
-        return Client::where('email', $email)->first();
+        return Client::with($with)->where('email', $email)->first();
     }
 
     public function getClientByProvider($provider_name, $provider_id)
@@ -52,12 +54,22 @@ class ClientService
 
     public function filter($filter, $with=[], $offset=0, $perPage=null)
     {
-        $query = Project::with($with);
-        if(isset($filter['text'])) $query->where("name", "LIKE", "%".$filter['text']."%");
+        $query = Client::with($with);
+        if(isset($filter['text'])) {
+            $query = $query->where(function($q) use($filter) { 
+                $q->where("firstname", "LIKE", "%".$filter['text']."%")->orWhere("lastname", "LIKE", "%".$filter['text']."%")
+                ->orWhere("email", "LIKE", "%".$filter['text']."%");
+            });
+        }
         if(isset($filter['date'])) $query = $query->whereDate("created_at", $filter['date']);
-        if(isset($filter['status'])) $query = ($filter['status'] == ProjectFilter::ACTIVE->value) ? $query->where("active", true) : $query->where("active", false);
+        if(isset($filter['status'])) $query = ($filter['status'] == ActiveToggle::ACTIVE->value) ? $query->where("activated", true) : $query->where("activated", false);
         if($this->count) return $query->count();
         return $query->orderBy("created_at", "DESC")->offset($offset)->limit($perPage)->get();
+    }
+
+    public function summary()
+    {
+        return ClientSummaryView::first();
     }
 
     public function totalClients()
@@ -96,6 +108,7 @@ class ClientService
         if(isset($data['title'])) $client->title = $data['title'];
         if(isset($data['firstname'])) $client->firstname = $data['firstname'];
         if(isset($data['lastname'])) $client->lastname = $data['lastname'];
+        if(isset($data['othernames'])) $client->othernames = $data['othernames'];
         // if(isset($data['email'])) $client->email = $data['email'];
         if(isset($data['photoId'])) $client->photo_id = $data['photoId'];
         if(isset($data['gender'])) $client->gender = $data['gender'];

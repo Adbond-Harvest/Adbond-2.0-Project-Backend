@@ -11,6 +11,7 @@ use app\Http\Controllers\User\ProjectTypeController as UserProjectTypeController
 use app\Http\Controllers\User\ProjectController as UserProjectController;
 use app\Http\Controllers\User\PackageController as UserPackageController;
 use app\Http\Controllers\User\IndexController as UserIndexController;
+use app\Http\Controllers\User\ClientController as UserClientController;
 
 // Client Controllers
 use app\Http\Controllers\Client\PromoController;
@@ -95,6 +96,13 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('/search/{projectId}', [UserPackageController::class, "search"]);
             Route::get('/export/{projectId}', [UserPackageController::class, "export"]);
             Route::get('/{id}', [UserPackageController::class, "package"]);
+        });
+
+        // Client
+        Route::group(['prefix' => '/clients'], function () {
+            Route::get('', [UserClientController::class, "index"]);
+            Route::get('/{clientId}', [UserClientController::class, "show"]);
+            Route::post('/{clientId}', [UserClientController::class, "update"]);
         });
     });
 
