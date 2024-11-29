@@ -27,7 +27,6 @@ class UpdatePackage extends BaseRequest
     public function rules(): array
     {
         return [
-            "id" => "required|integer",
             "projectId" => "nullable|integer|exists:projects,id",
             "name" => ["nullable","string", new PackageNameUnique()],
             "stateId" => "nullable|integer|exists:states,id",

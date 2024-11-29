@@ -80,7 +80,7 @@ class ClientController extends Controller
     {
         if (!is_numeric($clientId) || !ctype_digit($clientId)) return Utilities::error402("Invalid parameter clientID");
 
-        $client = $this->clientService->getClient($clientId);
+        $client = $this->clientService->getClient($clientId, ['assets']);
 
         if(!$client) return Utilities::error402("Client not found");
 
@@ -111,7 +111,7 @@ class ClientController extends Controller
 
             $client = $this->clientService->update($data, $client);
             if($oldPhotoId) $this->fileService->deleteFile($oldPhotoId);
-            
+
             DB::commit();
             return Utilities::ok(new ClientResource($client));
         }catch(\Exception $e){
