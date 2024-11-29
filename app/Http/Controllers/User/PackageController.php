@@ -197,7 +197,7 @@ class PackageController extends Controller
             $package = $this->packageService->update($data, $package);
             if(!empty($removedMediaIds)) $this->fileService->deleteFiles($removedMediaIds);
 
-            $package = $this->packageService->package($package->id, ['project', 'photos']);
+            $package = $this->packageService->package($package->id, ['project', 'media']);
             DB::commit();
 
             return Utilities::ok(new PackageResource($package));
