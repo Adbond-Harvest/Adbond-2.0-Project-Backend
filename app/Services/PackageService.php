@@ -168,7 +168,7 @@ class PackageService
 
     public function getPackageMediaIds($package)
     {
-        return PackageMedia::where("package_id", $package->id)->pluck("media_id")->toArray();
+        return PackageMedia::where("package_id", $package->id)->pluck("file_id")->toArray();
     }
 
     public function filter($filter, $with=[], $offset=0, $perPage=null)

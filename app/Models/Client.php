@@ -58,4 +58,9 @@ class Client extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(ClientNextOfKin::class, "client_id", "id");
     }
+
+    public function assets()
+    {
+        return $this->hasMany(ClientPackage::class, "client_id", "id");
+    }
 }
