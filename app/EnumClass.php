@@ -12,6 +12,8 @@ use app\Enums\FilePurpose;
 use app\Enums\PaymentMode;
 use app\Enums\CommissionTransactionType;
 use app\Enums\StaffCommissionType;
+use app\Enums\ProductCategory;
+use app\Enums\PostType;
 
 class EnumClass
 {
@@ -99,6 +101,34 @@ class EnumClass
         return [
             StaffCommissionType::DIRECT->value,
             StaffCommissionType::INDIRECT->value
+        ];
+    }
+
+    public static function ClientPackageFiles()
+    {
+        return [
+            FilePurpose::CONTRACT->value,
+            FilePurpose::DEED_OF_ASSIGNMENT->value,
+            FilePurpose::LETTER_OF_HAPPINESS->value
+        ];
+    }
+
+    public static function productCategories()
+    {
+        return [
+            ProductCategory::PURCHASE->value,
+            ProductCategory::INVESTMENT->value
+        ];
+    }
+
+    public static function postTypes()
+    {
+        return [
+            PostType::BLOG->value,
+            PostType::EVENTS->value,
+            PostType::NEWS->value,
+            PostType::OFFERS->value,
+            PostType::PROMOTIONS->value
         ];
     }
 }

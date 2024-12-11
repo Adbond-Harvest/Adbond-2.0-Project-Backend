@@ -44,6 +44,14 @@ class Client extends Authenticatable implements JWTSubject
         return $fullname;
     }
 
+    public function getNameAttribute()
+    {
+        $name = '';
+        if($this->firstname && !empty($this->firstname)) $name .= $this->firstname.' ';
+        if($this->lastname && !empty($this->lastname)) $name .= $this->lastname.' ';
+        return $name;
+    }
+
     public function photo()
     {
         return $this->belongsTo("app\Models\File");
@@ -62,5 +70,10 @@ class Client extends Authenticatable implements JWTSubject
     public function assets()
     {
         return $this->hasMany(ClientPackage::class, "client_id", "id");
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
     }
 }

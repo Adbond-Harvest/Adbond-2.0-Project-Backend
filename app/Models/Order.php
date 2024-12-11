@@ -29,9 +29,12 @@ class Order extends Model
         return $this->belongsTo(PaymentStatus::class);
     }
 
-    public function payments()
+    /**
+     * Get all payments for this order
+     */
+    public function payments(): MorphMany
     {
-        return $this->hasMany(Payment::class);
+        return $this->morphMany(Payment::class, 'purchase');
     }
 
     public function discounts()

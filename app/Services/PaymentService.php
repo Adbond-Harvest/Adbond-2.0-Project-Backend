@@ -64,7 +64,8 @@ class PaymentService
     public function save($data)
     {
         $payment = new Payment;
-        $payment->order_id = $data['orderId'];
+        $payment->purchase_id = $data['purchaseId'];
+        $payment->purchase_type = $data['purchaseType'];
         $payment->client_id = $data['clientId'];
         $payment->amount = $data['amount'];
         $payment->payment_mode_id = $data['paymentModeId'];

@@ -179,11 +179,11 @@ class PaymentController extends Controller
                 $paymentData['success'] = true;
                 $paymentData['confirmed'] = true;
             }else{
-                $paymentData['confirmed'] = false;
                 if($gatewayRes['paymentError']) {
                     $paymentData['flag'] = false;
                     $paymentData['failureMessage'] = $gatewayRes['message'];
                     $paymentData['success'] = false;
+                    $paymentData['confirmed'] = false;
                 }else{
                     $paymentData['success'] = true;
                     $paymentData['flag'] = true;
@@ -200,7 +200,8 @@ class PaymentController extends Controller
             $paymentData['amount'] = $data['amountPayed'];
         }
         
-        $paymentData['orderId'] = $order->id;
+        $paymentData['purchaseId'] = $order->id;
+        $paymentData['purchaseType'] = "app\Models\Order";
         $paymentData['receiptNumber'] = Helpers::generateReceiptNo($order->id, Auth::guard("client")->user()->id, $data['processingId']);
         if($data['cardPayment']) $paymentData['reference'] = $data['reference'];
         $paymentData['paymentDate'] = ($data['cardPayment']) ? now() : $data['paymentDate'];
@@ -235,6 +236,8 @@ class PaymentController extends Controller
             // dd('time to move..'.$uploadedReceipt);
             $response = Helpers::moveUploadedFileToCloud($uploadedReceipt, FileTypes::PDF->value, Auth::guard('client')->user()->id, 
             FilePurpose::PAYMENT_RECEIPT->value, self::$userType, "client-receipts");
+            $fileMeta = ["belongsId"=>$payment->id, "belongsType"=>"app\Models\Payment"];
+            $this->fileService->updateFileObj($fileMeta, $response['upload']['file']);
             
             if($response['success']) {
                 $this->paymentService->update(['receiptFileId' => $response['upload']['file']->id], $payment);

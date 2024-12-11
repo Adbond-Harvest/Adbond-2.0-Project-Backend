@@ -276,9 +276,9 @@ Class Helpers
         }
     }
 
-    public static function generateReceiptNo($orderId, $clientId, $processingId)
+    public static function generateReceiptNo($purchaseId, $clientId, $processingId)
     {
-        return $orderId.$processingId.$clientId;
+        return $purchaseId.$processingId.$clientId;
     }
 
     public static function generateOfferReceiptNo($payment)
@@ -295,7 +295,7 @@ Class Helpers
                 for($i=0; $i<$count; $i++) {
                     $zeros += '0';
                 }
-                $receiptNo = (int)$payment->order_id.$zeros.$payment->id;
+                $receiptNo = (int)$payment->purchase_id.$zeros.$payment->id;
                 $count++;
             }
             $exists = SalesOfferPayment::where('receipt_no', $receiptNo)->first();
@@ -569,26 +569,26 @@ Class Helpers
     {
         $addressArr = [];
         $addressArr = self::formatAddress($payment?->client?->address);
-        $unitSize = $payment?->order?->package->size;
-        $size = ($unitSize != null && $payment?->order?->units != null && $payment?->order?->units > 0) ? $unitSize * $payment?->order?->units : $unitSize;
+        $unitSize = $payment?->purchase?->package->size;
+        $size = ($unitSize != null && $payment?->purchase?->units != null && $payment?->purchase?->units > 0) ? $unitSize * $payment?->purchase?->units : $unitSize;
         $pdfData = [
             'image' => 'logo.jpg',
             'name' => $payment?->client?->full_name,
             'addressArr' => $addressArr,
             'date' => date('jS F, Y'),
-            'package' => $payment?->order?->package?->package?->name,
-            'project' => $payment?->order?->package?->package?->project?->project?->name,
-            'location' => $payment?->order?->package?->package?->project?->location?->name,
-            'price' => $payment?->order?->amount_payable,
+            'package' => $payment?->purchase?->package?->package?->name,
+            'project' => $payment?->purchase?->package?->package?->project?->project?->name,
+            'location' => $payment?->purchase?->package?->package?->project?->location?->name,
+            'price' => $payment?->purchase?->amount_payable,
             'amount_paid' => $payment->amount,
-            'units' => $payment?->order?->units,
+            'units' => $payment?->purchase?->units,
             'size' => $size,
             'payment_date' => date('d/m/Y', strtotime($payment->payment_date))
         ];
         // dd($pdfData);
         $pdf = PDF::loadView('pdf/letter_of_happiness', $pdfData);
         // return $pdf->stream('letter_of_happiness.pdf');
-        $pdf->save("files/letter_of_happiness_{$payment->order->id}.pdf");
+        $pdf->save("files/letter_of_happiness_{$payment->purchase->id}.pdf");
         // dd('done');
     }
 
@@ -604,13 +604,13 @@ Class Helpers
             if(isset($addressArr[2])) $address3 = $addressArr[2];
         }
         $discount = 0;
-        if($payment?->order->discounts && $payment?->order->discounts->count() > 0) {
-            foreach($payment?->order->discounts as $orderDiscount) {
+        if($payment?->purchase?->discounts && $payment?->purchase?->discounts->count() > 0) {
+            foreach($payment?->purchase->discounts as $orderDiscount) {
                 $discount += $orderDiscount->discount;
             }
         }
-        $unitSize = $payment?->order?->package?->size;
-        $size = ($unitSize != null && $payment?->order?->units != null && $payment?->order?->units > 0) ? $unitSize * $payment?->order?->units : $unitSize;
+        $unitSize = $payment?->purchase?->package?->size;
+        $size = ($unitSize != null && $payment?->purchase?->units != null && $payment?->purchase?->units > 0) ? $unitSize * $payment?->purchase?->units : $unitSize;
         $pdfData = [
             'image' => 'logo.jpg', 
             'name' => ucfirst($payment?->client?->full_name),
@@ -619,17 +619,17 @@ Class Helpers
             'address2' => $address2,
             'address3' => $address3,
             'date' => date('jS F, Y'),
-            'package' => $payment?->order?->package?->name,
-            'project' => $payment?->order?->package?->project?->name,
+            'package' => $payment?->purchase?->package?->name,
+            'project' => $payment?->purchase?->package?->project?->name,
             'paymentMethod' => ucfirst($payment?->paymentMode?->name),
-            'price' => $payment?->order?->package?->amount,
-            'amount' => $payment->order->amount_payable,
+            'price' => $payment?->purchase?->package?->amount,
+            'amount' => $payment->purchase->amount_payable,
             'currentAmount' => $payment->amount,
-            'amountPaid' => $payment->order->amount_payed,
-            'units' => $payment?->order?->units,
+            'amountPaid' => $payment->purchase->amount_payed,
+            'units' => $payment?->purchase?->units,
             'size' => $size,
             'discount' => $discount,
-            'balance' => $payment?->order->balance,
+            'balance' => $payment?->purchase->balance,
         ];
 
         // dd($pdfData);

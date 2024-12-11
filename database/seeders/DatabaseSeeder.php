@@ -27,6 +27,7 @@ use Database\Seeders\PaymentGateways;
 use Database\Seeders\CommissionRateSeeder;
 use Database\Seeders\DeductibleFees;
 use Database\Seeders\Benefits;
+use Database\Seeders\WalletSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -60,7 +61,8 @@ class DatabaseSeeder extends Seeder
             new PaymentGateways,
             new CommissionRateSeeder,
             new DeductibleFees,
-            new Benefits
+            new Benefits,
+            new WalletSeeder
         ];
 
         foreach($seeders as $seeder) $seeder->run();

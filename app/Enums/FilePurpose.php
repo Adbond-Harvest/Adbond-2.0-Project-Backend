@@ -15,5 +15,7 @@ enum FilePurpose: string
         case PAYMENT_RECEIPT = "Payment Receipt";
         case CONTRACT = "contract";
         case LETTER_OF_HAPPINESS = "letter of happiness";
+        case DEED_OF_ASSIGNMENT = "Deed of Assignment";
+        case POST_MEDIA = "post media";
         
     }

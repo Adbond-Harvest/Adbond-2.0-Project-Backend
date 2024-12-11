@@ -4,16 +4,23 @@ namespace app\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 use app\Models\PaymentMode;
+use app\Services\FileService;
 
 class Payment extends Model
 {
     use HasFactory;
 
-    public function order()
+    public static $type = "app\Models\Payment";
+
+    /**
+     * Get the parent purchase model (Order or Offer).
+     */
+    public function purchase(): MorphTo
     {
-        return $this->belongsTo(Order::class);
+        return $this->morphTo();
     }
 
     public function client()
@@ -54,7 +61,7 @@ class Payment extends Model
     protected static function boot()
     {
         parent::boot();
-
+        
         static::creating(function ($payment) {
             if(!$payment->confirmed && $payment->payment_mode_id) {
                 $payment->confirmed = ($payment->payment_mode_id == PaymentMode::cardPayment()->id);
@@ -62,5 +69,20 @@ class Payment extends Model
                 $payment->confirmed = false;
             }
         });
+
+        static::created(function ($payment) {
+            if($payment->evidence_file_id) self::updateFile($payment->evidence_file_id, $payment);
+            if($payment->receipt_file_id) self::updateFile($payment->receipt_file_id, $payment);
+        });
+    }
+
+    private static function updateFile($fileId, $clientPackage)
+    {
+        $fileService = new FileService;
+        $file = $fileService->getFile($fileId);
+        if($file && (!$file->belongs_id || !$file->belongs_type)){
+            $fileMeta = ["belongsId"=>$clientPackage->id, "belongsType"=>self::$type];
+            $fileService->updateFileObj($fileMeta, $file);
+        }
     }
 }

@@ -5,7 +5,8 @@ namespace app\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-use app\Http\Resources\AssetResource;;
+use app\Http\Resources\AssetResource;
+use app\Http\Resources\WalletResource;
 
 class ClientResource extends JsonResource
 {
@@ -33,6 +34,7 @@ class ClientResource extends JsonResource
             'occupation' => $this->occupation,
             'kycStatus' => $this->kyc_status,
             'active' => ($this->activated && $this->activated == 1) ? true : false,
+            'wallet' => new WalletResource($this->wallet),
             'joinedAt' => $this->created_at->format('F j, Y'),
             'assets' => AssetResource::collection($this->whenLoaded('assets'))
             // 'passwordSet' => ($this->password_set)

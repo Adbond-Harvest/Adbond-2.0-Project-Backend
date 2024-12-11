@@ -7,6 +7,7 @@ namespace app\Services;
 use Illuminate\Support\Facades\DB;
 
 use app\Models\Benefit;
+use app\Models\Bank;
 
 use app\Helpers;
 use app\Utilities;
@@ -35,6 +36,11 @@ class UtilityService
     public function benefitByName($name)
     {
         return Benefit::where("name", $name)->first();
+    }
+
+    public function banks()
+    {
+        return Bank::all();
     }
 
 }

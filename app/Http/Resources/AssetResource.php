@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 use app\Http\Resources\PackageResource;
+use app\Http\Resources\FileResource;
 
 use app\Enums\ClientPackageOrigin;
 
@@ -31,7 +32,8 @@ class AssetResource extends JsonResource
             "paymentPlan" => ($this->origin == ClientPackageOrigin::ORDER->value && $this->purchase->installment == 1) ? "installment" : "one-off",
             "appreciation" => $this->appreciation(),
             "status" => ($this->origin == ClientPackageOrigin::ORDER->value && $this->purchase->completed == 0) ? "pending" : "completed", 
-            "active" => ($this->origin == ClientPackageOrigin::ORDER->value && !$this->purchase?->completed) ? true : false
+            "active" => ($this->origin == ClientPackageOrigin::ORDER->value && !$this->purchase?->completed) ? true : false,
+            "files" => FileResource::collection($this->files)
         ];
     }
 

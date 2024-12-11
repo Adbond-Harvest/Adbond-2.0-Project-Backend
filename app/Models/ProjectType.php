@@ -5,9 +5,26 @@ namespace app\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use app\Enums\ProjectType as ProjectTypeEnum;
+
 class ProjectType extends Model
 {
     use HasFactory;
+
+    public static function land()
+    {
+        return self::where("name", ProjectTypeEnum::LAND->value);
+    }
+
+    public static function agro()
+    {
+        return self::where("name", ProjectTypeEnum::AGRO->value);
+    }
+
+    public static function homes()
+    {
+        return self::where("name", ProjectTypeEnum::HOMES->value);
+    }
 
     public function photo()
     {
