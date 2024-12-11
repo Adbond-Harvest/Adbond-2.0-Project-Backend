@@ -19,7 +19,7 @@ return new class extends Migration
             $table->bigInteger("receipt_no")->nullable();
             $table->double("amount");
             $table->foreignId("payment_mode_id")->constrained("payment_modes");
-            $table->boolean("confirmed");
+            $table->boolean("confirmed")->nullable();
             $table->foreignId("evidence_file_id")->nullable()->references("id")->on("files");
             $table->foreignId("payment_gateway_id")->nullable();
             $table->string("reference")->nullable();

@@ -20,6 +20,7 @@ class FileService
     private static $userType = "app\Models\Client";
     public $belongsId = null;
     public $belongsType = null;
+    public $docFile = false;
 
     public function getFile($id)
     {
@@ -33,7 +34,10 @@ class FileService
 
     public function save($file, $fileType, $user_id, $purpose, $user_type = null, $folder=null)
     {
-        $uploadedFile = ($fileType=='image' || $fileType=='video') ? $this->uploadMedia($file, $fileType, $folder) : $this->uploadDoc($file, $purpose, $folder);
+        $uploadedFile = ($fileType=='image' || $fileType=='video') ? 
+                    $this->uploadMedia($file, $fileType, $folder) 
+                    : 
+                    (($this->docFile) ? $this->uploadDocFile($file, $purpose, $folder) : $this->uploadDoc($file, $purpose, $folder));
         if($uploadedFile) {
             $status = $this->getStatus($uploadedFile);
             //dd($uploadedFile->offsetGet('secure_url'));
@@ -301,6 +305,37 @@ class FileService
         }else{
             return false;
         }
+    }
+
+    private function uploadDocFile($file, $purpose, $folder=null)
+    {
+        // $uploaded = in_array($purpose, [FilePurpose::CONTRACT->value, FilePurpose::LETTER_OF_HAPPINESS->value, FilePurpose::PAYMENT_RECEIPT->value]);
+        // if(!$uploaded) {
+        //     $filename = time().$file->getClientOriginalName();
+        //     $upload = Storage::disk('local')->putFileAs('files', $file, $filename);
+        // }else{
+        //     $upload = $file;
+        // }
+        // if($upload) {
+            $uploadFolder = ($folder==null) ? env("CLOUDINARY_DOCS") : env("CLOUDINARY_DOCS")."/".$folder;
+            
+            $uploadedFile = cloudinary()->uploadApi()->upload(
+                $file->getRealPath(),  
+                [
+                    // "public_id" => $file->getClientOriginalName(),
+                    "folder" => $uploadFolder,
+                    "resource_type" => "raw",
+                    "transformation" => [
+                        "flags" => 'attachment'
+                    ],
+                    // "format" => "pdf"
+                ]
+            );
+            // unlink($upload);
+            return $uploadedFile;
+        // }else{
+        //     return false;
+        // }
     }
 
     public function deleteFiles($filesIds)

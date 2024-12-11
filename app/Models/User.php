@@ -67,6 +67,14 @@ class User extends Authenticatable implements JWTSubject
 
     public static $userType = "app\Models\User";
 
+    public function getNameAttribute()
+    {
+        $fullname = '';
+        if($this->firstname && !empty($this->firstname)) $fullname .= $this->firstname.' ';
+        if($this->lastname && !empty($this->lastname)) $fullname .= $this->lastname.' ';
+        return $fullname;
+    }
+
     public function staffType()
     {
         return $this->belongsTo("app\Models\StaffType");

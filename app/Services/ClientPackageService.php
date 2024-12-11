@@ -47,5 +47,19 @@ class ClientPackageService
         return $clientPackage;
     }
 
+    public function update($data, $clientPackage)
+    {
+        if(isset($data['contractFileId'])) $clientPackage->contract_file_id = $data['contractFileId'];
+        if(isset($data['happinessLetterFileId'])) $clientPackage->happiness_letter_file_id = $data['happinessLetterFileId'];
+        if(isset($data['doaFileId'])) $clientPackage->doa_file_id = $data['doaFileId'];
+        $clientPackage->update();
+        return $clientPackage;
+    }
+
+    public function clientPackage($id, $with=[])
+    {
+        return ClientPackage::with($with)->where("id", $id)->first();
+    }
+
 
 }

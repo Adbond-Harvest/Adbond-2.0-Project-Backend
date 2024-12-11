@@ -14,6 +14,8 @@ use app\Http\Resources\PaymentPeriodStatusResource;
 use app\Http\Resources\BankAccountResource;
 use app\Http\Resources\FileResource;
 
+use app\Models\Order;
+
 class PaymentResource extends JsonResource
 {
     /**
@@ -37,7 +39,7 @@ class PaymentResource extends JsonResource
             "paymentGateway" => new PaymentGatewayResource($this->paymentGateway),
             "paymentEvidence" => new FileResource($this->paymentEvidence),
             "paymentReceipt" => new FileResource($this->paymentReceipt),
-            "order" => new OrderResource($this->whenLoaded("order"))
+            "order" => ($this->purchase_type == Order::$type) ? new OrderResource($this->whenLoaded("order")) : []
         ];
     }
 

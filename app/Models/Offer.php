@@ -17,4 +17,12 @@ class Offer extends Model
     {
         return $this->morphMany(ClientPackage::class, 'purchase');
     }
+
+    /**
+     * Get all payments for this order
+     */
+    public function payments(): MorphMany
+    {
+        return $this->morphMany(Payment::class, 'purchase');
+    }
 }

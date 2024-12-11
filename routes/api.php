@@ -12,6 +12,11 @@ use app\Http\Controllers\User\ProjectController as UserProjectController;
 use app\Http\Controllers\User\PackageController as UserPackageController;
 use app\Http\Controllers\User\IndexController as UserIndexController;
 use app\Http\Controllers\User\ClientController as UserClientController;
+use app\Http\Controllers\User\FileController as UserFileCOntroller;
+use app\Http\Controllers\User\Client\WalletController as UserClientWalletController;
+use app\Http\Controllers\User\Client\TransactionController as UserTransactionController;
+use app\Http\Controllers\User\PostController as UserPostController;
+use app\Http\Controllers\User\CommentController as UserCommentController;
 
 // Client Controllers
 use app\Http\Controllers\Client\PromoController;
@@ -98,11 +103,33 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('/{id}', [UserPackageController::class, "package"]);
         });
 
+        Route::group(['prefix' => '/posts'], function () {
+            Route::post('', [UserPostController::class, "save"]);
+            Route::post('/{postId}', [UserPostController::class, "update"]);
+            Route::post('/toggle_activate', [UserPostController::class, "toggleActivate"]);
+            Route::get('', [UserPostController::class, "posts"]);
+            Route::get('/{postId}', [UserPostController::class, "post"]);
+        });
+
+        Route::group(['prefix' => '/comments'], function () {
+            Route::post('', [UserCommentController::class, "save"]);
+        });
+
         // Client
         Route::group(['prefix' => '/clients'], function () {
             Route::get('', [UserClientController::class, "index"]);
             Route::get('/{clientId}', [UserClientController::class, "show"]);
             Route::post('/{clientId}', [UserClientController::class, "update"]);
+            Route::post('/re_upload_document/{assetId}', [UserFileController::class, "saveClientDocument"]);
+
+            Route::group(['prefix' => '/wallet', 'namespace' => 'Client'], function () {
+                Route::post('/link_bank_account', [UserClientWalletController::class, "linkBankAccount"]);
+            });
+            
+            Route::group(['prefix' => '/transactions', 'namespace' => 'Client'], function () {
+                Route::get('/{clientId}', [UserTransactionController::class, "transactions"]);
+                Route::get('/show/{transactionId}', [UserTransactionController::class, "transaction"]);
+            });
         });
     });
 
@@ -125,6 +152,7 @@ Route::group(['prefix' => '/v2',], function () {
     //Utitlity Routes
     Route::group(['prefix' => '/'], function () {    
         Route::get('benefits', [UtilityController::class, 'benefits']);
+        Route::get('banks', [UtilityController::class, 'banks']);
     });
 
     // Client Routes
