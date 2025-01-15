@@ -4,6 +4,7 @@ namespace app\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class WalletTransaction extends Model
 {
@@ -19,9 +20,17 @@ class WalletTransaction extends Model
         return $this->belongsTo(WalletBankAccount::class, "wallet_bank_account_id", "id");
     }
 
-    public function package()
+    // public function package()
+    // {
+    //     return $this->belongsTo(Package::class);
+    // }
+
+    /**
+     * Get the parent purchase model (Order or Offer).
+     */
+    public function source(): MorphTo
     {
-        return $this->belongsTo(Package::class);
+        return $this->morphTo();
     }
 
     public function WithdrawalRequest()

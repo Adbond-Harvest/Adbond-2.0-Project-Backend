@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('wallet_withdrawal_requests', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger("reference_no");
             $table->foreignId("wallet_id");
             $table->double("amount");
             $table->string("status");
             $table->text("rejected_reason")->nullable();
-            $table->foreignId("user_id");
+            $table->foreignId("user_id")->nullable();
             $table->timestamps();
         });
     }

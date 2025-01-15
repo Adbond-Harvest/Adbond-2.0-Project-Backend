@@ -22,6 +22,8 @@ class WalletResource extends JsonResource
         return [
             "id" => $this->id,
             "client" => new ClientBriefResource($this->whenLoaded("client")),
+            "lockedAmount" => $this->locked_amount,
+            "availableAmount" => $this->amount - $this->locked_amount,
             "currentBalance" => $this->amount,
             "totalBalance" => $this->total,
             "bankAccounts" => WalletBankAccountResource::collection($this->whenLoaded("bankAccounts")),

@@ -10,11 +10,13 @@ use app\Enums\OrderDiscountType;
 use app\Enums\FilePurpose;
 use app\Enums\ClientPackageOrigin;
 use app\Enums\FileTypes;
+use app\Enums\PackageType;
 
 use app\Helpers;
 use app\Utilities;
 
 use app\Services\ClientPackageService;
+use app\Services\ClientInvestmentService;
 use app\Services\FileService;
 use app\Services\CommissionService;
 
@@ -23,6 +25,11 @@ use app\Services\CommissionService;
  */
 class OrderService
 {
+
+    public function order($id, $with=[])
+    {
+        return Order::with($with)->where("id", $id)->first();
+    }
 
     public function getPayable($data, $promos, $promoCodeDiscount=null)
     {
@@ -73,14 +80,16 @@ class OrderService
         $order->client_id = $data['clientId'];
         $order->package_id = $data['packageId'];
         $order->units = $data['units'];
-        $order->amount_payed = $data['amountPayed'];
+        if(isset($data['balance']) && isset($data['balance'])) {
+            $order->amount_payed = $data['amountPayed'];
+            $order->balance = $data['balance'];
+        }
         $order->amount_payable = $data['amountPayable'];
         $order->unit_price = $data['unitPrice'];
         if(isset($data['promoCodeId'])) $order->promo_code_id = $data['promoCodeId'];
         $order->is_installment = $data['isInstallment'];
         if($data['isInstallment']) $order->installment_count = $data['installmentCount'];
         if(isset($data['installmentsPayed'])) $order->installments_payed = $data['installmentsPayed'];
-        $order->balance = $data['balance'];
         $order->payment_status_id = $data['paymentStatusId'];
         $order->order_date = $data['orderDate'];
         if(isset($data['paymentDueDate'])) $order->payment_due_date = $data['paymentDueDate'];
@@ -88,6 +97,28 @@ class OrderService
         if(isset($data['paymentPeriodStatusId'])) $order->payment_period_status_id = $data['paymentPeriodStatusId'];
 
         $order->save();
+
+        return $order;
+    }
+
+    public function update($data, $order)
+    {
+        if(isset($data['installmentsPayed'])) $order->installments_payed = $data['installmentsPayed'];
+        if(isset($data['paymentStatusId'])) $order->payment_status_id = $data['paymentStatusId'];
+        if(isset($data['amountPayed'])) {
+            $order->amount_payed += $data['amountPayed'];
+            $order->balance = $data['balance'];
+        }
+        $order->update();
+
+        return $order;
+    }
+
+    public function saveAmountPaid($order, $amount)
+    {
+        $data['amountPayed'] = $amount;
+        $data['balance'] = ($order->is_installment==1) ? $order->amount_payable - ($order->amount_payed + $amount) : 0;
+        $order = $this->update($data, $order);
 
         return $order;
     }
@@ -106,13 +137,14 @@ class OrderService
     }
 
 
-    public function completeOrder($order, $payment)
+    public function completeOrder($order, $payment, $clientInvestment=null)
     {
         $contractFileId = null;
         $contractFileObj = null;
         $letterOfHappinessFileId = null;
         $letterOfHappinessFileObj = null;
         $fileService = new FileService;
+        $clientInvestmentService = new ClientInvestmentService;
         try{
             // generate and save contract
             Helpers::generateContract($order);
@@ -139,7 +171,6 @@ class OrderService
             
             $response = Helpers::moveUploadedFileToCloud($uploadedLetter, FileTypes::PDF->value, $order->client->id, 
             FilePurpose::LETTER_OF_HAPPINESS->value, "app\Models\Client", "client-letter_of_happiness");
-            
             if($response['success']) {
                 $letterOfHappinessFileId = $response['upload']['file']->id;
                 $letterOfHappinessFileObj = $response['upload']['file'];
@@ -153,12 +184,43 @@ class OrderService
         $order->completed = true;
         $order->update();
 
+
         // save the clientPackage and return it
         $clientPackageService = new ClientPackageService;
         $files = [];
         if($contractFileId) $files['contractFileId'] = $contractFileId;
         if($letterOfHappinessFileId) $files['happinessLetterFileId'] = $letterOfHappinessFileId;
-        $clientPackage = $clientPackageService->saveClientPackageOrder($order, $files);
+        // dd($files);
+        if($order->package->type==PackageType::NON_INVESTMENT->value) $clientPackage = $clientPackageService->saveClientPackageOrder($order, $files);
+
+        if($order->package->type==PackageType::INVESTMENT->value) {
+            try{
+                // generate and save Memorandum of Agreement
+                Helpers::generateMemorandumAgreement($order);
+                // dd('generate receipt');
+                $uploadedMemorandum = "files/memorandum_agreement_{$order->id}.pdf";
+                
+                $response = Helpers::moveUploadedFileToCloud($uploadedMemorandum, FileTypes::PDF->value, $order->client->id, 
+                FilePurpose::MEMORANDUM_OF_AGREEMENT->value, "app\Models\Client", "client-agreement-memorandums");
+                
+                if($response['success']) {
+                    $memorandumFileId = $response['upload']['file']->id;
+                    $memorandumFileObj = $response['upload']['file'];
+                    $clientInvestment = $clientInvestmentService->addMemorandumAgreement($memorandumFileId, $clientInvestment);
+                }
+                
+            }catch(\Exception $e) {
+                Utilities::logStuff("Error Occurred while attempting to generate and upload Memorandum of agreement..".$e);
+            }
+            // $investmentData['startDate'] = date("Y-m-d");
+            // $investmentData['endDate'] = 
+            $clientPackage = $clientPackageService->saveClientPackageInvestment($clientInvestment);
+            $fileMeta = ["belongsId"=>$clientPackage->id, "belongsType"=>"app\Models\ClientInvestment"];
+            if($memorandumFileObj) $fileService->updateFileObj($fileMeta, $memorandumFileObj);
+        }
+
+         // Start the investment
+         $clientInvestmentService->start($clientInvestment);
 
         $fileMeta = ["belongsId"=>$clientPackage->id, "belongsType"=>"app\Models\ClientPackage"];
         if($contractFileObj) $fileService->updateFileObj($fileMeta, $contractFileObj);

@@ -5,7 +5,7 @@ namespace app\Http\Requests\Client;
 use Illuminate\Foundation\Http\FormRequest;
 use app\Http\Requests\BaseRequest;
 
-class InitializeCardPayment extends FormRequest
+class InitializeCardPayment extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.

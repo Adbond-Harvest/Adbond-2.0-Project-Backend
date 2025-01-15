@@ -3,11 +3,17 @@
 namespace app\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use app\Http\Requests\BaseRequest;
 
 use app\Rules\ValidPackageBrochureFile;
 use app\Rules\ValidPackageMediaFile;
 use app\Rules\PackageNameUnique;
+
+use app\EnumClass;
+use app\Enums\PackageType;
+use app\Enums\InvestmentRedemptionOption;
+use app\Rules\IsNonInvestmentPackage;
 
 class SavePackage extends BaseRequest
 {
@@ -31,7 +37,7 @@ class SavePackage extends BaseRequest
             "name" => ["required","string", new PackageNameUnique()],
             "state" => "required|string",
             "address" => "nullable|string",
-            "size" => "required|numeric",
+            "size" => "numeric|required_if:type,".PackageType::NON_INVESTMENT->value,
             "amount" => "required|numeric",
             "units" => "required|integer",
             "discount" => "nullable|numeric",
@@ -46,7 +52,28 @@ class SavePackage extends BaseRequest
             "installmentOption" => "nullable|boolean",
             "vrUrl" => "nullable|string",
             "packageMediaIds" => "nullable|array",
-            "packageMediaIds.*" => ["integer", new ValidPackageMediaFile()]
+            "packageMediaIds.*" => ["integer", new ValidPackageMediaFile()],
+            "type" => ["nullable", "string", Rule::in(EnumClass::packageTypes())],
+            "interestReturnDuration" => "integer|required_if:type,".PackageType::INVESTMENT->value,
+            "interestReturnTimeline" => "integer|required_if:type,".PackageType::INVESTMENT->value,
+            "interestReturnPercentage" => ["integer", Rule::requiredIf(function () {
+                                                    return $this->type === PackageType::INVESTMENT->value && is_null($this->interestReturnAmount);
+                                                }),
+                                            ],
+            "interestReturnAmount" => ["integer", Rule::requiredIf(function () {
+                                                    return $this->type === PackageType::INVESTMENT->value && is_null($this->interestReturnPercentage);
+                                                }),
+                                            ],
+            "redemptionOptions" => "array|required_if:type,".PackageType::INVESTMENT->value,
+            "redemptionOptions.*" => ["string", Rule::in(EnumClass::investmentRedemptionOptions())],
+            "redemptionPackageId" => ["integer", Rule::requiredIf(function() {
+                                                    return ($this->redemptionOptions && is_array($this->redemptionOptions)) &&
+                                                            (in_array(InvestmentRedemptionOption::PROFIT_ONLY->value, $this->redemptionOptions) 
+                                                            || 
+                                                            in_array(InvestmentRedemptionOption::PROPERTY->value, $this->redemptionOptions));
+                                                }),
+                                        new IsNonInvestmentPackage()
+                                    ]
         ];
     }
 }

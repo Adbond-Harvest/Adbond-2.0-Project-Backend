@@ -14,6 +14,8 @@ use app\Enums\CommissionTransactionType;
 use app\Enums\StaffCommissionType;
 use app\Enums\ProductCategory;
 use app\Enums\PostType;
+use app\Enums\PackageType;
+use app\Enums\InvestmentRedemptionOption;
 
 class EnumClass
 {
@@ -113,13 +115,13 @@ class EnumClass
         ];
     }
 
-    public static function productCategories()
-    {
-        return [
-            ProductCategory::PURCHASE->value,
-            ProductCategory::INVESTMENT->value
-        ];
-    }
+    // public static function productCategories()
+    // {
+    //     return [
+    //         ProductCategory::PURCHASE->value,
+    //         ProductCategory::INVESTMENT->value
+    //     ];
+    // }
 
     public static function postTypes()
     {
@@ -131,4 +133,21 @@ class EnumClass
             PostType::PROMOTIONS->value
         ];
     }
+
+    public static function packageTypes()
+    {
+        return [
+            PackageType::INVESTMENT->value,
+            PackageType::NON_INVESTMENT->value
+        ];
+    }
+
+    public static function investmentRedemptionOptions()
+    {
+        return [
+            InvestmentRedemptionOption::CASH->value,
+            InvestmentRedemptionOption::PROFIT_ONLY->value,
+            InvestmentRedemptionOption::PROPERTY->value
+        ];
+    } 
 }

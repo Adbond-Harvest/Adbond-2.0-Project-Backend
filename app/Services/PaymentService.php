@@ -2,13 +2,22 @@
 
 namespace app\Services;
 
+use Illuminate\Support\Facades\Mail;
+
 use app\Models\Order;
 use app\Models\Payment;
 use app\Models\Discount;
 use app\Models\PaymentMode;
 use app\Models\PaymentGateway;
 
+use app\Mail\NewPayment;
+
 use app\Enums\OrderDiscountType;
+use app\Enums\UserType;
+use app\Enums\FileTypes;use app\Enums\FilePurpose;
+
+
+use app\Services\FileService;
 
 use app\Helpers;
 use app\Utilities;
@@ -18,6 +27,11 @@ use app\Utilities;
  */
 class PaymentService
 {
+
+    public function getPayment($id, $with=[])
+    {
+        return Payment::with($with)->where("id", $id)->first();
+    }
 
     public function getPayable($data, $promos, $promoCodeDiscount=null)
     {
@@ -63,6 +77,7 @@ class PaymentService
 
     public function save($data)
     {
+        // dd($data);
         $payment = new Payment;
         $payment->purchase_id = $data['purchaseId'];
         $payment->purchase_type = $data['purchaseType'];
@@ -70,6 +85,7 @@ class PaymentService
         $payment->amount = $data['amount'];
         $payment->payment_mode_id = $data['paymentModeId'];
         if(isset($data['confirmed'])) $payment->confirmed = $data['confirmed'];
+        
         if(isset($data['evidenceFileId'])) $payment->evidence_file_id = $data['evidenceFileId'];
         if(isset($data['paymentGatewayId'])) $payment->payment_gateway_id = $data['paymentGatewayId'];
         if(isset($data['reference'])) $payment->reference = $data['reference'];
@@ -85,7 +101,6 @@ class PaymentService
         if(isset($data['userId'])) $payment->user_id = $data['userId'];
 
         $payment->save();
-
         return $payment;
     }
 
@@ -121,7 +136,7 @@ class PaymentService
             "Authorization" => "Bearer ".env('PAYSTACK_SECRET_KEY'),
             "Cache-Control" => "no-cache"
         ];
-        $post = ["email" => $client->email, "amount" => $amount];
+        $post = ["email" => $client->email, "amount" => ceil($amount)];
         $res = ['success' => false];
         $response = Helpers::request($url, $headers, $post);
         if($response['status'] && $response['status'] == true) {
@@ -145,24 +160,87 @@ class PaymentService
         $message = "";
         $res = ['success' => false, 'paymentError' => false];
         $data = Helpers::request($url, $headers);
+        // dd($data);
+        $gatewayResponse = (isset($data['data']['gateway_response'])) ? $data['data']['gateway_response'] : '';
         if(($data['status'] && $data['status'] == true) && ($data['data'] && $data['data']['status'] == "success")) {
             // dd($data);
+            $res["success"] = true;
             $resData = $data['data'];
-            $payedAmount = $resData['amount'];
+            $payedAmount = $resData['amount']/100;
             $commission = $resData['fees'];
             // dd('payed Amount: '.$payedAmount .' - Commission'. $commission);
             // $productAmount = $payedAmount - $commission; // Get the product amount by deducting paystack commission
             if(($payedAmount == $amount) || abs($payedAmount - $amount) < 1) {// The payed amount is equal to what should be paid or difference not up to 1
-                return ["success" => true, "amount" => $payedAmount];
+                $res["amount"] = $payedAmount;
             }else{
                 // dd($payedAmount .' == '. $amount . ' || ' . abs($payedAmount - $amount) . ' < 1');
-                $res['message'] = "The amount to be paid doesn't match the amount that was paid";
+                $res["amount"] = $payedAmount;
+                $res['paymentError'] = true;
+                $res['message'] = "The amount to be paid(".$amount.") doesn't match the amount that was paid(".$payedAmount.")";
             }
         }else{
-            $res['message'] = $data['message'];
+            $res['message'] = $data['message'].', '.$gatewayResponse;
             $res['paymentError'] = true;
         }
         return $res;
+    }
+
+    public function uploadReceipt($payment, $user)
+    {
+        // generate receipt if the card payment was successful
+        // dd($payment);
+        try{
+            $fileService = new FileService;
+            Helpers::generateReceipt($payment->load('paymentMode'));
+            // dd('generate receipt');
+            $uploadedReceipt = 'files/receipt'.$payment->receipt_no.'.pdf';
+            // dd('time to move..'.$uploadedReceipt);
+            $response = Helpers::moveUploadedFileToCloud($uploadedReceipt, FileTypes::PDF->value, $user->id, 
+            FilePurpose::PAYMENT_RECEIPT->value, UserType::CLIENT->value, "client-receipts");
+            $fileMeta = ["belongsId"=>$payment->id, "belongsType"=>"app\Models\Payment"];
+            $fileService->updateFileObj($fileMeta, $response['upload']['file']);
+            
+            if($response['success']) {
+                $this->update(['receiptFileId' => $response['upload']['file']->id], $payment);
+                // dd("got here");
+                try{
+                    // Send Payment Mail
+                    Mail::to($payment->client->email)->send(new NewPayment($payment, $uploadedReceipt));
+                }catch(\Exception $e) {
+                    Utilities::logStuff("Error Occurred while attempting to send Payment Email..".$e);
+                }
+            }
+        }catch(\Exception $e) {
+            Utilities::logStuff("Error Occurred while attempting to generate and upload receipt..".$e);
+        }
+    }
+
+    public function confirm($payment)
+    {
+        $payment->confirmed = true;
+        $payment->success = true;
+        $payment->update();
+
+        return $payment;
+    }
+
+    public function reject($payment, $message)
+    {
+        $payment->confirmed = false;
+        $payment->success = false;
+        $payment->rejected_reason = $message;
+        $payment->update();
+
+        return $payment;
+    }
+
+    public function flag($payment, $message)
+    {
+        $payment->flag = true;
+        $payment->flag_message = $message;
+        $payment->update();
+
+        return $payment->update();
     }
 
 }

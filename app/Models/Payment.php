@@ -63,10 +63,8 @@ class Payment extends Model
         parent::boot();
         
         static::creating(function ($payment) {
-            if(!$payment->confirmed && $payment->payment_mode_id) {
-                $payment->confirmed = ($payment->payment_mode_id == PaymentMode::cardPayment()->id);
-            }else{
-                $payment->confirmed = false;
+            if($payment->confirmed==null && $payment->payment_mode_id) {
+                $payment->confirmed = ($payment->payment_mode_id == PaymentMode::cardPayment()->id && $payment->flag==0 && $payment->success==1);
             }
         });
 

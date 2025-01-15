@@ -27,7 +27,7 @@ class ClientPackage extends Model
      */
     public function files()
     {
-        return $this->morphMany(\App\Models\File::class, 'belongs');
+        return $this->morphMany(File::class, 'belongs');
     }
 
     /**

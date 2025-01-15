@@ -13,12 +13,15 @@ return new class extends Migration
     {
         Schema::create('wallet_transactions', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger("reference_no")->index("reference_no_index");
             $table->foreignId("wallet_id");
             $table->foreignId("wallet_bank_account_id")->nullable();
             $table->double("amount");
             $table->double("balance");
             $table->string("transaction_type");
-            $table->foreignId("package_id")->nullable();
+            $table->string("source_type")->nullable();
+            $table->foreignId("source_id")->nullable();
+            // $table->foreignId("package_id")->nullable();
             $table->boolean("confirmed")->nullable();
             $table->foreignId("withdrawal_request_id")->nullable();
             $table->timestamps();

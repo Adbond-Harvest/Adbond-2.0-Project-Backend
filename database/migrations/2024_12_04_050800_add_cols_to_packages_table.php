@@ -15,7 +15,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('packages', function (Blueprint $table) {
-            $table->enum("category", EnumClass::productCategories())->default(ProductCategory::PURCHASE->value)->after("name");
+            // $table->enum("category", EnumClass::productCategories())->default(ProductCategory::PURCHASE->value)->after("name");
             $table->integer("interest_return_duration")->nullable()->after("min_price");
             $table->integer("interest_return_timeline")->nullable()->after("interest_return_duration");
             $table->double("interest_return_percentage")->nullable()->after("interest_return_timeline");

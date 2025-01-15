@@ -17,12 +17,14 @@ use app\Http\Controllers\User\Client\WalletController as UserClientWalletControl
 use app\Http\Controllers\User\Client\TransactionController as UserTransactionController;
 use app\Http\Controllers\User\PostController as UserPostController;
 use app\Http\Controllers\User\CommentController as UserCommentController;
+use app\Http\Controllers\User\PaymentController as UserPaymentController;
 
 // Client Controllers
 use app\Http\Controllers\Client\PromoController;
 use app\Http\Controllers\Client\OrderController;
 use app\Http\Controllers\Client\PaymentController;
 use app\Http\Controllers\Client\DashboardController;
+use app\Http\Controllers\Client\WalletController;
 
 //Public Controllers
 use app\Http\Controllers\ProjectController;
@@ -103,6 +105,12 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('/{id}', [UserPackageController::class, "package"]);
         });
 
+        Route::group(['prefix' => '/payments'], function () {
+            Route::post('/confirm', [UserPaymentController::class, 'confirm']);
+            Route::post('/reject', [UserPaymentController::class, 'reject']);
+            Route::post('/flag', [UserPaymentController::class, 'flag']);
+        });
+
         Route::group(['prefix' => '/posts'], function () {
             Route::post('', [UserPostController::class, "save"]);
             Route::post('/{postId}', [UserPostController::class, "update"]);
@@ -122,8 +130,15 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/{clientId}', [UserClientController::class, "update"]);
             Route::post('/re_upload_document/{assetId}', [UserFileController::class, "saveClientDocument"]);
 
+            // Wallet Routes
             Route::group(['prefix' => '/wallet', 'namespace' => 'Client'], function () {
                 Route::post('/link_bank_account', [UserClientWalletController::class, "linkBankAccount"]);
+                Route::get('/{clientId}', [UserClientWalletController::class, "index"]);
+                Route::get('/transactions/{clientId}', [UserClientWalletController::class, "transactions"]);
+                Route::get('/withdrawal_requests/{clientId}', [UserClientWalletController::class, "withdrawalRequests"]);
+                Route::get('/withdrawal_request/{requestId}', [UserClientWalletController::class, "withdrawalRequest"]);
+                Route::post('/withdrawal_requests/approve', [UserClientWalletController::class, "approveRequest"]);
+                Route::post('/withdrawal_requests/reject', [UserClientWalletController::class, "rejectRequest"]);
             });
             
             Route::group(['prefix' => '/transactions', 'namespace' => 'Client'], function () {
@@ -170,13 +185,23 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/upload_payment_evidence', 'FileController@savePaymentEvidence');
         });
 
+        //Order Routes
         Route::group(['prefix' => '/order',], function () {
             Route::post('/validate_promo_code', [PromoController::class, 'validate']);
             Route::post('/prepare', [OrderController::class, 'prepareOrder']);
         });
+
+        // Payment Routes
         Route::group(['prefix' => '/payment',], function () {
             Route::post('/initialize_card_payment', [PaymentController::class, 'initializeCardPayment']);
+            Route::post('/prepare_additional_payment', [PaymentController::class, 'prepareAdditionalPayment']);
             Route::post('/save', [PaymentController::class, 'save']);
+            Route::post('/save_additional_payment', [PaymentController::class, 'saveAdditionalPayment']);
+        });
+
+        //Wallet Routes
+        Route::group(['prefix' => '/wallet',], function () {
+            Route::post('/withdraw', [WalletController::class, 'withdraw']);
         });
     });
 

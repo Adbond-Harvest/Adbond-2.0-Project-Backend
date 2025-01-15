@@ -56,6 +56,11 @@ class Order extends Model
 
         static::creating(function ($order) {
             $order->payment_period_status_id = PaymentPeriodStatus::normal()->id;
+            // if(!$order->balance) $order->bala
+            if($order->balance < 0) $order->balance = 0;
+        });
+        self::updating(function (Order $order) {
+            if($order->balance < 0) $order->balance = 0;
         });
     }
 }

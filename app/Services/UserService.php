@@ -168,12 +168,12 @@ class UserService
         return User::select(DB::raw("SUM(commission) as total"))->get();
     }
 
-    public function save($data, $user_id=null)
+    public function save($data, $user_id)
     {
         $user = new User;
         if(isset($data['title'])) $user->title = $data['title'];
-        if(isset($data['firstname'])) $user->firstname = $data['firstname'];
-        if(isset($data['lastname'])) $user->lastname = $data['lastname'];
+        $user->firstname = $data['firstname'];
+        $user->lastname = $data['lastname'];
         $user->email = $data['email'];
         $user->password =  bcrypt($data['password']);
         if(isset($data['role_id'])) $user->role_id = $data['role_id'];
@@ -185,12 +185,12 @@ class UserService
         if(isset($data['postal_code'])) $user->postal_code = $data['postal_code'];
         if(isset($data['marital_status'])) $user->marital_status = $data['marital_status'];
         $user->registered_by = $user_id;
-        $user->referer_code = Utilities::generateRandomString(5);
+        $user->referer_code = Utilities::generateRefererCode();
         if(isset($data['file_id'])) $user->photo_id = $data['file_id']; 
         if(isset($data['gender'])) $user->gender = $data['gender']; 
         if(isset($data['department_id'])) $user->department_id = $data['department_id']; 
         if(isset($data['position_id'])) $user->position_id = $data['position_id']; 
-        $user->date_joined = (isset($data['date_joined'])) ? $data['date_joined'] : date('Y-m-d'); 
+        $user->date_joined = (isset($data['dateJoined'])) ? $data['dateJoined'] : date('Y-m-d'); 
         $user->save();
         return $user;
     }

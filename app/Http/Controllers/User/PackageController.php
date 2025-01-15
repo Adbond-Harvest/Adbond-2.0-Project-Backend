@@ -83,6 +83,7 @@ class PackageController extends Controller
         try{
             DB::beginTransaction();
             $data = $request->validated();
+            // dd($data);
             $data['userId'] = Auth::user()->id;
             // if brochure file is uploaded
             if($request->hasFile('brochureFile')) { 

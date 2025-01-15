@@ -21,12 +21,15 @@ class WalletWithdrawalRequestResource extends JsonResource
     {
         return [
             "id" => $this->id,
+            "referenceNo" => $this->reference_no,
             "amount" => $this->amount,
+            "walletBalance" => $this->wallet->balance,
             "client" => new ClientBriefResource($this->whenLoaded("wallet.client")),
             "wallet" => new WalletResource($this->whenLoaded("wallet")),
             "status" => $this->status,
             "rejectedReason" => $this->rejected_reason,
-            "treatedBy" => new UserBriefResource($this->whenLoaded("user"))
+            "treatedBy" => new UserBriefResource($this->whenLoaded("user")),
+            "date" => $this->created_at->format('F j, Y')
         ];
     }
 }
