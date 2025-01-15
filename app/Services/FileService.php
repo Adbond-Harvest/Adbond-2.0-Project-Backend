@@ -278,7 +278,7 @@ class FileService
 
     private function uploadDoc($file, $purpose, $folder=null)
     {
-        $uploaded = in_array($purpose, [FilePurpose::CONTRACT->value, FilePurpose::LETTER_OF_HAPPINESS->value, FilePurpose::PAYMENT_RECEIPT->value]);
+        $uploaded = in_array($purpose, [FilePurpose::CONTRACT->value, FilePurpose::LETTER_OF_HAPPINESS->value, FilePurpose::PAYMENT_RECEIPT->value, FilePurpose::MEMORANDUM_OF_AGREEMENT->value]);
         if(!$uploaded) {
             $filename = time().$file->getClientOriginalName();
             $upload = Storage::disk('local')->putFileAs('files', $file, $filename);

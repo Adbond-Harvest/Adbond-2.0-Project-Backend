@@ -33,7 +33,7 @@ class OrderResource extends JsonResource
             "paymentStatus" => new PaymentStatusResource($this->whenLoaded("paymentStatus")),
             "orderDate" => $this->order_date,
             "paymentDueDate" => $this->payment_due_date,
-            "payments" => PaymentResource::collection($this->payments)
+            "payments" => PaymentResource::collection($this->whenLoaded('payments'))
         ];
     }
 }

@@ -517,7 +517,7 @@ Class Helpers
         $data['address'] = $order->client->address;
         // $data['location'] = $order?->packageItem?->package?->project_location?->location?->name;
         $projectAddress = $order?->package?->address;
-        $state = $order?->package?->state?->name.' State';
+        $state = $order?->package?->state.' State';
         $data['location'] = ($projectAddress) ? $projectAddress.', '.$state : $state;
         $data['state'] = $state;
         $data['price'] = $order->amount;
@@ -532,9 +532,9 @@ Class Helpers
         // dd($data);
     }
 
-    public static function generateContract($order)
+    public static function generateContract($order, $preparedData=null)
     {
-        $data = self::prepareContract($order);
+        $data = ($preparedData) ? $preparedData : self::prepareContract($order);
         if(!isset($data['project']) || $data['project']==null) $data['project'] = '';
         if(!isset($data['package']) || $data['package']==null) $data['package'] = '';
         if(!isset($data['client']) || $data['client']==null) $data['client'] = '';
@@ -590,6 +590,39 @@ Class Helpers
         // return $pdf->stream('letter_of_happiness.pdf');
         $pdf->save("files/letter_of_happiness_{$payment->purchase->id}.pdf");
         // dd('done');
+    }
+
+    public static function generateMemorandumAgreement($order)
+    {
+        $data = self::prepareContract($order);
+        if(!isset($data['project']) || $data['project']==null) $data['project'] = '';
+        if(!isset($data['package']) || $data['package']==null) $data['package'] = '';
+        if(!isset($data['client']) || $data['client']==null) $data['client'] = '';
+        if(!isset($data['address']) || $data['address']==null) $data['address'] = '';
+        if(!isset($data['state']) || $data['state']==null) $data['state'] = '';
+        if(!isset($data['size']) || $data['size']==null) $data['size'] = '';
+        if(!isset($data['price']) || $data['price']==null) $data['price'] = '';
+        if(!isset($data['installment_duration']) || $data['installment_duration']==null) $data['installment_duration'] = 12;
+        $data['location'] = (!isset($data['location']) || $data['location']==null) ? '' : $data['location'];
+        $pdfData = [
+            'image' => public_path('images/logo.PNG'),
+            'day' => date('jS'),
+            'month' => date('F'),
+            'year' => date('Y'),
+            'project' => $data['project'],
+            'package' => $data['package'],
+            'client' => $data['client'],
+            'state' => $data['state'],
+            'address' => $data['address'],
+            'price' => (float)$data['price'],
+            'size' => (float)$data['size'],
+            'location' => $data['location'],
+            'installment_duration' => $data['installment_duration'],
+            'installment' => $data['installment']
+        ];
+        $pdf = PDF::loadView('pdf/memorandum_agreement', $pdfData);
+        // return $pdf->stream('memorandum_agreement.pdf');
+        $pdf->save("files/memorandum_agreement_{$order->id}.pdf");
     }
 
     public static function generateReceipt($payment)

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId("client_id")->references("id")->on("clients");
             $table->foreignId("package_id")->references("id")->on("packages");
             $table->double("units");
-            $table->double("amount_payed");
+            $table->double("amount_payed")->default(0);
             $table->double("amount_payable");
             $table->foreignId("promo_code_id")->nullable()->references("id")->on("promo_codes");
             $table->boolean("is_installment")->default(false);

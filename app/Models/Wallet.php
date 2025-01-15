@@ -30,4 +30,18 @@ class Wallet extends Model
     {
         $this->hasMany(WalletWithdrawalRequest::class);
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // static::creating(function ($order) {
+        //     $order->payment_period_status_id = PaymentPeriodStatus::normal()->id;
+        //     // if(!$order->balance) $order->bala
+        //     if($order->balance < 0) $order->balance = 0;
+        // });
+        self::updating(function (Wallet $wallet) {
+            if($wallet->locked_amount < 0) $wallet->locked_amount = 0;
+        });
+    }
 }

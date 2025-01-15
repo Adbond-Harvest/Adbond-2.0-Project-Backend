@@ -3,7 +3,10 @@
 namespace app\Http\Requests\Client;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use app\Http\Requests\BaseRequest;
+
+use app\EnumClass;
 
 class PrepareOrder extends BaseRequest
 {
@@ -28,7 +31,9 @@ class PrepareOrder extends BaseRequest
             "installmentCount" => "required_if:isInstallment,true",
             "units" => "required|integer",
             "promoCode" => "nullable|string|exists:promo_codes,code",
-            "processingId" => "nullable"
+            "processingId" => "nullable",
+            "redemptionOption" => ['nullable', 'string', Rule::in(EnumClass::investmentRedemptionOptions())],
+            // "redemptionPackageId" => "nullable|integer|exists:packages,id"
         ];
     }
 }

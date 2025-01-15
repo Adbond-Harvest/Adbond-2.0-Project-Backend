@@ -6,15 +6,24 @@ namespace app\Services;
 
 use app\Models\Wallet;
 use app\Models\WalletBankAccount;
+use app\Models\WalletTransaction;
+use app\Models\WalletWithdrawalRequest;
+use app\Models\ClientInvestment;
 
 use app\Helpers;
 use app\Utilities;
+
+use app\Enums\TransactionType;
+use app\Enums\WalletTransactionSource;
+use app\Enums\WalletWithdrawalRequestStatus;
 
 /**
  * user service class
  */
 class WalletService
 {
+    public $walletId = null;
+    
     public function wallets($with=[])
     {
         return Wallet::with($with)->get();
@@ -30,6 +39,48 @@ class WalletService
         return Wallet::with($with)->where("client_id", $clientId)->first();
     }
 
+    public function transactions($walletId, $with=[])
+    {
+        return WalletTransaction::with($with)->where("wallet_id", $walletId)->get();
+    }
+
+    public function getTransactionsByReference($referenceNo)
+    {
+        return WalletTransaction::where("reference_no", $referenceNo)->first();
+    }
+
+    public function getInvestmentTransactions($investmentId)
+    {
+        return WalletTransaction::where("source_type", WalletTransactionSource::INVESTMENT->value)->where("source_id", $investmentId)->get();
+    }
+
+    public function getWithdrawalByReference($referenceNo, $with=[])
+    {
+        return WalletWithdrawalRequest::with($with)->where("reference_no", $referenceNo)->first();
+    }
+
+    public function getWithdrawalById($id, $with=[])
+    {
+        return WalletWithdrawalRequest::with($with)->where("id", $id)->first();
+    }
+
+    public function withdrawalRequests($with=[])
+    {
+        $query = WalletWithdrawalRequest::with($with);
+        if($this->walletId) $query->where("wallet_id", $this->walletId);
+        return $query->get();
+    }
+
+    public function getTotalInvestmentAmount($investmentId)
+    {
+        $amount = 0;
+        $transactions = $this->getInvestmentTransactions($investmentId);
+        if($transactions->count() > 0) {
+            foreach($transactions as $transaction) $amount += $transaction->amount;
+        }
+        return $amount;
+    }
+
     public function addBankAccount($wallet, $bankData)
     {
         $bankAccount = new WalletBankAccount;
@@ -39,5 +90,104 @@ class WalletService
         $bankAccount->wallet_id = $wallet->id;
         $bankAccount->save();
     }
+
+    public function creditInvestmentProfit($wallet, $clientInvestment, $amount, $end=false)
+    {
+        // Utilities::logStuff("about to credit profits");
+        $transaction = new WalletTransaction;
+        $transaction->reference_no = $this->generateReferenceNo();
+        // Utilities::logStuff("reference generated");
+        $transaction->wallet_id = $wallet->id;
+        $transaction->amount = $amount;
+        $transaction->balance = $wallet->amount + $amount;
+        $transaction->transaction_type = TransactionType::IN_FLOW->value;
+        $transaction->source_type = WalletTransactionSource::INVESTMENT->value;
+        $transaction->source_id = $clientInvestment->id;
+        $transaction->confirmed = true;
+        $transaction->save();
+
+        // Utilities::logStuff("transaction saved");
+
+        $wallet->amount = $transaction->balance;
+        $wallet->total = $wallet->total + $amount;
+        if($end) {
+            $investmentAmount = $this->getTotalInvestmentAmount($clientInvestment->id);
+            $wallet->locked_amount = $wallet->locked_amount - ($investmentAmount - $amount);
+        }else{
+            $wallet->locked_amount = $wallet->locked_amount + $amount;
+        }
+        $wallet->update();
+        // Utilities::logStuff("Profit credited");
+
+        return $wallet;
+    }
+
+    public function generateWithdrawalRequest($wallet, $amount)
+    {
+        $withdrawalRequest = new WalletWithdrawalRequest;
+        $withdrawalRequest->reference_no = $this->generateWithdrawalReferenceNo();
+        $withdrawalRequest->wallet_id = $wallet->id;
+        $withdrawalRequest->amount = $amount;
+        $withdrawalRequest->status = WalletWithdrawalRequestStatus::PENDING->value;
+        $withdrawalRequest->save();
+
+        return $withdrawalRequest;
+    }
+
+    public function approveWithdrawalRequest($request, $userId)
+    {
+        $request->status = WalletWithdrawalRequestStatus::APPROVED->value;
+        $request->user_id = $userId;
+        $request->save();
+
+        return $request;
+    }
+
+    public function debit($wallet, $amount)
+    {
+        $wallet->amount = $wallet->amount - $amount;
+
+        $transaction = new WalletTransaction;
+        $transaction->reference_no = $this->generateReferenceNo();
+        $transaction->wallet_id = $wallet->id;
+        $transaction->amount = $amount;
+        $transaction->balance = $wallet->amount;
+        $transaction->transaction_type = TransactionType::OUT_FLOW->value;
+        $transaction->confirmed = true;
+        $transaction->save();
+
+        $wallet->update();
+
+        return $wallet;
+    }
+
+    public function rejectWithdrawalRequest($request, $message, $userId)
+    {
+        $request->status = WalletWithdrawalRequestStatus::REJECTED->value;
+        $request->rejected_reason = $message;
+        $request->user_id = $userId;
+        $request->save();
+
+        return $request;
+    }
+
+    private function generateReferenceNo()
+    {
+        do{
+            $referenceNo = Utilities::generateRandomNumber(12);
+            $exists = $this->getTransactionsByReference($referenceNo);
+        }while($exists);
+        return $referenceNo;
+    }
+
+    private function generateWithdrawalReferenceNo()
+    {
+        do{
+            $referenceNo = Utilities::generateRandomNumber(12);
+            $exists = $this->getWithdrawalByReference($referenceNo);
+        }while($exists);
+        return $referenceNo;
+    }
+    
 
 }

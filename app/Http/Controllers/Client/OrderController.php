@@ -15,6 +15,9 @@ use app\Services\PromoCodeService;
 use app\Services\PromoService;
 use app\Services\PackageService;
 
+use app\Enums\PackageType;
+use app\Enums\InvestmentRedemptionOption;
+
 use app\Utilities;
 
 class OrderController extends Controller
@@ -36,8 +39,17 @@ class OrderController extends Controller
     {
         // try{
             $data = $request->validated();
+            // dd($data);
             $package = $this->packageService->package($data['packageId']);
             if(!$package) return Utilities::error402("Package was not found");
+
+            if($package->type == PackageType::INVESTMENT->value) {
+                if(!isset($data['redemptionOption'])) return Utilities::error402("You must select a redemption option");
+                if($data['redemptionOption'] == InvestmentRedemptionOption::PROFIT_ONLY->value || $data['redemptionOption'] == InvestmentRedemptionOption::PROPERTY->value) {
+                    // if(!isset($data['redemptionPackageId'])) return Utilities::error402("You must select the redemption package");
+                    $data['redemptionPackageId'] = $package->redemption_package_id;
+                }
+            }
 
             if($package->available_units < $data['units']) return Utilities::error402("Available Units is not up to ".$data['units']);
 
@@ -49,7 +61,7 @@ class OrderController extends Controller
             $processingId  = (isset($data['processingId'])) ? $data['processingId'] : Utilities::getOrderProcessingId();
             
             $data['amountDetail'] = $amountDetail;
-            $data['amountPayable'] = ($data['isInstallment']) ? ($package->amount/$data['installmentCount']) : $amountDetail['amount'];
+            $data['amountPayable'] = ($data['isInstallment']) ? (round($amountDetail['amount']/$data['installmentCount'], 2)) : $amountDetail['amount'];
             // Cache this data to be used to complete the order processing
             if(isset($data['processingId'])) Cache::forget('order_processing_' . $processingId);
             Cache::put('order_processing_' . $processingId, $data, now()->addHours(12));

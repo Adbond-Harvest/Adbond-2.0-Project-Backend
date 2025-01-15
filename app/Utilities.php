@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Cache;
 
 use app\Services\AuthService;
 use app\Models\User;
-
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard\Percentage;
 
 class Utilities
 {
@@ -190,11 +190,31 @@ class Utilities
         return (float)((float)$discount/(1-($percentage/100)));
     }
 
+    public static function getPercentageAmount($amount, $percentage)
+    {
+        if($percentage <= 0) {
+            return 0;
+        }
+        return ($percentage/100) * $amount;
+    }
+
+    public static function generateRandomNumber($length)
+    {
+        $min = pow(10, $length - 1); // Minimum number with the given length
+        $max = pow(10, $length) - 1; // Maximum number with the given length
+        return rand($min, $max); // Generate a random number between min and max
+    }
+
     public static function generateRandomString($length)
     {
         $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+        return substr(str_shuffle($permitted_chars), 0, $length);
+    }
+
+    public static function generateRefererCode()
+    {
         do{
-            $code = substr(str_shuffle($permitted_chars), 0, 5);
+            $code = self::generateRandomString(5);
             $exists = User::where('referer_code', $code)->first();
         }while($exists);
         return $code;
