@@ -55,7 +55,7 @@ class CronJobController extends Controller
                 foreach($investments as $investment) {
                     $wallet = $this->walletService->clientWallet($investment->client->id);
                     //check if the end-date has reached or passed, if so, end the investment
-                    if(Carbon::parse(($investment->end_date)->isToday() || \Carbon\Carbon::parse($investment->end_date)->isPast()) || $investment->interest_payment_left <= 1) {
+                    if((Carbon::parse($investment->end_date)->isToday() || Carbon::parse($investment->end_date)->isPast()) || $investment->interest_payment_left <= 1) {
                         $this->endInvestment($investment, $wallet);
                     }else{
                         // if end-date has not reached, and if the redemption type is profit-only or cash, 
