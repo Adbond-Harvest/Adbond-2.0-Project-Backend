@@ -55,7 +55,7 @@ class OrderController extends Controller
 
             $promoCodeDiscount = (isset($data['promoCode'])) ? $this->promoCodeService->validatePromoCode($data['code'], $package)['discount'] : null;
             $promos = $this->promoService->getPromos($package, Auth::guard('client')->user());
-            $processingData = ["amount" => ($package->amount * $data['units']), "isInstallment" => $data['isInstallment']];
+            $processingData = ["amount" => ($package->amount * $data['units']), "isInstallment" => $data['isInstallment'], "packageType" => $package->type];
             $amountDetail = $this->orderService->getPayable($processingData, $promos, $promoCodeDiscount);
 
             $processingId  = (isset($data['processingId'])) ? $data['processingId'] : Utilities::getOrderProcessingId();
