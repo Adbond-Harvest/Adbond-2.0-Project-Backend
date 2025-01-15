@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId("post_id");
             $table->string("message");
-            $table->morphs("commenter");
+            $table->string("commenter_type");
+            $table->foreignId("commenter_id");
             $table->timestamps();
         });
     }
