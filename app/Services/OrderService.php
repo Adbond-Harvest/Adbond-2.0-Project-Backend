@@ -35,7 +35,7 @@ class OrderService
     {
         $appliedDiscounts = [];
         $discountedAmount = $data['amount'];
-        if(!$data['isInstallment']) {
+        if($data['packageType']==PackageType::NON_INVESTMENT->value && !$data['isInstallment']) {
             $fullPaymentDiscount = Discount::fullPayment()->discount;
             $discountArr = Utilities::getDiscount($discountedAmount, $fullPaymentDiscount);
             $discountedAmount = $discountArr['amount'];
