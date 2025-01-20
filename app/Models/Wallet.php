@@ -23,12 +23,12 @@ class Wallet extends Model
 
     public function transactions()
     {
-        $this->hasMany(WalletTransaction::class);
+        return $this->hasMany(WalletTransaction::class);
     }
 
     public function withdrawalRequests()
     {
-        $this->hasMany(WalletWithdrawalRequest::class);
+        return $this->hasMany(WalletWithdrawalRequest::class);
     }
 
     protected static function boot()

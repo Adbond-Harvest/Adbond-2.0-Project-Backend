@@ -1,12 +1,11 @@
 <?php
 
-namespace app\Http\Requests\User;
+namespace app\Http\Requests\Client;
 
 use Illuminate\Foundation\Http\FormRequest;
-
 use app\Http\Requests\BaseRequest;
 
-class AddWalletBankAccount extends BaseRequest
+class AddTransactionPin extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +23,7 @@ class AddWalletBankAccount extends BaseRequest
     public function rules(): array
     {
         return [
-            "bankId" => "required|integer|exists:banks,id",
-            "accountName" => "required|string",
-            "accountNumber" => "required|string|digits:10",
+            "pin" => "required|integer|digits:6",
             "walletId" => "required|integer"
         ];
     }

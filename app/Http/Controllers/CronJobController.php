@@ -14,6 +14,8 @@ use app\Services\FileService;
 use app\Services\ClientPackageService;
 
 use app\Enums\InvestmentRedemptionOption;
+use app\Enums\FileTypes;
+use app\Enums\FilePurpose;
 
 use app\Helpers;
 use app\Utilities;
@@ -108,13 +110,13 @@ class CronJobController extends Controller
             }
         }
         $data = null;
-        if( in_array($investment->redemption_options, $propertyOptions) ) {
+        if( in_array($investment->redemption_option, $propertyOptions) ) {
             $contractFileId = $this->handleContract($investment);
 
             $data = [
                 "packageId" => $investment->redemption_package_id,
                 "amount" => $investment->redemptionPackage->amount,
-                "unitPrice" => $investment->redemptionPackage->unit_price,
+                "unitPrice" => $investment->redemptionPackage->amount,
                 "contractFileId" => $contractFileId
             ];
         }

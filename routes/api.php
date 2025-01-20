@@ -25,6 +25,7 @@ use app\Http\Controllers\Client\OrderController;
 use app\Http\Controllers\Client\PaymentController;
 use app\Http\Controllers\Client\DashboardController;
 use app\Http\Controllers\Client\WalletController;
+use app\Http\Controllers\Client\TransactionController;
 
 //Public Controllers
 use app\Http\Controllers\ProjectController;
@@ -148,7 +149,9 @@ Route::group(['prefix' => '/v2',], function () {
         });
     });
 
-    //Public Routes
+    /*
+        Public Routes Begins here
+    */
     Route::group(['prefix' => '/projects'], function () {
         // Project Routes
         Route::get('', [ProjectController::class, 'getProjects']);
@@ -169,6 +172,11 @@ Route::group(['prefix' => '/v2',], function () {
         Route::get('benefits', [UtilityController::class, 'benefits']);
         Route::get('banks', [UtilityController::class, 'banks']);
     });
+
+
+    /*
+        Client Routes Begins Here
+    */
 
     // Client Routes
     Route::group(['middleware' => ClientAuth::class, 'prefix' => '/client', 'namespace' => 'Client',], function () {
@@ -201,7 +209,19 @@ Route::group(['prefix' => '/v2',], function () {
 
         //Wallet Routes
         Route::group(['prefix' => '/wallet',], function () {
+            Route::get('', [WalletController::class, 'index']);
+            Route::get('/transactions', [WalletController::class, 'transactions']);
+            Route::post('/link_bank_account', [WalletController::class, 'LinkBankAccount']);
+            Route::post('/set_transaction_pin', [WalletController::class, 'setTransactionPin']);
+            Route::post('/validate_withdrawal', [WalletController::class, 'validateWithdrawal']);
             Route::post('/withdraw', [WalletController::class, 'withdraw']);
+        });
+
+        //Transaction Routes
+        Route::group(['prefix' => '/transactions',], function () {
+            Route::get('', [TransactionController::class, 'index']);
+            Route::get('/{transactionId}', [TransactionController::class, 'transaction']);
+            Route::get('/export/{transactionId}', [TransactionController::class, 'export']);
         });
     });
 

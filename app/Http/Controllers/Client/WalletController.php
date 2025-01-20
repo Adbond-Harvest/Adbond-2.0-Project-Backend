@@ -6,9 +6,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use app\Http\Controllers\Controller;
 
+use app\Http\Requests\AddWalletBankAccount;
 use app\Http\Requests\Client\WalletWithdrawal;
+use app\Http\Requests\Client\AddTransactionPin;
+use app\Http\Requests\Client\ValidateWalletWithdrawal;
 
 use app\Http\Resources\WalletWithdrawalRequestResource;
+use app\Http\Resources\WalletResource;
+use app\Http\Resources\WalletTransactionResource;
 
 use app\Services\WalletService;
 
@@ -23,18 +28,93 @@ class WalletController extends Controller
         $this->walletService = new WalletService;
     }
 
-    public function withdraw(WalletWithdrawal $request)
+    public function index(Request $request)
+    {
+        $wallet = $this->walletService->clientWallet(Auth::guard("client")->user()->id);
+        if(!$wallet) return Utilities::error402("Wallet not found");
+
+        return Utilities::ok(new WalletResource($wallet));
+    }
+
+    public function LinkBankAccount(AddWalletBankAccount $request)
+    {
+        try{
+            DB::beginTransaction();
+            $data = $request->validated();
+            $wallet = $this->walletService->wallet($data['walletId']);
+            if(!$wallet) return Utilities::error402("Wallet not found");
+
+            $this->walletService->addBankAccount($wallet, $data);
+            $wallet = $this->walletService->wallet($wallet->id, ['bankAccounts']);
+
+            DB::commit();
+            return Utilities::ok(new WalletResource($wallet));
+        }catch(\Exception $e){
+            DB::rollBack();
+            return Utilities::error($e, 'An error occurred while trying to perform this operation, Please try again later or contact support');
+        }
+    }
+
+    public function setTransactionPin(AddTransactionPin $request)
     {
         try{
             $data = $request->validated();
             $wallet = $this->walletService->wallet($data['walletId']);
+            if(!$wallet) return Utilities::error402("Wallet not found");
+
+            $wallet = $this->walletService->setTransactionPin($wallet, $data['pin']);
+            return Utilities::okay("Transaction Pin Set");
+        }catch(\Exception $e){
+            DB::rollBack();
+            return Utilities::error($e, 'An error occurred while trying to perform this operation, Please try again later or contact support');
+        }
+    }
+
+    public function transactions()
+    {
+        try{
+            $wallet = Auth::guard("client")->user()->wallet;
 
             if(!$wallet) return Utilities::error402("Wallet not found");
 
-            if($wallet->client_id != Auth::guard("client")->user()->id) return Utilities::error402("You cannot withdraw from a wallet you dont own");
+            $transactions = $this->walletService->transactions($wallet->id);
+            return Utilities::ok(WalletTransactionResource::collection($transactions));
+
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to send verification mail, Please try again later or contact support');
+        }
+    }
+
+    public function transaction($transactionId)
+    {
+        if (!is_numeric($transactionId) || !ctype_digit($transactionId)) return Utilities::error402("Invalid parameter transactionID");
+
+        $transaction = $this->walletService->transaction($transactionId);
+    }
+
+    public function validateWithdrawal(ValidateWalletWithdrawal $request)
+    {
+        $wallet = Auth::guard("client")->user()->wallet;
+        if(!$wallet) return Utilities::error402("Wallet not found for this client");
+
+        $availableAmount = $wallet->amount - $wallet->locked_amount;
+        if($request->validated('amount') > $availableAmount) return Utilities::error402("Insufficient Available funds");
+
+        return Utilities::okay("successful");
+    }
+
+    public function withdraw(WalletWithdrawal $request)
+    {
+        try{
+            $data = $request->validated();
+            $wallet = Auth::guard("client")->user()->wallet;
+
+            if(!$wallet) return Utilities::error402("Wallet not found");
+
+            if($data['pin'] != $wallet->transaction_pin) return Utilities::error402("Incorrect Pin");
 
             $availableAmount = $wallet->amount - $wallet->locked_amount;
-            if($data['amount'] > $availableAmount) return Utilities::error402("The amount you want to withdraw is greater than available amount");
+            if($data['amount'] > $availableAmount) return Utilities::error402("Insufficient Available funds");
 
             $withdrawalRequest = $this->walletService->generateWithdrawalRequest($wallet, $data['amount']);
 

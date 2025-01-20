@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use app\Http\Controllers\Controller;
 
-use app\Http\Requests\User\AddWalletBankAccount;
+use app\Http\Requests\AddWalletBankAccount;
 use app\Http\Requests\User\ApproveWithdrawalRequest;
 use app\Http\Requests\User\RejectWithdrawalRequest;
 

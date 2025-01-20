@@ -44,6 +44,11 @@ class WalletService
         return WalletTransaction::with($with)->where("wallet_id", $walletId)->get();
     }
 
+    public function transaction($id, $with=[])
+    {
+        return WalletTransaction::with($with)->where("id", $id)->first();
+    }
+    
     public function getTransactionsByReference($referenceNo)
     {
         return WalletTransaction::where("reference_no", $referenceNo)->first();
@@ -71,6 +76,20 @@ class WalletService
         return $query->get();
     }
 
+    public function totalOutflows($client)
+    {
+        $total = 0;
+        $transactions = $client?->wallet?->transactions;
+        if($transactions && $transactions->count() > 0) {
+            foreach($transactions as $transaction) {
+                if($transaction->transaction_type == TransactionType::OUT_FLOW->value) {
+                    $total += $transaction->amount;
+                }
+            }
+        }
+        return $total;
+    }
+
     public function getTotalInvestmentAmount($investmentId)
     {
         $amount = 0;
@@ -81,6 +100,14 @@ class WalletService
         return $amount;
     }
 
+    public function create($clientId)
+    {
+        $wallet = new Wallet;
+        $wallet->client_id = $clientId;
+        $wallet->save();
+        return $wallet;
+    }
+
     public function addBankAccount($wallet, $bankData)
     {
         $bankAccount = new WalletBankAccount;
@@ -89,6 +116,14 @@ class WalletService
         $bankAccount->account_name = $bankData['accountName'];
         $bankAccount->wallet_id = $wallet->id;
         $bankAccount->save();
+    }
+
+    public function setTransactionPin($wallet, $pin)
+    {
+        $wallet->transaction_pin = $pin;
+        $wallet->update();
+
+        return $wallet;
     }
 
     public function creditInvestmentProfit($wallet, $clientInvestment, $amount, $end=false)
