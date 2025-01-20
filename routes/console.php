@@ -18,4 +18,4 @@ Schedule::call(function () {
     $cronJobController = new CronJobController;
 
     $cronJobController->checkInvestmentReturns();
-})->everyMinute();
+})->daily();

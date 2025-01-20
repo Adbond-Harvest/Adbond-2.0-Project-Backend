@@ -13,6 +13,7 @@ use app\Mail\EmailVerification;
 use app\Services\ClientService;
 use app\Services\EmailService;
 use app\Services\UserService;
+use app\Services\WalletService;
 
 use app\Http\Resources\ClientBriefResource;
 
@@ -30,6 +31,7 @@ class ClientAuthController extends Controller
     private $clientService;
     private $emailService;
     private $userService;
+    private $walletService;
 
     /**
      * Create a new AuthController instance.
@@ -41,6 +43,7 @@ class ClientAuthController extends Controller
         $this->clientService = new ClientService;
         $this->emailService = new EmailService;
         $this->userService = new UserService;
+        $this->walletService = new WalletService;
         // $this->emailService = new EmailService;
         // $this->authService = new AuthService;
     }
@@ -102,6 +105,10 @@ class ClientAuthController extends Controller
             $client = $this->clientService->save($post);
             $client?->referer;
             $this->emailService->delete_email_tokens($post['email']);
+
+            // Create a wallet for the client
+            $this->walletService->create($client->id);
+            
             $credentials = $request->only('email', 'password');
             if (! $token = Auth::guard('client')->attempt($credentials)) {
                 return response()->json([

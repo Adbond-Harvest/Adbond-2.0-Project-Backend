@@ -380,6 +380,7 @@ Class Helpers
 
     public static function moveUploadedFileToCloud($filePath, $fileType, $userId, $purpose, $userType, $folder)
     {
+        $filePath = public_path($filePath);
         $fileService = new FileService;
         $success = false;
         $uploadRes = null;
@@ -562,7 +563,8 @@ Class Helpers
         ];
         $pdf = PDF::loadView('pdf/contract', $pdfData);
         // return $pdf->stream('contract.pdf');
-        $pdf->save("files/contract_{$order->id}.pdf");
+        $path = public_path("files/contract_{$order->id}.pdf");
+        $pdf->save($path);
     }
 
     public static function generateLetterOfHappiness($payment)

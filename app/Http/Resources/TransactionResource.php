@@ -4,6 +4,8 @@ namespace app\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use app\Enums\PackagePaymentOption;
+use app\Models\Order;
 
 class TransactionResource extends JsonResource
 {
@@ -23,7 +25,8 @@ class TransactionResource extends JsonResource
             "amount" => $this->amount,
             "status" => ($this->confirmed == 1) ? "Successful" : (($this->success === 0) ? "Failed" : "Pending"),
             "paymentMode" => $this->paymentMode?->name,
-            "date" => $this->created_at->format('F j, Y')
+            "date" => $this->created_at->format('F j, Y'),
+            "plan" => ($this->purchase && $this->purchase_type==Order::$type && $this->purchase?->is_installment==1) ?  PackagePaymentOption::INSTALLMENT->value : PackagePaymentOption::ONE_OFF->value,
         ];
     }
 }

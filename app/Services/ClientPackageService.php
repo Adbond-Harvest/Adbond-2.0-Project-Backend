@@ -87,7 +87,7 @@ class ClientPackageService
                 if($data) {
                     $clientPackage->package_id = $data['packageId'];
                     $clientPackage->amount = $data['amount'];
-                    $clientPackage->units = $data['units'];
+                    $clientPackage->units = (isset($data['units'])) ? $data['units'] : 1;
                     $clientPackage->unit_price = $data['unitPrice'];
                     if(isset($data['contractFileId'])) $clientPackage->contract_file_id = $data['contractFileId'];
                     if(isset($data['happinessLetterFileId'])) $clientPackage->happiness_letter_file_id = $data['happinessLetterFileId'];
