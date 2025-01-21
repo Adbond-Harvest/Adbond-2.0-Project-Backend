@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 use app\Http\Resources\AssetResource;
 use app\Http\Resources\WalletResource;
+use app\Http\Resources\ClientNextOfKinResource;
 
 class ClientResource extends JsonResource
 {
@@ -33,12 +34,13 @@ class ClientResource extends JsonResource
             'maritalStatus' => $this->marital_status,
             'occupation' => $this->occupation,
             'kycStatus' => $this->kyc_status,
+            'joinedAt' => $this->created_at->format('F j, Y'),
+            // 'kyc_completed' => Helpers::kycCompleted($this),
             'active' => ($this->activated && $this->activated == 1) ? true : false,
             'wallet' => new WalletResource($this->wallet),
-            'joinedAt' => $this->created_at->format('F j, Y'),
-            'assets' => AssetResource::collection($this->whenLoaded('assets'))
+            'assets' => AssetResource::collection($this->whenLoaded('assets')),
+            'nextOfKin' => ClientNextOfKinResource::collection($this->whenLoaded("nextOfKins"))
             // 'passwordSet' => ($this->password_set)
-            // 'kyc_completed' => Helpers::kycCompleted($this),
         ];
     }
 }
