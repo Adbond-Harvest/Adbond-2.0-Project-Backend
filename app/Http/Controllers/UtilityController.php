@@ -8,7 +8,7 @@ use app\Http\Resources\BenefitResource;
 use app\Http\Resources\BankResource;
 
 use app\Services\UtilityService;
-use App\Utilities;
+use app\Utilities;
 
 class UtilityController extends Controller
 {
