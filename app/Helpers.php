@@ -197,7 +197,7 @@ Class Helpers
             $client->age_group_id == '' || $client->age_group_id == null ||
             // $client->country_id == '' || $client->country_id == null ||
             // $client->state_id == '' || $client->state_id == null ||
-            $client->nextOfKins->count() == 0
+            !$client->nextOfKins
         ) {
             $completed = false;
         }
@@ -219,7 +219,7 @@ Class Helpers
             ($client->age_group_id != '' || $client->age_group_id != null) ||
             // $client->country_id == '' || $client->country_id == null ||
             // $client->state_id == '' || $client->state_id == null ||
-            ($client->nextOfKins && $client->nextOfKins->count() > 0)
+            ($client->nextOfKins)
         ) {
             $started = true;
         }

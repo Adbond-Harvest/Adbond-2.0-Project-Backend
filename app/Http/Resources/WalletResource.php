@@ -31,7 +31,7 @@ class WalletResource extends JsonResource
             "totalBalance" => $this->total,
             "totalOutflow" => $walletService->totalOutflows($this->client),
             "transactionPinSet" => ($this->transaction_pin) ? true : false,
-            "bankAccounts" => WalletBankAccountResource::collection($this->whenLoaded("bankAccounts")),
+            "bankAccounts" => WalletBankAccountResource::collection($this->bankAccounts),
             "transactions" => WalletTransactionResource::collection($this->whenLoaded("transactions")),
             "withdrawalRequests" => WalletWithdrawalRequestResource::collection($this->whenLoaded("withdrawalRequests"))
         ];
