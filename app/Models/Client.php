@@ -66,6 +66,7 @@ class Client extends Authenticatable implements JWTSubject
     {
         $nextOfKins = $this->hasMany(ClientNextOfKin::class, "client_id", "id");
         if(!$nextOfKins || $nextOfKins->count() == 0) return null;
+        return $nextOfKins;
     }
 
     public function assets()
