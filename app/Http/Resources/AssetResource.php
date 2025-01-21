@@ -28,12 +28,16 @@ class AssetResource extends JsonResource
             "project" => $this->package?->project?->name,
             "projectType" => $this->package?->project?->projectType?->name,
             "purchaseAt" => $this->created_at->format('F j, Y'), 
-            "amount" => ($this->origin == ClientPackageOrigin::ORDER->value) ? $this->purchase?->amount_payable : $this->purchase?->price,
-            "paymentPlan" => ($this->origin == ClientPackageOrigin::ORDER->value && $this?->purchase?->is_installment == 1) ? "installment" : "one-off",
+            "amount" => $this->amount, //($this->origin == ClientPackageOrigin::ORDER->value) ? $this->purchase?->amount_payable : $this->purchase?->price,
+            "amountPaid" => $this->amountPaid(),
+            "paymentPlan" => $this->paymentPlan(),
+            "installmentCount" => $this->installmentCount(),
+            "nextPaymentDate" => $this->payment_due_date,
             "appreciation" => $this->appreciation(),
             "status" => ($this->origin == ClientPackageOrigin::ORDER->value && $this->purchase?->completed == 0) ? "pending" : "completed", 
             "active" => ($this->origin == ClientPackageOrigin::ORDER->value && !$this->purchase?->completed) ? true : false,
-            "files" => FileResource::collection($this->files)
+            "files" => FileResource::collection($this->files),
+            "returns" => $this->investmentReturns()
         ];
     }
 
@@ -49,5 +53,48 @@ class AssetResource extends JsonResource
         }
         // dd($purchaseWorth);
         return Utilities::calculateAppreciation($currentWorth, $purchaseWorth);
+    }
+
+    private function amountPaid()
+    {
+        if($this->purchase_complete==0) {
+            if($this->origin == ClientPackageOrigin::INVESTMENT->value) return $this->purchase->order->amount_payed;
+            return $this->purchase?->amount_payed;
+        }
+        return $this->amount;
+    }
+
+    private function installmentCount()
+    {
+        if($this->origin == ClientPackageOrigin::ORDER->value || $this->origin == ClientPackageOrigin::INVESTMENT->value) {
+            $order = ($this->origin == ClientPackageOrigin::ORDER->value) ? $this?->purchase : $this->purchase->order;
+            return ($order?->is_installment == 1) ? $order->installment_count : null;
+        }
+        return null;
+    }
+
+    private function paymentPlan()
+    {
+        
+        if($this->origin == ClientPackageOrigin::ORDER->value || $this->origin == ClientPackageOrigin::INVESTMENT->value) {
+            $order = ($this->origin == ClientPackageOrigin::ORDER->value) ? $this?->purchase : $this->purchase->order;
+            return ($order?->is_installment == 1) ? "installment" : "one-off";
+        }
+        return "one-off";
+    }
+
+    private function investmentReturns()
+    {
+        if($this->origin == ClientPackageOrigin::INVESTMENT->value) {
+            $investment = $this->purchase;
+            if($investment) {
+                return [
+                    "returns" => ($investment->amount) ? $investment->amount : $investment->percentage.'%',
+                    "timeline" => $investment->duration.'Months',
+                    "duration" => $investment->timeline.'Months'
+                ];
+            }
+        }
+        return null;
     }
 }
