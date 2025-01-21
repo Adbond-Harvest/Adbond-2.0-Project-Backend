@@ -80,7 +80,7 @@ class ClientController extends Controller
     {
         if (!is_numeric($clientId) || !ctype_digit($clientId)) return Utilities::error402("Invalid parameter clientID");
 
-        $client = $this->clientService->getClient($clientId, ['assets']);
+        $client = $this->clientService->getClient($clientId, ['assets', 'nextOfKins']);
 
         if(!$client) return Utilities::error402("Client not found");
 

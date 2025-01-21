@@ -29,9 +29,9 @@ class AssetResource extends JsonResource
             "projectType" => $this->package?->project?->projectType?->name,
             "purchaseAt" => $this->created_at->format('F j, Y'), 
             "amount" => ($this->origin == ClientPackageOrigin::ORDER->value) ? $this->purchase?->amount_payable : $this->purchase?->price,
-            "paymentPlan" => ($this->origin == ClientPackageOrigin::ORDER->value && $this->purchase->installment == 1) ? "installment" : "one-off",
+            "paymentPlan" => ($this->origin == ClientPackageOrigin::ORDER->value && $this?->purchase?->is_installment == 1) ? "installment" : "one-off",
             "appreciation" => $this->appreciation(),
-            "status" => ($this->origin == ClientPackageOrigin::ORDER->value && $this->purchase->completed == 0) ? "pending" : "completed", 
+            "status" => ($this->origin == ClientPackageOrigin::ORDER->value && $this->purchase?->completed == 0) ? "pending" : "completed", 
             "active" => ($this->origin == ClientPackageOrigin::ORDER->value && !$this->purchase?->completed) ? true : false,
             "files" => FileResource::collection($this->files)
         ];
