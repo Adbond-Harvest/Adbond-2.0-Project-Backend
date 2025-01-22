@@ -35,7 +35,7 @@ class DashboardController extends Controller
         try{
             $assetSummary = $this->assetService->clientAssetSummary(Auth::guard('client')->user()->id);
             $assets = $this->assetService->clientAssets(Auth::guard('client')->user()->id);
-            $projects = $this->projectService->activeProjects(['projectType']);
+            $projects = $this->projectService->activeProjects(['projectType'], 0, 10);
             $transactions = $this->transactionService->transactions([], 0, 10);
             return [
                 "assetSummary" => new AssetSummaryResource($assetSummary),

@@ -32,6 +32,7 @@ class ClientResource extends JsonResource
             'dob' => $this->dob,
             'country' => ($this->country) ? $this->country->name : null,
             'maritalStatus' => $this->marital_status,
+            'employmentStatus' => $this->employment_status,
             'occupation' => $this->occupation,
             'kycStatus' => $this->kyc_status,
             'joinedAt' => $this->created_at->format('F j, Y'),

@@ -16,6 +16,7 @@ use app\Services\UserService;
 use app\Services\WalletService;
 
 use app\Http\Resources\ClientBriefResource;
+use app\Http\Resources\ClientResource;
 
 use app\Http\Requests\Client\Register;
 use app\Http\Requests\Client\VerifyEmail;
@@ -123,7 +124,7 @@ class ClientAuthController extends Controller
                 'token' => $token,
                 'token_type' => 'bearer',
                 'token_expires_in' => Auth::factory()->getTTL(), 
-                'client' => new ClientBriefResource($client)
+                'client' => new ClientResource($client)
             ], 200);
         }catch(\Exception $e){
             if(isset($client)) {
@@ -132,7 +133,7 @@ class ClientAuthController extends Controller
             Log::stack(['project'])->info($e->getMessage().' in '.$e->getFile().' at Line '.$e->getLine());
             return response()->json([
                 'statusCode' => 500,
-                'message' => 'An error occured while trying to perform this operation, Please try again later or contact support'
+                'message' => 'An error occurred while trying to perform this operation, Please try again later or contact support'
             ], 500);
         }
     }
@@ -151,7 +152,7 @@ class ClientAuthController extends Controller
             ], 402);
         }
         Auth::guard('client')->user()?->referer;
-        $user = new ClientBriefResource(Auth::guard('client')->user());
+        $user = new ClientResource(Auth::guard('client')->user());
         return response()->json([
             'statusCode' => 200,
             'data' => [

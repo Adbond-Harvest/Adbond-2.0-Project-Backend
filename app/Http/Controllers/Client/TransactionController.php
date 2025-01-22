@@ -12,7 +12,7 @@ use app\Services\TransactionService;
 
 use app\Enums\ProjectType;
 
-use App\Utilities;
+use app\Utilities;
 
 class TransactionController extends Controller
 {
