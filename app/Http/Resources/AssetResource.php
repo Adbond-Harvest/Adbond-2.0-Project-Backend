@@ -29,6 +29,9 @@ class AssetResource extends JsonResource
             "projectType" => $this->package?->project?->projectType?->name,
             "purchaseAt" => $this->created_at->format('F j, Y'), 
             "amount" => $this->amount, //($this->origin == ClientPackageOrigin::ORDER->value) ? $this->purchase?->amount_payable : $this->purchase?->price,
+            "location" => $this->package?->state,
+            "units" => $this->units,
+            "size" => $this->package?->size,
             "amountPaid" => $this->amountPaid(),
             "paymentPlan" => $this->paymentPlan(),
             "installmentCount" => $this->installmentCount(),
@@ -40,6 +43,13 @@ class AssetResource extends JsonResource
             "returns" => $this->investmentReturns()
         ];
     }
+
+    // private function package()
+    // {
+    //     if($this->origin == ClientPackageOrigin::INVESTMENT->value) {
+    //         $package = $this->purchase->order
+    //     }
+    // }
 
     private function appreciation()
     {
