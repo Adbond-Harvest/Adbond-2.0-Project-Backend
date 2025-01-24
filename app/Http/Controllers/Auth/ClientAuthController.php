@@ -105,6 +105,7 @@ class ClientAuthController extends Controller
             $post['emailVerifiedAt'] = $emailVerification->updated_at;
             $client = $this->clientService->save($post);
             $client?->referer;
+            $client?->nextOfKins;
             $this->emailService->delete_email_tokens($post['email']);
 
             // Create a wallet for the client
