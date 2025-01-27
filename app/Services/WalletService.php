@@ -108,6 +108,11 @@ class WalletService
         return $wallet;
     }
 
+    public function getWalletBankAccount($wallet, $bankId, $accountNumber)
+    {
+        return WalletBankAccount::where("wallet_id", $wallet->id)->where("bank_id", $bankId)->where("account_number", $accountNumber)->first();
+    }
+
     public function addBankAccount($wallet, $bankData)
     {
         $bankAccount = new WalletBankAccount;

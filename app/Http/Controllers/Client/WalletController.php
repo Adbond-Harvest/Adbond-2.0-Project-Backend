@@ -3,6 +3,7 @@
 namespace app\Http\Controllers\Client;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use app\Http\Controllers\Controller;
 
@@ -43,6 +44,9 @@ class WalletController extends Controller
             $data = $request->validated();
             $wallet = $this->walletService->wallet($data['walletId']);
             if(!$wallet) return Utilities::error402("Wallet not found");
+
+            $bankAccount = $this->walletService->getWalletBankAccount($wallet, $data['bankId'],  $data['accountNumber']);
+            if($bankAccount) return Utilities::error402("This bank Account is already linked to this wallet");
 
             $this->walletService->addBankAccount($wallet, $data);
             $wallet = $this->walletService->wallet($wallet->id, ['bankAccounts']);
