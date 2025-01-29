@@ -26,6 +26,7 @@ use app\Http\Controllers\Client\PaymentController;
 use app\Http\Controllers\Client\DashboardController;
 use app\Http\Controllers\Client\WalletController;
 use app\Http\Controllers\Client\TransactionController;
+use app\Http\Controllers\Client\ProjectController as ClientProjectController;
 
 //Public Controllers
 use app\Http\Controllers\ProjectController;
@@ -191,6 +192,15 @@ Route::group(['prefix' => '/v2',], function () {
         Route::group(['prefix' => '/file',], function () {
             Route::post('/upload_profile_photo', 'FileController@saveProfilePhoto');
             Route::post('/upload_payment_evidence', 'FileController@savePaymentEvidence');
+        });
+
+        // Project Routes
+        Route::group(['prefix' => '/projects',], function () {
+            Route::get('/summary', [ClientProjectController::class, 'summary']);
+            Route::get('', [ClientProjectController::class, 'projects']);
+            Route::get('/{projectTypeId}', [ClientProjectController::class, 'projects']);
+            Route::get('/get_project/{projectId}', [ClientProjectController::class, 'project']);
+            Route::get('/get_project/all/{projectTypeId}', [ClientProjectController::class, 'projectType']);
         });
 
         //Order Routes
