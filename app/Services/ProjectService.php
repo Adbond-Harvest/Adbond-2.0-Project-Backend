@@ -5,6 +5,7 @@ namespace app\Services;
 use app\Models\Project;
 use app\Models\ProjectType;
 use app\Models\ProjectLocation;
+use app\Models\ProjectPackageSummaryView;
 
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -17,6 +18,7 @@ class ProjectService
 {
     public $count = false;
     public $typeId = null;
+    public $status = null;
 
     public function save($data)
     {
@@ -77,15 +79,37 @@ class ProjectService
     {
         $query = Project::with($with);
         if($this->typeId) $query = $query->where("project_type_id", $this->typeId);
+        if($this->status) $query = $query->where("status", $this->status);
         if($this->count) return $query->count();
         if($perPage==null) $perPage=env('PAGINATION_PER_PAGE', 15);
         return $query->orderBy("created_at", "DESC")->limit($perPage)->offset($offset)->get();
         // dd($projects);
     }
 
+    public function projectPackageSummary($projectId=null)
+    {
+        return ProjectPackageSummaryView::when($this->typeId, function ($query) {
+            return $query->where("project_type_id", $this->typeId);
+        })
+        ->when($projectId, function ($query) use ($projectId) {
+            return $query->where("project_id", $projectId);
+        })
+        ->get();
+    }
+
     public function activeProjects($with=[], $offset=0, $perPage=null)
     {
         $query = Project::with($with)->where("active", true);
+        if($this->typeId) $query = $query->where("project_type_id", $this->typeId);
+        if($this->count) return $query->count();
+        if($perPage==null) $perPage=env('PAGINATION_PER_PAGE', 15);
+        return $query->orderBy("created_at", "DESC")->limit($perPage)->offset($offset)->get();
+        // dd($projects);
+    }
+
+    public function inActiveProjects($with=[], $offset=0, $perPage=null)
+    {
+        $query = Project::with($with)->where("active", false);
         if($this->typeId) $query = $query->where("project_type_id", $this->typeId);
         if($this->count) return $query->count();
         if($perPage==null) $perPage=env('PAGINATION_PER_PAGE', 15);
