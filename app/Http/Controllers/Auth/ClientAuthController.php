@@ -152,8 +152,11 @@ class ClientAuthController extends Controller
                 'message' => 'Wrong Email or Password'
             ], 402);
         }
-        Auth::guard('client')->user()?->referer;
-        $user = new ClientResource(Auth::guard('client')->user());
+        // $client = $this->clientService->getClient(Auth::guard('client')->user()->id, ['referer', 'nextOfKin']);
+        $user = Auth::guard('client')->user();
+        $user->load(['referer', 'nextOfKins']);
+    
+        $user = new ClientResource($user);
         return response()->json([
             'statusCode' => 200,
             'data' => [
