@@ -18,6 +18,7 @@ use app\Http\Controllers\User\Client\TransactionController as UserTransactionCon
 use app\Http\Controllers\User\PostController as UserPostController;
 use app\Http\Controllers\User\CommentController as UserCommentController;
 use app\Http\Controllers\User\PaymentController as UserPaymentController;
+use app\Http\Controllers\User\SiteTourController as UserSiteTourController;
 
 // Client Controllers
 use app\Http\Controllers\Client\PromoController;
@@ -27,6 +28,7 @@ use app\Http\Controllers\Client\DashboardController;
 use app\Http\Controllers\Client\WalletController;
 use app\Http\Controllers\Client\TransactionController;
 use app\Http\Controllers\Client\ProjectController as ClientProjectController;
+use app\Http\Controllers\Client\PackageController as ClientPackageController;
 
 //Public Controllers
 use app\Http\Controllers\ProjectController;
@@ -111,6 +113,16 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/confirm', [UserPaymentController::class, 'confirm']);
             Route::post('/reject', [UserPaymentController::class, 'reject']);
             Route::post('/flag', [UserPaymentController::class, 'flag']);
+        });
+
+        Route::group(['prefix' => '/site_tour'], function () {
+            Route::group(['prefix' => '/schedules'], function () {
+                Route::post('', [UserSiteTourController::class, 'createSchedule']);
+                Route::patch('/{id}', [UserSiteTourController::class, 'updateSchedule']);
+                Route::delete('/{id', [UserPaymentController::class, 'deleteSchedule']);
+                Route::get('', [UserSiteTourController::class, 'schedules']);
+                Route::get('/{id}', [UserSiteTourController::class, 'schedule']);
+            });
         });
 
         Route::group(['prefix' => '/posts'], function () {
@@ -201,6 +213,11 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('/{projectTypeId}', [ClientProjectController::class, 'projects']);
             Route::get('/get_project/{projectId}', [ClientProjectController::class, 'project']);
             Route::get('/get_project/all/{projectTypeId}', [ClientProjectController::class, 'projectType']);
+        });
+
+         // Package Routes
+         Route::group(['prefix' => '/packages',], function () {
+            Route::get('/{packageId}', [ClientPackageController::class, 'package']);
         });
 
         //Order Routes

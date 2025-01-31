@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 use app\Http\Resources\ProjectResource;
+use app\Http\Resources\ProjectTypeResource;
 use app\Http\Resources\StateResource;
 use app\Http\Resources\FileResource;
 use app\Http\Resources\BenefitResource;
