@@ -5,7 +5,7 @@ namespace app\Http\Requests\User;
 use Illuminate\Foundation\Http\FormRequest;
 use app\Http\Requests\BaseRequest;
 
-class CreateSiteTourSchedule extends BaseRequest
+class UpdateSiteTourSchedule extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,9 @@ class CreateSiteTourSchedule extends BaseRequest
     public function rules(): array
     {
         return [
-            "packageId" => "required|integer",
-            "availableDate" => "required|date|after:today",
-            "availableTime" => "required|date_format:h:i A",
-            "fee" => "required|numeric"
+            "packageId" => "nullable|integer",
+            "availableDate" => "nullable|date|after:today",
+            "availableTime" => "nullable|date_format:h:i A" 
         ];
     }
 }

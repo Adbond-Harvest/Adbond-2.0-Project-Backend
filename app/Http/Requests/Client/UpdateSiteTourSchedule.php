@@ -1,18 +1,17 @@
 <?php
 
-namespace app\Http\Requests\User;
+namespace app\Http\Requests\Client;
 
 use Illuminate\Foundation\Http\FormRequest;
-use app\Http\Requests\BaseRequest;
 
-class CreateSiteTourSchedule extends BaseRequest
+class UpdateSiteTourSchedule extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -23,10 +22,7 @@ class CreateSiteTourSchedule extends BaseRequest
     public function rules(): array
     {
         return [
-            "packageId" => "required|integer",
-            "availableDate" => "required|date|after:today",
-            "availableTime" => "required|date_format:h:i A",
-            "fee" => "required|numeric"
+            //
         ];
     }
 }
