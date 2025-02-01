@@ -14,8 +14,8 @@ return new class extends Migration
     {
         DB::statement("CREATE VIEW project_packages_summary_view AS
             SELECT 
-                project_types.id AS project_type_id,
-                project_types.name AS project_type,
+                MIN(project_types.id) AS project_type_id,
+                MIN(project_types.name) AS project_type,
                 projects.id AS project_id,
                 projects.name AS project_name,
                 COUNT(packages.id) AS total_packages
