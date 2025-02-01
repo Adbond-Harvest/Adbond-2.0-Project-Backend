@@ -81,11 +81,14 @@ class ProjectController extends Controller
         $projectTypes = $this->projectTypeService->projectTypes();
         $this->projectService->count = true;
         $summary = [];
-        $summary['all'] = $this->projectService->projects();
+        $summary['all'] = ["total" => $this->projectService->projects()];
         if($projectTypes->count() > 0) {
             foreach($projectTypes as $projectType) {
                 $this->projectService->typeId = $projectType->id;
-                $summary[$projectType->name] = $this->projectService->projects();
+                $summary[$projectType->name] = [
+                    "id" => $projectType->id,
+                    "total" => $this->projectService->projects()
+                ];
             }
         }
 
