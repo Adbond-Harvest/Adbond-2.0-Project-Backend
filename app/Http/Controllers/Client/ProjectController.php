@@ -129,7 +129,7 @@ class ProjectController extends Controller
         $packages = $this->packageService->packages();
 
         return Utilities::ok([
-            "summary" => $summary,
+            "project" => new ProjectResource($project),
             "packages" => PackageResource::collection($packages)
         ]);
     }
