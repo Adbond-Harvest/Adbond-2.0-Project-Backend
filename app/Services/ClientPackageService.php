@@ -10,6 +10,7 @@ use app\Models\ClientPackage;
 use app\Models\Order;
 use app\Models\Offer;
 use app\Models\ClientInvestment;
+use app\Models\ClientAssetsView;
 
 use app\Services\ClientInvestmentService;
 
@@ -112,5 +113,14 @@ class ClientPackageService
         return ClientPackage::with($with)->where("id", $id)->first();
     }
 
+    public function clientAssetSummary($clientId)
+    {
+        return ClientAssetsView::where("client_id", $clientId)->first();
+    }
+
+    public function clientAssets($clientId)
+    {
+        return ClientPackage::where("client_id", $clientId)->get();
+    }
 
 }

@@ -5,6 +5,8 @@ namespace app\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+
 class ClientInvestment extends Model
 {
     use HasFactory;
@@ -42,5 +44,10 @@ class ClientInvestment extends Model
     public function files()
     {
         return $this->morphMany(File::class, 'belongs');
+    }
+
+    public function interests(): MorphMany
+    {
+        return $this->morphMany(WalletTransaction::class, 'source');
     }
 }
