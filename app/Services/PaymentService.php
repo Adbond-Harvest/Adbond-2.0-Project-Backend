@@ -136,7 +136,13 @@ class PaymentService
             "Authorization" => "Bearer ".env('PAYSTACK_SECRET_KEY'),
             "Cache-Control" => "no-cache"
         ];
-        $post = ["email" => $client->email, "amount" => ceil($amount)];
+        $post = ["email" => $client->email, "amount" => ceil($amount), "callback_url"=> "https://yourdomain.com/payment/callback"];
+        // {
+        //     "email": "customer@example.com",
+        //     "amount": 500000, // Amount in kobo
+        //     "callback_url": "https://yourdomain.com/payment/callback"
+        //   }
+          
         $res = ['success' => false];
         $response = Helpers::request($url, $headers, $post);
         if($response['status'] && $response['status'] == true) {

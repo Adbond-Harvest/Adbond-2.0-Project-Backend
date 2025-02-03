@@ -29,6 +29,7 @@ use app\Http\Controllers\Client\WalletController;
 use app\Http\Controllers\Client\TransactionController;
 use app\Http\Controllers\Client\ProjectController as ClientProjectController;
 use app\Http\Controllers\Client\PackageController as ClientPackageController;
+use app\Http\Controllers\Client\AssetController;
 
 //Public Controllers
 use app\Http\Controllers\ProjectController;
@@ -232,6 +233,13 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/prepare_additional_payment', [PaymentController::class, 'prepareAdditionalPayment']);
             Route::post('/save', [PaymentController::class, 'save']);
             Route::post('/save_additional_payment', [PaymentController::class, 'saveAdditionalPayment']);
+        });
+
+        //Assets Routes
+        Route::group(['prefix' => '/assets'], function () {
+            Route::get('/summary', [AssetController::class, 'summary']);
+            Route::get('', [AssetController::class, 'assets']);
+            Route::get('/{assetId}', [AssetController::class, 'asset']);
         });
 
         //Wallet Routes

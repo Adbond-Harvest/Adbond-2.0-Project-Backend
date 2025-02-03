@@ -30,6 +30,8 @@ class AssetResource extends JsonResource
             "purchaseAt" => $this->created_at->format('F j, Y'), 
             "amount" => $this->amount, //($this->origin == ClientPackageOrigin::ORDER->value) ? $this->purchase?->amount_payable : $this->purchase?->price,
             "location" => $this->package?->state,
+            "address" => $this->package?->address,
+            "description" => $this->package?->description,
             "units" => $this->units,
             "size" => $this->package?->size,
             "amountPaid" => $this->amountPaid(),
@@ -37,6 +39,7 @@ class AssetResource extends JsonResource
             "installmentCount" => $this->installmentCount(),
             "nextPaymentDate" => $this->payment_due_date,
             "appreciation" => $this->appreciation(),
+            "balance" => $this->balance(),
             "status" => ($this->origin == ClientPackageOrigin::ORDER->value && $this->purchase?->completed == 0) ? "pending" : "completed", 
             "active" => ($this->origin == ClientPackageOrigin::ORDER->value && !$this->purchase?->completed) ? true : false,
             "files" => FileResource::collection($this->files),
@@ -72,6 +75,17 @@ class AssetResource extends JsonResource
             return $this->purchase?->amount_payed;
         }
         return $this->amount;
+    }
+
+    private function balance()
+    {
+        if($this->origin == ClientPackageOrigin::ORDER->value) {
+            return $this->purchase?->balance;
+        }
+        if($this->origin == ClientPackageOrigin::INVESTMENT->value) {
+            return $this->purchase?->order?->balance;
+        }
+        return 0;
     }
 
     private function installmentCount()
