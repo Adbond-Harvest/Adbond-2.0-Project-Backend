@@ -37,6 +37,7 @@ use app\Http\Controllers\PackageController;
 use app\Http\Controllers\UtilityController;
 
 use app\Http\Controllers\TestController;
+use App\Utilities;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -161,6 +162,9 @@ Route::group(['prefix' => '/v2',], function () {
                 Route::get('/show/{transactionId}', [UserTransactionController::class, "transaction"]);
             });
         });
+
+        Route::get('/bank_accounts', [UtilityController::class, "bankAccounts"]);
+        Route::get('/resell_orders', [UtilityController::class, "resellOrders"]);
     });
 
     /*
@@ -258,6 +262,10 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('/{transactionId}', [TransactionController::class, 'transaction']);
             Route::get('/export/{transactionId}', [TransactionController::class, 'export']);
         });
+
+
+        Route::get('/bank_accounts', [UtilityController::class, "activeBankAccounts"]);
+        Route::get('/resell_orders', [UtilityController::class, "resellOrders"]);
     });
 
     // Route::get('test/benefit', [TestController::class, 'benefit']);
