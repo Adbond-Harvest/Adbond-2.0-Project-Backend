@@ -22,7 +22,7 @@ return new class extends Migration
             $table->double("package_price");
             $table->foreignId("resell_order_id")->nullable();
             $table->boolean("active")->default(false);
-            $table->boolean("approved")->default(false);
+            $table->boolean("approved")->nullable();
             $table->text("rejected_reason")->nullable();
             $table->boolean("completed")->default(false);
             $table->foreignId("payment_status_id");

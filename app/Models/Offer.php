@@ -10,12 +10,37 @@ class Offer extends Model
 {
     use HasFactory;
 
+    public function asset()
+    {
+        return $this->belongsTo(ClientPackage::class, 'purchase_id');
+    }
+
+    public function paymentStatus()
+    {
+        return $this->belongsTo(PaymentStatus::class);
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function resellOrder()
+    {
+        return $this->belongsTo(ResellOrder::class);
+    }
+
     /**
      * Get all client packages for this offer
      */
-    public function clientPackages(): MorphMany
+    public function clientPackage()
     {
-        return $this->morphMany(ClientPackage::class, 'purchase');
+        return $this->hasOne(ClientPackage::class, 'purchase_id');
     }
 
     /**
@@ -25,4 +50,6 @@ class Offer extends Model
     {
         return $this->morphMany(Payment::class, 'purchase');
     }
+
+
 }

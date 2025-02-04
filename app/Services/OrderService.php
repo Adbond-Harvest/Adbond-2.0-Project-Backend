@@ -217,10 +217,10 @@ class OrderService
             $clientPackage = $clientPackageService->saveClientPackageInvestment($clientInvestment);
             $fileMeta = ["belongsId"=>$clientPackage->id, "belongsType"=>"app\Models\ClientInvestment"];
             if($memorandumFileObj) $fileService->updateFileObj($fileMeta, $memorandumFileObj);
-        }
 
-         // Start the investment
-         $clientInvestmentService->start($clientInvestment);
+            // Start the investment
+            $clientInvestmentService->start($clientInvestment);
+        }
 
         $fileMeta = ["belongsId"=>$clientPackage->id, "belongsType"=>"app\Models\ClientPackage"];
         if($contractFileObj) $fileService->updateFileObj($fileMeta, $contractFileObj);
