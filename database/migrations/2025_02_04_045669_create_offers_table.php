@@ -13,17 +13,20 @@ return new class extends Migration
     {
         Schema::create('offers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("client_id")->references("id")->on("clients");
-            $table->foreignId("package_id")->references("id")->on("packages");
+            $table->foreignId("client_id");
+            $table->foreignId("package_id");
+            $table->foreignId("client_package_id");
             $table->double("units")->nullable();
-            $table->foreignId("project_id")->references("id")->on("projects");
+            $table->foreignId("project_id");
             $table->double("price");
+            $table->double("package_price");
+            $table->foreignId("resell_order_id")->nullable();
             $table->boolean("active")->default(false);
             $table->boolean("approved")->default(false);
             $table->text("rejected_reason")->nullable();
-            $table->boolean("completed");
-            $table->foreignId("payment_status_id")->references("id")->on("payment_statuses");
-            $table->foreignId("user_id")->nullable()->references("id")->on("users");
+            $table->boolean("completed")->default(false);
+            $table->foreignId("payment_status_id");
+            $table->foreignId("user_id")->nullable();
             $table->timestamps();
         });
     }

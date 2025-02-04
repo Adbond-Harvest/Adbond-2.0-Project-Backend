@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 use app\Models\Benefit;
 use app\Models\Bank;
+use app\Models\ResellOrder;
+use app\Models\BankAccount;
 
 use app\Helpers;
 use app\Utilities;
@@ -41,6 +43,17 @@ class UtilityService
     public function banks()
     {
         return Bank::all();
+    }
+
+    public function bankAccounts($active=null)
+    {
+        if(!$active) return BankAccount::all();
+        return BankAccount::where("active", $active)->get();
+    }
+
+    public function resellOrders()
+    {
+        return ResellOrder::all();
     }
 
 }
