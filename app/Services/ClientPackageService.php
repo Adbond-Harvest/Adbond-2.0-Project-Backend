@@ -37,7 +37,7 @@ class ClientPackageService
         $clientPackage->origin = $data['origin'];
         $clientPackage->purchase_id = $data['purchaseId'];
         $clientPackage->purchase_type = $data['purchaseType'];
-        $clientPackage->purchase_complete = $data['purchaseComplete'];
+        if(isset($data['purchaseComplete'])) $clientPackage->purchase_complete = $data['purchaseComplete'];
         $clientPackage->amount = $data['amount'];
         if(isset($data['units'])) $clientPackage->units = $data['units'];
         $clientPackage->unit_price = $data['unitPrice'];
@@ -54,7 +54,7 @@ class ClientPackageService
         $data['purchaseType'] = Order::$type;
         if(isset($files['contractFileId'])) $data['contractFileId'] = $files['contractFileId'];
         if(isset($files['happinessLetterFileId'])) $data['happinessLetterFileId'] = $files['happinessLetterFileId'];
-        $data['purchaseComplete'] = $order->completed;
+        if($order->completed == 1) $data['purchaseComplete'] = true;
         $data['packageType'] = $order->package->type;
         $data['amount'] = $order->amount_payable;
         $data['units'] = $order->units;
@@ -69,7 +69,7 @@ class ClientPackageService
         $data['origin'] = ClientPackageOrigin::INVESTMENT->value;
         $data['purchaseId'] = $clientInvestment->id;
         $data['purchaseType'] = ClientInvestment::$type;
-        $data['purchaseComplete'] = $clientInvestment->order->completed;
+        if($clientInvestment->order->completed == 1) $data['purchaseComplete'] = true;
         $data['amount'] = $clientInvestment->capital;
         $data['unitPrice'] = $clientInvestment->order->unit_price;
 
