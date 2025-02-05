@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Rules;
+namespace app\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Owenoj\LaravelGetId3\GetId3;
 
-use App\Utilities;
+use app\Utilities;
 
 class VideoDuration implements ValidationRule
 {

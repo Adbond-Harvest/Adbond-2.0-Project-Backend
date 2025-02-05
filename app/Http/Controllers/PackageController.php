@@ -4,10 +4,10 @@ namespace app\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Http\Resources\PackageResource;
+use app\Http\Resources\PackageResource;
 
-use App\Services\PackageService;
-use App\Utilities;
+use app\Services\PackageService;
+use app\Utilities;
 
 class PackageController extends Controller
 {

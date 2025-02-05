@@ -37,7 +37,7 @@ use app\Http\Controllers\PackageController;
 use app\Http\Controllers\UtilityController;
 
 use app\Http\Controllers\TestController;
-use App\Utilities;
+use app\Utilities;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();

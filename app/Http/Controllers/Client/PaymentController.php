@@ -335,7 +335,7 @@ class PaymentController extends Controller
 
                 $this->paymentService->uploadReceipt($payment, Auth::guard('client')->user());  
                 $clientInvestment = (isset($clientInvestment)) ? $clientInvestment : null;
-                ($order->installment == 0 || $order->installments_payed == $order->installment_count) ? 
+                ($order->installment == 0 || $order->installments_payed === $order->installment_count) ? 
                     $this->orderService->completeOrder($order, $payment, $clientInvestment) 
                     : 
                     (($order->package->type==PackageType::INVESTMENT->value) ? $this->clientPackageService->saveClientPackageInvestment($clientInvestment) : $this->clientPackageService->saveClientPackageOrder($order));

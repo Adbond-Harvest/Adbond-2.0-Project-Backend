@@ -8,7 +8,7 @@ use app\Http\Controllers\Controller;
 use app\Http\Resources\TransactionResource;
 
 use app\Services\TransactionService;
-use App\Utilities;
+use app\Utilities;
 
 class TransactionController extends Controller
 {

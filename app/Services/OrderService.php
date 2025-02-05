@@ -89,7 +89,7 @@ class OrderService
         if(isset($data['promoCodeId'])) $order->promo_code_id = $data['promoCodeId'];
         $order->is_installment = $data['isInstallment'];
         if($data['isInstallment']) $order->installment_count = $data['installmentCount'];
-        if(isset($data['installmentsPayed'])) $order->installments_payed = $data['installmentsPayed'];
+        if(isset($data['isInstallment'])) $order->installments_payed = 1;
         $order->payment_status_id = $data['paymentStatusId'];
         $order->order_date = $data['orderDate'];
         if(isset($data['paymentDueDate'])) $order->payment_due_date = $data['paymentDueDate'];
