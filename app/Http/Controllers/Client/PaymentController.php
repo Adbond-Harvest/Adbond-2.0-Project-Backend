@@ -164,7 +164,7 @@ class PaymentController extends Controller
             }
 
             if($payment->confirmed == 1) {
-                if($order->installment==1) {
+                if($order->is_installment==1) {
                     $order = $this->orderService->update(['installmentsPayed' => 1], $order);
                 }
             }
@@ -320,7 +320,7 @@ class PaymentController extends Controller
         // if the payment gateway marked the payment as a success, deduct the units
         if($order?->package && (!$data['cardPayment'] || ($data['cardPayment'] && !$gatewayRes['paymentError']))) {
             // deduct units only if it full payment or the first payment of an installment
-            if($order->installment == 0 || $order->installments_payed < 2) $this->packageService->deductUnits($order->units, $order?->package);
+            if($order->is_installment == 0 || $order->installments_payed < 2) $this->packageService->deductUnits($order->units, $order?->package);
             if($order->package->type==PackageType::INVESTMENT->value) $clientInvestment = $this->clientInvestmentService->saveInvestment($order, $processedData);
 
             if($data['cardPayment']) {
@@ -328,14 +328,14 @@ class PaymentController extends Controller
                 
                 // If its full payment or its the first installment or its the last installment
                 // if the client was referred to by a staff, add commission to the staff
-                if(($order->installment==0 || ($order->installments_payed < 2 || $order->payment_status_id==PaymentStatus::complete()->id)) && Auth::guard('client')->user()->referer) {
+                if(($order->is_installment==0 || ($order->installments_payed < 2 || $order->payment_status_id==PaymentStatus::complete()->id)) && Auth::guard('client')->user()->referer) {
                     // calculate the bonus/commission for the referer and save it
                     $commission = $this->commissionService->save(Auth::guard("client")->user()->referer, $order);
                 }
 
                 $this->paymentService->uploadReceipt($payment, Auth::guard('client')->user());  
                 $clientInvestment = (isset($clientInvestment)) ? $clientInvestment : null;
-                ($order->installment == 0 || $order->installments_payed === $order->installment_count) ? 
+                ($order->is_installment == 0 || $order->installments_payed == $order->installment_count) ? 
                     $this->orderService->completeOrder($order, $payment, $clientInvestment) 
                     : 
                     (($order->package->type==PackageType::INVESTMENT->value) ? $this->clientPackageService->saveClientPackageInvestment($clientInvestment) : $this->clientPackageService->saveClientPackageOrder($order));
