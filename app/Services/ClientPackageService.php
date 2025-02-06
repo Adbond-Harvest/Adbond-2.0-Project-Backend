@@ -122,7 +122,7 @@ class ClientPackageService
     public function clientAssets($clientId, $with=[], $offset=0, $perPage=null)
     {
         // return ClientPackage::where("client_id", $clientId)->get();
-        $query = ClientPackage::with($with);
+        $query = ClientPackage::with($with)->where("client_id", $clientId);
         if($this->filter && is_array($this->filter)) {
             $filter = $this->filter;
             if(isset($filter['text'])) {
