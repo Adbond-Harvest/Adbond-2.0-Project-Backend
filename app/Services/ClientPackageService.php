@@ -24,6 +24,7 @@ use app\Exports\PackageExport;
 class ClientPackageService
 {
     public $count = false;
+    public $filter = null;
 
     public function save($data)
     {
@@ -118,9 +119,24 @@ class ClientPackageService
         return ClientAssetsView::where("client_id", $clientId)->first();
     }
 
-    public function clientAssets($clientId)
+    public function clientAssets($clientId, $with=[], $offset=0, $perPage=null)
     {
-        return ClientPackage::where("client_id", $clientId)->get();
+        // return ClientPackage::where("client_id", $clientId)->get();
+        $query = ClientPackage::with($with);
+        if($this->filter && is_array($this->filter)) {
+            $filter = $this->filter;
+            if(isset($filter['text'])) {
+                $query->whereHas('package', function($packageQuery) use($filter) {
+                    $packageQuery->where("name", "LIKE", "%".$filter['text']."%")
+                    ->orWhereHas('project', function($projectQuery) use($filter) {
+                        $projectQuery->where("name", "LIKE", "%".$filter['text']."%");
+                    });
+                });
+            }
+            if(isset($filter['date'])) $query = $query->whereDate("created_at", $filter['date']);
+        }
+        if($this->count) return $query->count();
+        return $query->orderBy("created_at", "DESC")->offset($offset)->limit($perPage)->get();
     }
 
 }
