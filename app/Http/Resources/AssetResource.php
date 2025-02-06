@@ -43,7 +43,7 @@ class AssetResource extends JsonResource
             "status" => ($this->origin == ClientPackageOrigin::ORDER->value && $this->purchase?->completed == 0) ? "pending" : "completed", 
             "active" => ($this->origin == ClientPackageOrigin::ORDER->value && !$this->purchase?->completed) ? true : false,
             "files" => FileResource::collection($this->files),
-            "returns" => $this->investmentReturns()
+            // "returns" => $this->investmentReturns()
         ];
     }
 

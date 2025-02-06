@@ -34,7 +34,7 @@ class AssetController extends Controller
     {
         $assets = $this->clientPackageService->clientAssets(Auth::guard('client')->user()->id);
 
-        return Utilities::ok(ClientAssetResource::collection($assets));
+        return Utilities::ok(AssetResource::collection($assets));
     }
 
     public function asset($assetId)
