@@ -18,6 +18,7 @@ use app\Http\Controllers\User\Client\TransactionController as UserTransactionCon
 use app\Http\Controllers\User\PostController as UserPostController;
 use app\Http\Controllers\User\CommentController as UserCommentController;
 use app\Http\Controllers\User\PaymentController as UserPaymentController;
+use app\Http\Controllers\User\AssetController as UserAssetController;
 use app\Http\Controllers\User\SiteTourController as UserSiteTourController;
 
 // Client Controllers
@@ -115,6 +116,11 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/confirm', [UserPaymentController::class, 'confirm']);
             Route::post('/reject', [UserPaymentController::class, 'reject']);
             Route::post('/flag', [UserPaymentController::class, 'flag']);
+        });
+
+        //Assets Routes
+        Route::group(['prefix' => '/assets'], function () {
+            Route::get('', [UserAssetController::class, "assets"]);
         });
 
         Route::group(['prefix' => '/site_tour'], function () {

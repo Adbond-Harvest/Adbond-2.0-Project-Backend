@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 use app\Http\Resources\PackageResource;
 use app\Http\Resources\FileResource;
+use app\Http\Resources\ClientBriefResource;
 
 use app\Enums\ClientPackageOrigin;
 
@@ -23,6 +24,7 @@ class AssetResource extends JsonResource
     {
         return [
             "id" => $this->id,
+            "client" => new ClientBriefResource($this->whenLoaded("client")),
             "package" => $this->package?->name,
             "project_identifier" => $this->identifier,
             "project" => $this->package?->project?->name,
