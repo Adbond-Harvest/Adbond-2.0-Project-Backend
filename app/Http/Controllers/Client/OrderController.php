@@ -37,7 +37,7 @@ class OrderController extends Controller
 
     public function prepareOrder(PrepareOrder $request)
     {
-        // try{
+        try{
             $data = $request->validated();
             // dd($data);
             $package = $this->packageService->package($data['packageId']);
@@ -75,8 +75,8 @@ class OrderController extends Controller
                 "amountPayable" => $data['amountPayable'],
                 "appliedDiscounts" => $amountDetail
             ]);
-        // }catch(\Exception $e){
-        //     return Utilities::error($e, 'An error occurred while trying to send verification mail, Please try again later or contact support');
-        // }
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to send verification mail, Please try again later or contact support');
+        }
     }
 }

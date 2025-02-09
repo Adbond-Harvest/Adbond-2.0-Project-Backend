@@ -20,6 +20,7 @@ use app\Http\Controllers\User\CommentController as UserCommentController;
 use app\Http\Controllers\User\PaymentController as UserPaymentController;
 use app\Http\Controllers\User\AssetController as UserAssetController;
 use app\Http\Controllers\User\SiteTourController as UserSiteTourController;
+use app\Http\Controllers\User\OfferController as UserOfferController;
 
 // Client Controllers
 use app\Http\Controllers\Client\PromoController;
@@ -31,6 +32,8 @@ use app\Http\Controllers\Client\TransactionController;
 use app\Http\Controllers\Client\ProjectController as ClientProjectController;
 use app\Http\Controllers\Client\PackageController as ClientPackageController;
 use app\Http\Controllers\Client\AssetController;
+use app\Http\Controllers\Client\OfferController;
+use app\Http\Controllers\Client\OfferBidController;
 
 //Public Controllers
 use app\Http\Controllers\ProjectController;
@@ -121,6 +124,13 @@ Route::group(['prefix' => '/v2',], function () {
         //Assets Routes
         Route::group(['prefix' => '/assets'], function () {
             Route::get('', [UserAssetController::class, "assets"]);
+        });
+
+        //Offers Routes
+        Route::group(['prefix' => '/offers'], function () {
+            Route::get('', [UserOfferController::class, "offers"]);
+            Route::post('/approve', [UserOfferController::class, "approve"]);
+            Route::post('/reject', [UserOfferController::class, "reject"]);
         });
 
         Route::group(['prefix' => '/site_tour'], function () {
@@ -250,6 +260,22 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('/summary', [AssetController::class, 'summary']);
             Route::get('', [AssetController::class, 'assets']);
             Route::get('/{assetId}', [AssetController::class, 'asset']);
+        });
+
+        //Offer Routes
+        Route::group(['prefix' => '/offers'], function () {
+            Route::post('', [OfferController::class, 'create']);
+            Route::get('', [OfferController::class, 'offers']);
+            Route::post('/make_bid', [OfferBidController::class, 'bid']);
+            Route::get('/{offerId}', [OfferController::class, 'offer']);
+        });
+
+        //Offer Bid Routes
+        Route::group(['prefix' => '/bids'], function () {
+            // Route::post('/{bidId}', [OfferBidController::class, 'getBid']);
+            Route::get('', [OfferBidController::class, 'myBids']);
+            Route::post('/accept', [OfferBidController::class, 'acceptBid']);
+            Route::post('/reject', [OfferBidController::class, 'rejectBid']);
         });
 
         //Wallet Routes
