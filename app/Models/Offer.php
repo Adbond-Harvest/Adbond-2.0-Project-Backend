@@ -12,7 +12,7 @@ class Offer extends Model
 
     public function asset()
     {
-        return $this->belongsTo(ClientPackage::class, 'purchase_id');
+        return $this->belongsTo(ClientPackage::class, 'client_package_id');
     }
 
     public function paymentStatus()
@@ -51,5 +51,20 @@ class Offer extends Model
         return $this->morphMany(Payment::class, 'purchase');
     }
 
+    public function bids()
+    {
+        return $this->hasMany(OfferBid::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($offer) {
+            if($offer->resell_order_id) {
+                $offer->approved = 1;
+            }
+        });
+    }
 
 }

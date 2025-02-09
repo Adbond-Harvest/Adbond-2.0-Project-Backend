@@ -16,6 +16,7 @@ use app\Enums\ProductCategory;
 use app\Enums\PostType;
 use app\Enums\PackageType;
 use app\Enums\InvestmentRedemptionOption;
+use app\Enums\OfferApprovalStatus;
 
 class EnumClass
 {
@@ -150,4 +151,13 @@ class EnumClass
             InvestmentRedemptionOption::PROPERTY->value
         ];
     } 
+
+    public static function offerApprovalStatuses()
+    {
+        return [
+            OfferApprovalStatus::PENDING->value,
+            OfferApprovalStatus::APPROVED->value,
+            OfferApprovalStatus::REJECTED->value
+        ];
+    }
 }

@@ -21,12 +21,14 @@ return new class extends Migration
             $table->double("price");
             $table->double("package_price");
             $table->foreignId("resell_order_id")->nullable();
-            $table->boolean("active")->default(false);
+            $table->foreignId("accepted_bid_id")->nullable();
+            $table->boolean("active")->default(true);
             $table->boolean("approved")->nullable();
             $table->text("rejected_reason")->nullable();
             $table->boolean("completed")->default(false);
             $table->foreignId("payment_status_id");
             $table->foreignId("user_id")->nullable();
+            $table->date("approval_date")->nullable();
             $table->timestamps();
         });
     }
