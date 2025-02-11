@@ -266,6 +266,7 @@ Route::group(['prefix' => '/v2',], function () {
         Route::group(['prefix' => '/offers'], function () {
             Route::post('', [OfferController::class, 'create']);
             Route::get('', [OfferController::class, 'offers']);
+            Route::get('/sales', [OfferController::class, "saleOffers"]);
             Route::post('/make_bid', [OfferBidController::class, 'bid']);
             Route::get('/{offerId}', [OfferController::class, 'offer']);
         });

@@ -12,6 +12,7 @@ class OfferService
     public $clientId = null;
     public $filter = null;
     public $count = null;
+    public $sales = null;
 
     public function save($data)
     {
@@ -47,6 +48,8 @@ class OfferService
     {
         $query = Offer::with($with);
         if($this->clientId) $query->where("client_id", $this->clientId);
+        if($this->sales == false) $query->whereNull("resell_order_id")->whereNull("accepted_bid_id");
+        if($this->sales == true) $query->whereNotNull("resell_order_id")->OrWhereNotNull("accepted_bid_id");
         if($this->filter && is_array($this->filter)) {
             $filter = $this->filter;
             if(isset($filter['text'])) {
