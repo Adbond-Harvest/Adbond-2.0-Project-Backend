@@ -34,6 +34,17 @@ class OfferService
         return $offer;
     }
 
+    public function update($data, $offer)
+    {
+        if(isset($data['price'])) {
+            $offer->price = $data['price'];
+            if($offer->approved == 0) $offer->approved = null;
+        }
+        $offer->update();
+
+        return $offer;
+    }
+
     public function bidAccepted($offer, $bid)
     {
         $offer->accepted_bid_id = $bid->id;

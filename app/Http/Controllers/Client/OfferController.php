@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use app\Http\Controllers\Controller;
 
 use app\Http\Requests\Client\CreateOffer;
+use app\Http\Requests\Client\UpdateOffer;
 
 use app\Http\Resources\OfferResource;
 
@@ -16,6 +17,7 @@ use app\Services\ClientPackageService;
 
 use app\Enums\ClientPackageOrigin;
 use app\Enums\PackageType;
+use app\Enums\OfferApprovalStatus;
 
 use app\Utilities;
 
@@ -78,6 +80,23 @@ class OfferController extends Controller
         }
     }
 
+    public function update(UpdateOffer $request)
+    {
+        try{
+            $data = $request->validated();
+            $offer = $this->offerService->offer($data['offerId']);
+            if(!$offer) return Utilities::error402("Offer not found");
+
+            if($offer->completed == 1) return Utilities::error402("Offer has been completed");
+
+            $offer = $this->offerService->update($data, $offer);
+
+            return Utilities::ok(new OfferResource($offer));
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to send verification mail, Please try again later or contact support');
+        }
+    }
+
     public function offers(Request $request)
     {
         $page = ($request->query('page')) ?? 1;
@@ -119,6 +138,31 @@ class OfferController extends Controller
         $this->offerService->clientId = Auth::guard("client")->user()->id;
 
         $this->offerService->sales = true;
+
+        $offers = $this->offerService->offers([], $offset, $perPage);
+
+        $this->offerService->count = true;
+        $offersCount = $this->offerService->offers();
+
+        return Utilities::paginatedOkay(OfferResource::collection($offers), $page, $perPage, $offersCount);
+    }
+
+    public function activeOffers(Request $request)
+    {
+        $page = ($request->query('page')) ?? 1;
+        $perPage = ($request->query('perPage'));
+        if(!is_int((int) $page) || $page <= 0) $page = 1;
+        if(!is_int((int) $perPage) || $perPage==null) $perPage = env('PAGINATION_PER_PAGE');
+        $offset = $perPage * ($page-1);
+
+        $filter = [];
+        if($request->query('text')) $filter["text"] = $request->query('text');
+        if($request->query('date')) $filter["date"] = $request->query('date');
+        $filter["status"] = OfferApprovalStatus::APPROVED->value;
+        
+        $this->offerService->filter = $filter;
+
+        $this->offerService->sales = false;
 
         $offers = $this->offerService->offers([], $offset, $perPage);
 
