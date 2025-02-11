@@ -93,6 +93,33 @@ class OfferController extends Controller
         $this->offerService->filter = $filter;
         $this->offerService->clientId = Auth::guard("client")->user()->id;
 
+        $this->offerService->sales = false;
+
+        $offers = $this->offerService->offers([], $offset, $perPage);
+
+        $this->offerService->count = true;
+        $offersCount = $this->offerService->offers();
+
+        return Utilities::paginatedOkay(OfferResource::collection($offers), $page, $perPage, $offersCount);
+    }
+
+    public function saleOffers(Request $request)
+    {
+        $page = ($request->query('page')) ?? 1;
+        $perPage = ($request->query('perPage'));
+        if(!is_int((int) $page) || $page <= 0) $page = 1;
+        if(!is_int((int) $perPage) || $perPage==null) $perPage = env('PAGINATION_PER_PAGE');
+        $offset = $perPage * ($page-1);
+
+        $filter = [];
+        if($request->query('text')) $filter["text"] = $request->query('text');
+        if($request->query('date')) $filter["date"] = $request->query('date');
+        
+        $this->offerService->filter = $filter;
+        $this->offerService->clientId = Auth::guard("client")->user()->id;
+
+        $this->offerService->sales = true;
+
         $offers = $this->offerService->offers([], $offset, $perPage);
 
         $this->offerService->count = true;
