@@ -33,8 +33,8 @@ class OfferController extends Controller
         if(!is_int((int) $perPage) || $perPage==null) $perPage = env('PAGINATION_PER_PAGE');
         $offset = $perPage * ($page-1);
 
-        $filter['status'] = OfferApprovalStatus::PENDING->value;
-        $this->offerService->filter = $filter;
+        // $filter['status'] = OfferApprovalStatus::PENDING->value;
+        // $this->offerService->filter = $filter;
 
         $offers = $this->offerService->offers(['client'], $offset, $perPage);
 
