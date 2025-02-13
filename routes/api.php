@@ -11,6 +11,7 @@ use app\Http\Controllers\User\ProjectTypeController as UserProjectTypeController
 use app\Http\Controllers\User\ProjectController as UserProjectController;
 use app\Http\Controllers\User\PackageController as UserPackageController;
 use app\Http\Controllers\User\IndexController as UserIndexController;
+use app\Http\Controllers\User\StaffController as StaffController;
 use app\Http\Controllers\User\ClientController as UserClientController;
 use app\Http\Controllers\User\FileController as UserFileCOntroller;
 use app\Http\Controllers\User\Client\WalletController as UserClientWalletController;
@@ -75,6 +76,14 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/update', 'ProfileController@update');
         });
         Route::post('/upload_photo', 'FileController@savePhoto');
+
+        //Staff Routes
+        Route::group(['prefix' => '/staffs'], function () {
+            Route::post('', [StaffController::class, "save"]);
+            Route::get('', [StaffController::class, "users"]);
+            Route::get('/{userId}', [StaffController::class, "user"]);
+            Route::patch('/{userId}', [StaffController::class, "update"]);
+        });
 
         //Project Types
         Route::group(['prefix' => '/project_types'], function () {

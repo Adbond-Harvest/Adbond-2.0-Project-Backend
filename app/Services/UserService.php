@@ -6,7 +6,7 @@ use app\Notifications\APIPasswordResetNotification;
 use app\Exceptions\UserNotFoundException;
 
 use app\Models\User;
-// use app\Models\Role;
+use app\Models\Role;
 // use app\Models\Staff_type;
 use app\Models\Client;
 
@@ -39,8 +39,9 @@ class UserService
         return User::with($with)->where("email", $email)->first();
     }
 
-    public function getUsers()
+    public function getUsers($user)
     {
+        if($user->role_id != Role::SuperAdmin()->id) return User::where("role_id", "!=", Role::SuperAdmin()->id)->get();
         return User::all();
     }
 

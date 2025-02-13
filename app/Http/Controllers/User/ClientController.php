@@ -15,6 +15,7 @@ use app\Http\Requests\User\UpdateClient;
 
 use app\Services\ClientService;
 use app\Services\FileService;
+use app\Services\UserActivityLogService;
 
 use app\Models\Client;
 use app\Models\User;
@@ -28,11 +29,13 @@ class ClientController extends Controller
 {
     private $clientService;
     private $fileService;
+    private $activityLogService;
 
     public function __construct()
     {
         $this->clientService = new ClientService;
         $this->fileService = new FileService;
+        $this->activityLogService = new UserActivityLogService;
     }
 
     public function index(Request $request)
@@ -111,6 +114,12 @@ class ClientController extends Controller
 
             $client = $this->clientService->update($data, $client);
             if($oldPhotoId) $this->fileService->deleteFile($oldPhotoId);
+
+            try{
+                $this->activityLogService->log(Auth::user(), "Updated Client Information");
+            }catch(\Exception $e){
+                Utilities::logStuff('An error occurred while trying to Log Staff activity updating a client');
+            }
 
             DB::commit();
             return Utilities::ok(new ClientResource($client));

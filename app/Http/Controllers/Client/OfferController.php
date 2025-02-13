@@ -167,7 +167,7 @@ class OfferController extends Controller
         $offers = $this->offerService->offers([], $offset, $perPage);
 
         $this->offerService->count = true;
-        $offersCount = $this->offerService->offers();
+        $offersCount = $this->offerService->offers(['bids']);
 
         return Utilities::paginatedOkay(OfferResource::collection($offers), $page, $perPage, $offersCount);
     }
