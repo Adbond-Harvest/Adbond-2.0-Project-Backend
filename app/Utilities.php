@@ -10,6 +10,9 @@ use app\Services\AuthService;
 use app\Models\User;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard\Percentage;
 
+use app\Enums\UserType;
+use app\Enums\RefererCodePrefix;
+
 class Utilities
 {
     public $guard;
@@ -211,10 +214,11 @@ class Utilities
         return substr(str_shuffle($permitted_chars), 0, $length);
     }
 
-    public static function generateRefererCode()
+    public static function generateRefererCode($userType)
     {
+        $prefix = ($userType==UserType::USER->value) ? RefererCodePrefix::USER->value : RefererCodePrefix::CLIENT->value;
         do{
-            $code = self::generateRandomString(5);
+            $code = $prefix.self::generateRandomString(5);
             $exists = User::where('referer_code', $code)->first();
         }while($exists);
         return $code;

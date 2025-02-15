@@ -162,6 +162,27 @@ class WalletService
         return $wallet;
     }
 
+    public function creditCommissionEarning($wallet, $clientCommission)
+    {
+        $transaction = new WalletTransaction;
+        $transaction->reference_no = $this->generateReferenceNo();
+        $transaction->wallet_id = $wallet->id;
+        $transaction->amount = $clientCommission->amount_after_tax;
+        $transaction->balance = $wallet->amount + $transaction->amount;
+        $transaction->transaction_type = TransactionType::IN_FLOW->value;
+        $transaction->source_type = WalletTransactionSource::COMMISSION->value;
+        $transaction->source_id = $clientCommission->id;
+        $transaction->confirmed = true;
+        $transaction->save();
+
+        $wallet->amount = $transaction->balance;
+        $wallet->total = $wallet->total + $transaction->amount;
+
+        $wallet->update();
+
+        return $wallet;
+    }
+
     public function generateWithdrawalRequest($wallet, $amount)
     {
         $withdrawalRequest = new WalletWithdrawalRequest;

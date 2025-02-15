@@ -12,6 +12,8 @@ use app\Models\Payment_mode;
 use app\Models\StaffCommissionEarning;
 use app\Models\DeductibleFee;
 use app\Models\CommissionRate;
+use app\Models\ClientCommissionEarning;
+use app\Models\ClientCommissionRate;
 
 use app\Enums\StaffTypes;
 use app\Enums\StaffCommissionType;
@@ -58,6 +60,47 @@ class CommissionService
             $newCommissionRate->save();
          }
          return CommissionRate::where('staff_type_id', $data['staff_type_id'])->get();
+    }
+
+    public function setClientCommissionRate($rate)
+    {
+        $clientRate = ClientCommissionRate::first() ?? new ClientCommissionRate;
+        $clientRate->rate = $rate;
+        $clientRate->save();
+
+        return $clientRate;
+    }
+
+    public function saveClientEarning($client, $order)
+    {
+        $fee = DeductibleFee::where("name", "commission tax")->first();
+        $commissionTax = $fee ? $fee->commission_tax : 0;
+        $clientCommissionRate = ClientCommissionRate::first();
+
+        if($clientCommissionRate) {
+            $clientCommission = new ClientCommissionEarning;
+            $clientCommission->client_id = $client->id;
+            $clientCommission->order_id = $order->id;
+            $clientCommission->amount = $order->amount_payable;
+            $clientCommission->commission = $clientCommissionRate->rate;
+            $clientCommission->commission_amount = round(($clientCommissionRate->rate/100) * $clientCommission->amount, 2);
+            $clientCommission->tax = $commissionTax;
+            $taxAmount = round(($commissionTax/100) * $clientCommission->commission_amount, 2);
+            $clientCommission->amount_after_tax = $clientCommission->commission_amount - $taxAmount;
+            $clientCommission->save();
+
+            return $clientCommission;
+        }
+
+        /*
+            $table->foreignId("client_id");
+            $table->foreignId("order_id");
+            $table->double("amount");
+            $table->double("commission");
+            $table->double("commission_amount");
+            $table->double("tax");
+            $table->double("amount_after_tax");
+        */
     }
 
     public function save($user, $order)

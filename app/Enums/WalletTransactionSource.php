@@ -7,4 +7,5 @@ use app\Models\ClientInvestment;
 enum WalletTransactionSource: string
     {
         case INVESTMENT = "app\Models\ClientInvestment";
+        case COMMISSION = "app\Models\ClientCommissionEarning";
     }
