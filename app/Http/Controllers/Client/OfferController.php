@@ -139,7 +139,7 @@ class OfferController extends Controller
 
         $this->offerService->sales = true;
 
-        $offers = $this->offerService->offers([], $offset, $perPage);
+        $offers = $this->offerService->offers(['bids'], $offset, $perPage);
 
         $this->offerService->count = true;
         $offersCount = $this->offerService->offers();

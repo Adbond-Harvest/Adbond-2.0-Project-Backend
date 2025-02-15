@@ -24,7 +24,7 @@ class OfferResource extends JsonResource
             "units" => $this->units,
             "price" => $this->price,
             "active" => ($this->active==1) ? true : false,
-            "status" => (!$this->approved) ? "Pending" : (($this->approved==1) ? "Approved" : "Rejected"),
+            "status" => ($this->approved==null) ? "Pending" : (($this->approved==1) ? "Approved" : "Rejected"),
             "completed" => ($this->completed==1) ? true : false,
             "rejectedReason" => $this->rejected_reason,
             "paymentStatus" => $this?->paymentStatus?->name,

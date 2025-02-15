@@ -20,7 +20,8 @@ class OfferBidResource extends JsonResource
         return [
             "id" => $this->id,
             "price" => $this->price,
-            "status" =>  ($this->accepted) ? (($this->accepted == 1) ? "Accepted" : "Rejected") : "Pending",
+            "status" =>  ($this->accepted == null) ? (($this->accepted == 1) ? "Accepted" : "Rejected") : "Pending",
+            "date" => $this->created_at->format('F j, Y'),
             "offer" => new OfferResource($this->whenLoaded('offer')),
             "client" => new ClientBriefResource($this->whenLoaded("client"))
         ];
