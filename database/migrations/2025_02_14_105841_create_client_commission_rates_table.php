@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('clients', function (Blueprint $table) {
-            $table->string("referer_code")->nullable()->after("referer_id");
+        Schema::create('client_commission_rates', function (Blueprint $table) {
+            $table->id();
+            $table->double("rate");
+            $table->timestamps();
         });
     }
 
@@ -21,8 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('clients', function (Blueprint $table) {
-            $table->dropColumn("referer_code");
-        });
+        Schema::dropIfExists('client_commission_rates');
     }
 };
