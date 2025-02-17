@@ -111,6 +111,12 @@ class OfferBidController extends Controller
 
         $this->bidService->filter = $filter;
         $this->bidService->clientId = Auth::guard("client")->user()->id;
+
+        $bids = $this->bidService->bids([], $offset, $perPage);
+        $this->bidService->count = true;
+        $bidsCount = $this->bidService->bids();
+
+        return Utilities::paginatedOkay(OfferBidResource::collection($bids), $page, $perPage, $bidsCount);
     }
 
     public function getBid($bidId)
