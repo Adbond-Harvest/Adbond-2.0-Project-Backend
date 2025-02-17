@@ -21,6 +21,7 @@ use app\Services\FileService;
 use app\Models\Client;
 
 use app\Enums\FilePurpose;
+use app\Enums\UserType;
 use app\Utilities;
 
 class ClientController extends Controller
@@ -61,7 +62,7 @@ class ClientController extends Controller
             return Utilities::okay("Profile Updated Successfully", new ClientBriefResource($client));
         }catch(\Exception $e){
             DB::rollBack();
-            return Utilities::error($e, 'An error occured while trying to Perform this operation, Please try again later or contact support');
+            return Utilities::error($e, 'An error occurred while trying to Perform this operation, Please try again later or contact support');
         }
     }
 
@@ -73,7 +74,19 @@ class ClientController extends Controller
             $kin = $this->clientService->updateNextOfKin($data);
             return Utilities::okay("next of Kin added Successfully", new ClientNextOfKinResource($kin));
         }catch(\Exception $e){
-            return Utilities::error($e, 'An error occured while trying to send verification mail, Please try again later or contact support');
+            return Utilities::error($e, 'An error occurred while trying to send verification mail, Please try again later or contact support');
         }
+    }
+
+    public function generateRefererCode(Request $request)
+    {
+        $code = Auth::guard('client')->user()->referer_code;
+        if(!$code) {
+            $code = Utilities::generateRefererCode(UserType::CLIENT->value);
+
+            $client = $this->clientService->update(['refererCode' => $code], Auth::guard('client')->user());
+        }
+
+        return Utilities::ok($code);
     }
 }

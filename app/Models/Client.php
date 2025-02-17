@@ -9,6 +9,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+
+use app\Enums\RefererCodePrefix;
 
 class Client extends Authenticatable implements JWTSubject
 {
@@ -57,9 +60,16 @@ class Client extends Authenticatable implements JWTSubject
         return $this->belongsTo("app\Models\File");
     }
 
-    public function referer()
+    // public function referer()
+    // {
+    //     return $this->morphOne();
+    // }
+    /**
+     * Get the referer model (User or Client).
+     */
+    public function referer(): MorphTo
     {
-        return $this->belongsTo(User::class);
+        return $this->morphTo();
     }
 
     public function nextOfKins()

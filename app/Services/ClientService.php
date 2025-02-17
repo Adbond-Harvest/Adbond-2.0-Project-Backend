@@ -95,6 +95,7 @@ class ClientService
         if(isset($data['stateId'])) $client->state_id = $data['stateId'];
         if(isset($data['ageGroupId'])) $client->age_group_id = $data['ageGroupId'];
         if(isset($data['refererId'])) $client->referer_id = $data['refererId'];
+        if(isset($data['refererType'])) $client->referer_type = $data['refererType'];
         if(isset($data['marital_status'])) $client->marital_status = $data['maritalStatus'];
         if(isset($data['employment_status'])) $client->employment_status = $data['employmentStatus'];
         if(isset($data['occupation'])) $client->occupation = $data['occupation'];
@@ -123,6 +124,7 @@ class ClientService
         // /if(array_key_exists('occupation', $data));
         if(isset($data['postalCode'])) $client->postal_code = $data['postalCode'];
         if(isset($data['ageGroupId'])) $client->age_group_id = $data['ageGroupId'];
+        if(isset($data['refererCode'])) $client->referer_code = $data['refererCode'];
         if(isset($data['dob'])) {
             $ageGroupService = new AgeGroupService;
             $ageGroup = $ageGroupService->getGroupFromDob($data['dob']);

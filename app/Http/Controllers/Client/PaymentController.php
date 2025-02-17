@@ -38,7 +38,7 @@ use app\Enums\PaymentPurpose;
 use app\Enums\FilePurpose;
 use app\Enums\FileTypes;
 use app\Enums\PackageType;
-
+use app\Enums\UserType;
 use app\Utilities;
 use app\Helpers;
 
@@ -330,7 +330,12 @@ class PaymentController extends Controller
                 // if the client was referred to by a staff, add commission to the staff
                 if(($order->is_installment==0 || ($order->installments_payed < 2 || $order->payment_status_id==PaymentStatus::complete()->id)) && Auth::guard('client')->user()->referer) {
                     // calculate the bonus/commission for the referer and save it
-                    $commission = $this->commissionService->save(Auth::guard("client")->user()->referer, $order);
+                    if($order->payment_status_id==PaymentStatus::complete()->id && Auth::guard("client")->user()->referer_type == UserType::CLIENT->value) {
+                        $this->commissionService->saveClientEarning(Auth::guard("client")->user()->referer, $order);
+                    }
+                    if(Auth::guard("client")->user()->referer_type == UserType::USER->value) {
+                        $this->commissionService->save(Auth::guard("client")->user()->referer, $order);
+                    }
                 }
 
                 $this->paymentService->uploadReceipt($payment, Auth::guard('client')->user());  

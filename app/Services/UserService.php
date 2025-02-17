@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\DB;
 use app\Helpers;
 use app\Utilities;
 
+use app\Enums\UserType;
+
 /**
  * user service class
  */
@@ -186,7 +188,7 @@ class UserService
         if(isset($data['postal_code'])) $user->postal_code = $data['postal_code'];
         if(isset($data['marital_status'])) $user->marital_status = $data['marital_status'];
         $user->registered_by = $user_id;
-        $user->referer_code = Utilities::generateRefererCode();
+        $user->referer_code = Utilities::generateRefererCode(UserType::USER->value);
         if(isset($data['file_id'])) $user->photo_id = $data['file_id']; 
         if(isset($data['gender'])) $user->gender = $data['gender']; 
         if(isset($data['department_id'])) $user->department_id = $data['department_id']; 

@@ -21,6 +21,7 @@ use app\Services\ClientPackageService;
 use app\Services\ClientInvestmentService;
 
 use app\Enums\PackageType;
+use app\Enums\UserType;
 
 use app\Utilities;
 
@@ -54,14 +55,19 @@ class PaymentController extends Controller
             // dd($payment->purchase);
             // update order table to reflect amount_payed and balance;
             $order = $this->orderService->saveAmountPaid($order, $payment->amount);
-            $data['paymentStatusId'] = PaymentStatus::deposit()->id;
+            $data['paymentStatusId'] = ($order->balance <= 0) ? PaymentStatus::complete()->id : PaymentStatus::deposit()->id;
             $data['installmentsPayed'] = $order->installments_payed+1;
             $order = $this->orderService->update($data, $order);
 
             // update staff commission
             if(($order->is_installment==0 || ($order->installments_payed < 2 || $order->payment_status_id==PaymentStatus::complete()->id)) && $payment->client->referer) {
                 // calculate the bonus/commission for the referer and save it
-                $commission = $this->commissionService->save($payment->client->referer, $order);
+                if($order->payment_status_id==PaymentStatus::complete()->id && $payment->client->referer_type == UserType::CLIENT->value) {
+                    $this->commissionService->saveClientEarning($payment->client->referer, $order);
+                }
+                if($payment->client->referer_type == UserType::USER->value) {
+                    $this->commissionService->save($payment->client->referer, $order);
+                }
             }
 
             $this->paymentService->uploadReceipt($payment, $payment->client); 

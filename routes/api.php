@@ -35,6 +35,7 @@ use app\Http\Controllers\Client\PackageController as ClientPackageController;
 use app\Http\Controllers\Client\AssetController;
 use app\Http\Controllers\Client\OfferController;
 use app\Http\Controllers\Client\OfferBidController;
+use app\Http\Controllers\Client\ClientController;
 
 //Public Controllers
 use app\Http\Controllers\ProjectController;
@@ -228,8 +229,9 @@ Route::group(['prefix' => '/v2',], function () {
         });
         // Client Profile
         Route::group(['prefix' => '/profile',], function () {
-            Route::post('/update', 'ClientController@update');
-            Route::post('/save_next_of_kin', 'ClientController@addNextOfKin');
+            Route::post('/update', [ClientController::class, 'update']);
+            Route::post('/save_next_of_kin', [ClientController::class, 'addNextOfKin']);
+            Route::get('/generate_referer_code', [ClientController::class, 'generateRefererCode']);
         });
         Route::group(['prefix' => '/file',], function () {
             Route::post('/upload_profile_photo', 'FileController@saveProfilePhoto');
