@@ -13,6 +13,7 @@ use app\Services\AgeGroupService;
 use app\Models\Client;
 use app\Models\ClientNextOfKin;
 use app\Models\ClientSummaryView;
+use app\Models\ClientCommissionEarning;
 
 use app\Enums\KYCStatus;
 use app\Enums\ActiveToggle;
@@ -184,6 +185,11 @@ class ClientService
         if(isset($data['stateId'])) $kin->state_id = $data['stateId'];
         $kin->save();
         return $kin;
+    }
+
+    public function referralEarnings($clientId)
+    {
+        return ClientCommissionEarning::where("client_id", $clientId)->get();
     }
 
 }

@@ -88,4 +88,9 @@ class Client extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(Wallet::class);
     }
+
+    public function siteTourSchedules()
+    {
+        return $this->hasManyThrough(SiteTourSchedule::class, SiteTourBooking::class, "client_id", "id", "id", "site_tour_schedule_id");
+    }
 }

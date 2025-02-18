@@ -25,7 +25,9 @@ class UpdateSiteTourSchedule extends BaseRequest
         return [
             "packageId" => "nullable|integer",
             "availableDate" => "nullable|date|after:today",
-            "availableTime" => "nullable|date_format:h:i A" 
+            "availableTime" => "nullable|date_format:h:i A",
+            "fee" => "nullable|numeric",
+            "slots" => "nullable|integer"
         ];
     }
 }

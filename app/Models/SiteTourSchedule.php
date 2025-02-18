@@ -28,4 +28,9 @@ class SiteTourSchedule extends Model
     {
         return $this->hasMany(SiteTourBooking::class);
     }
+
+    public function clients()
+    {
+        return $this->belongsToMany(Client::class, 'site_tour_bookings', 'site_tour_schedule_id', 'client_id', 'id', 'id');
+    }
 }
