@@ -97,8 +97,11 @@ class ClientAuthController extends Controller
         try{
             $post = $request->all();
             if(isset($post['referalCode'])) {
-                $user = $this->userService->getUserByRefererCode($post['referalCode']);
-                if($user) $post['refererId'] = $user->id;
+                $userData = Utilities::getByRefererCode($post['referalCode']);
+                if($userData['user']) {
+                    $post['refererId'] = $userData['user']->id;
+                    $post['refererType'] = $userData['userType'];
+                }
             }
             $emailVerification = $this->emailService->emailExists($post['email']);
             if(!$emailVerification || !$emailVerification->verified) return Utilities::error402('Email has not been verified');

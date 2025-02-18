@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 
 use app\Services\AuthService;
 use app\Models\User;
+use app\Models\Client;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard\Percentage;
 
 use app\Enums\UserType;
@@ -222,6 +223,13 @@ class Utilities
             $exists = User::where('referer_code', $code)->first();
         }while($exists);
         return $code;
+    }
+
+    public static function getByRefererCode($code)
+    {
+        $userType = (strpos($code, RefererCodePrefix::USER->value) !== false) ? UserType::USER->value : UserType::CLIENT->value;
+        $user = ($userType == UserType::USER->value) ? User::where('referer_code', $code)->first() : Client::where('referer_code', $code)->first();
+        return ["user" => $user, "userType" => $userType];
     }
 
     public static function getOrderProcessingId()

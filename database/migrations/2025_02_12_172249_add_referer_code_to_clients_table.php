@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('clients', function (Blueprint $table) {
-            $table->string("referer_code")->nullable()->after("referer_id");
+            $table->string("referer_type")->nullable()->after("referer_id");
+            $table->string("referer_code")->nullable()->after("referer_type");
         });
     }
 

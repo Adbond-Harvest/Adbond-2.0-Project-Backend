@@ -12,9 +12,12 @@ class SiteTourService
     /*
         Site Tour Schedule Services
     */
+    public $count = null;
     public $cancelled = null;
     public $future = null;
     public $filter = null;
+    public $clientId = null;
+    public $booked = null;
 
     public function save($data)
     {
@@ -23,6 +26,7 @@ class SiteTourService
         $siteTourSchedule->project_id = $data['projectId'];
         $siteTourSchedule->package_id = $data['packageId'];
         $siteTourSchedule->fee = $data['fee'];
+        $siteTourSchedule->slots = $data['slots'];
         $siteTourSchedule->available_date = $data['availableDate'];
         $siteTourSchedule->available_time = Carbon::createFromFormat('h:i A', $data['availableTime'])->format('H:i:s');
 
@@ -37,6 +41,7 @@ class SiteTourService
         if(isset($data['projectId'])) $siteTourSchedule->project_id = $data['projectId'];
         if(isset($data['packageId'])) $siteTourSchedule->package_id = $data['packageId'];
         if(isset($data['fee'])) $siteTourSchedule->fee = $data['fee'];
+        if(isset($data['slots'])) $siteTourSchedule->slots = $data['slots'];
         if(isset($data['availableDate'])) $siteTourSchedule->available_date = $data['availableDate'];
         if(isset($data['availableTime'])) $siteTourSchedule->available_time = Carbon::createFromFormat('h:i A', $data['availableTime'])->format('H:i:s');
 
@@ -50,9 +55,33 @@ class SiteTourService
         $siteTourSchedule->delete();
     }
 
-    public function schedules($with=[])
+    public function schedules($with=[], $offset=0, $perPage=null)
     {
         $query = SiteTourSchedule::with($with);
+        if($this->booked === true) {
+            // if we are getting schedules that are booked
+            if($this->clientId) {
+                // if the booking we are looking for is for a particular client
+                $query->whereHas("clients", function($clientQuery) {
+                    $clientQuery->where("client_id", $this->clientId);
+                });
+            }else{
+                // if its not for a particular client
+                $query->whereHas("clients");
+            }
+        }
+        if($this->booked === false) {
+            // if we are getting schedules that are not booked
+            if($this->clientId) {
+                // if we are looking for schedules not booked by a particular client
+                $query->whereDoesntHave("clients", function($clientQuery) {
+                    $clientQuery->where("client_id", $this->clientId);
+                });
+            }else{
+                // if its not for a particular client
+                $query->whereDoesntHave("clients");
+            }
+        }
         if($this->future) $query->where("available_date", ">", Carbon::now());
         if($this->filter) {
             $filter = $this->filter;
@@ -71,12 +100,32 @@ class SiteTourService
             }
         }
         if($this->cancelled) $query->where("cancelled", $this->cancelled);
-        return $query->orderBy("available_date", "DESC")->get();
+
+        if($this->count) return $query->count();
+        return $query->orderBy("created_at", "DESC")->offset($offset)->limit($perPage)->get();
+        // return $query->orderBy("available_date", "DESC")->get();
     }
+
+    // public function unbookedSchedules($with=[])
+    // {
+    //     SiteTourSchedule::whereDoesntHave('clients', function ($query) {
+    //         $query->where('client_id', $clientId);
+    //     });
+    // }
 
     public function schedule($id, $with=[])
     {
         return SiteTourSchedule::with($with)->where("id", $id)->first();
+    }
+
+    public function deductSlots($siteTourSchedule, $slots = 1)
+    {
+        $remainingSlots = $siteTourSchedule->slots - $slots;
+        $siteTourSchedule->slots = ($remainingSlots >= 0) ? $remainingSlots : 0;
+
+        $siteTourSchedule->update();
+
+        return $siteTourSchedule;
     }
 
 

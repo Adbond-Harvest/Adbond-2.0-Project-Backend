@@ -26,7 +26,8 @@ class CreateSiteTourSchedule extends BaseRequest
             "packageId" => "required|integer",
             "availableDate" => "required|date|after:today",
             "availableTime" => "required|date_format:h:i A",
-            "fee" => "required|numeric"
+            "fee" => "required|numeric",
+            "slots" => "required|integer"
         ];
     }
 }

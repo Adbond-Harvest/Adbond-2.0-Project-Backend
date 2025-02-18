@@ -22,6 +22,7 @@ use app\Http\Controllers\User\PaymentController as UserPaymentController;
 use app\Http\Controllers\User\AssetController as UserAssetController;
 use app\Http\Controllers\User\SiteTourController as UserSiteTourController;
 use app\Http\Controllers\User\OfferController as UserOfferController;
+use app\Http\Controllers\User\UtilityController as UserUtilityController;
 
 // Client Controllers
 use app\Http\Controllers\Client\PromoController;
@@ -35,6 +36,8 @@ use app\Http\Controllers\Client\PackageController as ClientPackageController;
 use app\Http\Controllers\Client\AssetController;
 use app\Http\Controllers\Client\OfferController;
 use app\Http\Controllers\Client\OfferBidController;
+use app\Http\Controllers\Client\ClientController;
+use app\Http\Controllers\Client\SiteTourController;
 
 //Public Controllers
 use app\Http\Controllers\ProjectController;
@@ -186,6 +189,9 @@ Route::group(['prefix' => '/v2',], function () {
                 Route::get('/{clientId}', [UserTransactionController::class, "transactions"]);
                 Route::get('/show/{transactionId}', [UserTransactionController::class, "transaction"]);
             });
+
+            Route::get('/roles', [UserUtilityController::class, "roles"]);
+            Route::get('/staff_types', [UserUtilityController::class, "staffTypes"]);
         });
 
         Route::get('/bank_accounts', [UtilityController::class, "bankAccounts"]);
@@ -228,8 +234,10 @@ Route::group(['prefix' => '/v2',], function () {
         });
         // Client Profile
         Route::group(['prefix' => '/profile',], function () {
-            Route::post('/update', 'ClientController@update');
-            Route::post('/save_next_of_kin', 'ClientController@addNextOfKin');
+            Route::post('/update', [ClientController::class, 'update']);
+            Route::post('/save_next_of_kin', [ClientController::class, 'addNextOfKin']);
+            Route::get('/generate_referer_code', [ClientController::class, 'generateRefererCode']);
+            Route::get('/referral_earnings', [ClientController::class, 'referralEarnings']);
         });
         Route::group(['prefix' => '/file',], function () {
             Route::post('/upload_profile_photo', 'FileController@saveProfilePhoto');
@@ -304,6 +312,13 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('', [TransactionController::class, 'index']);
             Route::get('/{transactionId}', [TransactionController::class, 'transaction']);
             Route::get('/export/{transactionId}', [TransactionController::class, 'export']);
+        });
+
+        //Site Tours
+        Route::group(['prefix' => '/site_tours',], function () {
+            Route::post('/book', [SiteTourController::class, 'book']);
+            Route::get('/schedules', [SiteTourController::class, 'schedules']);
+            Route::get('', [SiteTourController::class, 'siteTours']);
         });
 
 
