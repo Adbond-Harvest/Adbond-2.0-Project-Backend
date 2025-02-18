@@ -44,7 +44,7 @@ class UserResource extends JsonResource
             'address' => $this->address,
             'maritalStatus' => $this->marital_status,
             'registeredBy' => new UserBriefResource($this->registerer),
-            'clients' => ClientBriefResource::collection($this->clients),
+            // 'clients' => ClientBriefResource::collection($this->clients),
             // 'sales' => OrderSalesResource::collection($this->sales),
             // 'commission' => $this->commission(),
             // 'commission_before_tax' => $this->beforeTax(),
