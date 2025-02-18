@@ -19,6 +19,7 @@ class ProjectService
     public $count = false;
     public $typeId = null;
     public $status = null;
+    public $all = null;
 
     public function save($data)
     {
@@ -82,6 +83,7 @@ class ProjectService
         if($this->status) $query = $query->where("status", $this->status);
         if($this->count) return $query->count();
         if($perPage==null) $perPage=env('PAGINATION_PER_PAGE', 15);
+        if($this->all) return $query->orderBy("created_at", "DESC")->get();
         return $query->orderBy("created_at", "DESC")->limit($perPage)->offset($offset)->get();
         // dd($projects);
     }
@@ -139,6 +141,7 @@ class ProjectService
         if(isset($filter['date'])) $query = $query->whereDate("created_at", $filter['date']);
         if(isset($filter['status'])) $query = ($filter['status'] == ProjectFilter::ACTIVE->value) ? $query->where("active", true) : $query->where("active", false);
         if($this->count) return $query->count();
+        if($this->all) return $query->orderBy("created_at", "DESC")->get();
         return $query->orderBy("created_at", "DESC")->offset($offset)->limit($perPage)->get();
     }
 
