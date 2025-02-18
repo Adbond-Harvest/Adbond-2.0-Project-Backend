@@ -119,6 +119,9 @@ class ProjectController extends Controller
         $summaryData = $this->summary($projectTypeId);
 
         $this->projectService->typeId = $projectTypeId;
+
+        if($request->has('all')) $this->projectService->all - true;
+
         $page = ($request->query('page')) ?? 1;
         $perPage = ($request->query('perPage'));
         if(!is_int((int) $page) || $page <= 0) $page = 1;
@@ -134,14 +137,15 @@ class ProjectController extends Controller
             $filter["status"] = $request->query('status');
         }
 
-
-        $projects = $this->projectService->filter($filter, ["projectType", "packages"], $offset, $perPage);
+        $with = ($request->has('all')) ? [] : ["projectType", "packages"];
+    
+        $projects = $this->projectService->filter($filter, $with, $offset, $perPage);
 
         // $projects = $this->projectService->projects(["projectType"], $offset, $perPage);
         $this->projectService->count = true;
         $projectsCount = $this->projectService->filter($filter);
 
-        $meta = [
+        $meta = ($request->has('all')) ? [] : [
             "page" => $page,
             "perPage" => $perPage,
             "pages" => ceil($projectsCount/$perPage),

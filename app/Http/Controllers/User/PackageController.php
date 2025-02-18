@@ -46,6 +46,8 @@ class PackageController extends Controller
         if (!is_numeric($projectId) || !ctype_digit($projectId)) return Utilities::error402("Invalid parameter projectID");
         $this->packageService->projectId = $projectId;
 
+        if($request->has('all')) $this->projectService->all - true;
+
         $page = ($request->query('page')) ?? 1;
         $perPage = ($request->query('perPage'));
         if(!is_int((int) $page) || $page <= 0) $page = 1;
@@ -66,7 +68,10 @@ class PackageController extends Controller
         $this->packageService->count = true;
         $packagesCount = $this->packageService->filter($filter);
 
-        return Utilities::paginatedOkay(PackageResource::collection($packages), $page, $perPage, $packagesCount);
+        return ($request->has('all')) ? 
+                        Utilities::ok(PackageResource::collection($packages))
+                        :
+                        Utilities::paginatedOkay(PackageResource::collection($packages), $page, $perPage, $packagesCount);
     }
 
     public function package($id)
