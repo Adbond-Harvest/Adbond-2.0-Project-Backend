@@ -40,7 +40,7 @@ class ClientResource extends JsonResource
             'active' => ($this->activated && $this->activated == 1) ? true : false,
             'wallet' => new WalletResource($this->wallet),
             'assets' => AssetResource::collection($this->whenLoaded('assets')),
-            'nextOfKin' => ClientNextOfKinResource::collection($this->whenLoaded("nextOfKins"))
+            'nextOfKin' => new ClientNextOfKinResource($this->whenLoaded("nextOfKins"))
             // 'passwordSet' => ($this->password_set)
         ];
     }

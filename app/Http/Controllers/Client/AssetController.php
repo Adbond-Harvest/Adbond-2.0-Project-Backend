@@ -43,7 +43,7 @@ class AssetController extends Controller
         if($request->query('date')) $filter["date"] = $request->query('date');
         
         $this->clientPackageService->filter = $filter;
-        $assets = $this->clientPackageService->clientAssets(Auth::guard('client')->user()->id, [], $offset, $perPage);
+        $assets = $this->clientPackageService->clientAssets(Auth::guard('client')->user()->id, ['package.media'], $offset, $perPage);
 
         // Get Count
         $this->clientPackageService->count = true;
@@ -54,7 +54,7 @@ class AssetController extends Controller
 
     public function asset($assetId)
     {
-        $asset = $this->clientPackageService->clientPackage($assetId);
+        $asset = $this->clientPackageService->clientPackage($assetId, ['package.media']);
         if(!$asset) return Utilities::error402("Asset not found");
 
         if($asset->client_id != Auth::guard('client')->user()->id) return Utilities::error402("You are not permitted to view this asset");
