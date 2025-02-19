@@ -41,7 +41,7 @@ class WalletService
 
     public function transactions($walletId, $with=[])
     {
-        return WalletTransaction::with($with)->where("wallet_id", $walletId)->get();
+        return WalletTransaction::with($with)->where("wallet_id", $walletId)->orderBy("created_at", "DESC")->get();
     }
 
     public function transaction($id, $with=[])
@@ -56,7 +56,7 @@ class WalletService
 
     public function getInvestmentTransactions($investmentId)
     {
-        return WalletTransaction::where("source_type", WalletTransactionSource::INVESTMENT->value)->where("source_id", $investmentId)->get();
+        return WalletTransaction::where("source_type", WalletTransactionSource::INVESTMENT->value)->where("source_id", $investmentId)->orderBy("created_at", "DESC")->get();
     }
 
     public function getWithdrawalByReference($referenceNo, $with=[])
@@ -73,7 +73,7 @@ class WalletService
     {
         $query = WalletWithdrawalRequest::with($with);
         if($this->walletId) $query->where("wallet_id", $this->walletId);
-        return $query->get();
+        return $query->orderBy("created_at", "DESC")->get();
     }
 
     public function totalOutflows($client)

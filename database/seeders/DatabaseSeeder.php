@@ -29,6 +29,7 @@ use Database\Seeders\DeductibleFees;
 use Database\Seeders\Benefits;
 use Database\Seeders\WalletSeeder;
 use Database\Seeders\BankAccounts;
+use Database\Seeders\AddRefererUserCode;
 
 class DatabaseSeeder extends Seeder
 {
@@ -64,7 +65,8 @@ class DatabaseSeeder extends Seeder
             new DeductibleFees,
             new Benefits,
             new WalletSeeder,
-            new BankAccounts
+            new BankAccounts,
+            new AddRefererUserCode
         ];
 
         foreach($seeders as $seeder) $seeder->run();

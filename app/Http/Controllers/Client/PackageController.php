@@ -25,7 +25,7 @@ class PackageController extends Controller
     {
         if ($packageId && (!is_numeric($packageId) || !ctype_digit($packageId))) return Utilities::error402("Invalid parameter packageID");
 
-        $package = $this->packageService->package($packageId, ['project.projectType']);
+        $package = $this->packageService->package($packageId, ['project.projectType', 'media']);
 
         if(!$package) return Utilities::error402("Package not found");
 

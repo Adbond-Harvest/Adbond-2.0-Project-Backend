@@ -7,6 +7,7 @@ use app\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 use app\Mail\EmailVerification;
 
@@ -95,8 +96,13 @@ class ClientAuthController extends Controller
      */
     public function register(Register $request) {
         try{
+            DB::beginTransaction();
+
             $post = $request->all();
             if(isset($post['referalCode'])) {
+                $user = $this->userService->getUserByRefererCode($post['referalCode']);
+                if(!$user) return Utilities::error402("Invalid Referer Code");
+
                 $userData = Utilities::getByRefererCode($post['referalCode']);
                 if($userData['user']) {
                     $post['refererId'] = $userData['user']->id;
@@ -114,6 +120,8 @@ class ClientAuthController extends Controller
             // Create a wallet for the client
             $this->walletService->create($client->id);
             
+            DB::commit();
+
             $credentials = $request->only('email', 'password');
             if (! $token = Auth::guard('client')->attempt($credentials)) {
                 return response()->json([
@@ -131,6 +139,8 @@ class ClientAuthController extends Controller
                 'client' => new ClientResource($client)
             ], 200);
         }catch(\Exception $e){
+            DB::rollBack();
+            
             if(isset($client)) {
                 $this->clientService->delete($client);
             }
