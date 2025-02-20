@@ -25,7 +25,8 @@ class AssetResource extends JsonResource
         return [
             "id" => $this->id,
             "client" => new ClientBriefResource($this->whenLoaded("client")),
-            "package" => new PackageResource($this->whenLoaded("package")),
+            "package" => $this->package->name,
+            "media" => FileResource::collection($this->package->media),
             "project_identifier" => $this->identifier,
             "project" => $this->package?->project?->name,
             "projectType" => $this->package?->project?->projectType?->name,
