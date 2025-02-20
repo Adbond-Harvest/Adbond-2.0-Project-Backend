@@ -85,9 +85,15 @@ class SiteTourController extends Controller
         return Utilities::okay("Site Tour Schedule Deleted Successfully");
     }
 
-    public function schedules()
+    public function schedules(Request $request)
     {
-        $schedules = $this->siteTourService->schedules();
+        $page = ($request->query('page')) ?? 1;
+        $perPage = ($request->query('perPage'));
+        if(!is_int((int) $page) || $page <= 0) $page = 1;
+        if(!is_int((int) $perPage) || $perPage==null) $perPage = env('PAGINATION_PER_PAGE');
+        $offset = $perPage * ($page-1);
+
+        $schedules = $this->siteTourService->schedules([], $offset, $perPage);
 
         return Utilities::ok(SiteTourScheduleResource::collection($schedules));
     }
