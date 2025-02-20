@@ -127,6 +127,7 @@ class ProjectController extends Controller
         $summary = $this->projectService->projectPackageSummary();
 
         $packages = $this->packageService->packages();
+        $packages->load("media");
 
         return Utilities::ok([
             "project" => new ProjectResource($project),
@@ -145,6 +146,7 @@ class ProjectController extends Controller
         $summary = $this->projectService->projectPackageSummary();
 
         $packages = $projectType->packages()->get();
+        $packages->load("media");
 
         return Utilities::ok([
             "summary" => $summary,
