@@ -24,7 +24,7 @@ class CreateSiteTourSchedule extends BaseRequest
     {
         return [
             "packageId" => "required|integer",
-            "availableDate" => "required|date|after:today",
+            "availableDate" => "required|date|date_format:Y-m-d|after:today",
             "availableTime" => "required|date_format:h:i A",
             "fee" => "required|numeric",
             "slots" => "required|integer"
