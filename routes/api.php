@@ -305,6 +305,7 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/set_transaction_pin', [WalletController::class, 'setTransactionPin']);
             Route::post('/validate_withdrawal', [WalletController::class, 'validateWithdrawal']);
             Route::post('/withdraw', [WalletController::class, 'withdraw']);
+            Route::get('/withdrawal_requests', [WalletController::class, 'withdrawalRequests']);
         });
 
         //Transaction Routes

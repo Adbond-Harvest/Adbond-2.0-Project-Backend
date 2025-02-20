@@ -127,4 +127,12 @@ class WalletController extends Controller
             return Utilities::error($e, 'An error occurred while trying to perform this operation, Please try again later or contact support');
         }
     }
+
+    public function withdrawalRequests()
+    {
+        $this->walletService->walletId = Auth::guard("client")->user()->wallet->id;
+        $withdrawalRequests = $this->walletService->withdrawalRequests();
+
+        return Utilities::ok(WalletWithdrawalRequestResource::collection($withdrawalRequests));
+    }
 }
