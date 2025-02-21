@@ -53,11 +53,24 @@ class ClientController extends Controller
                 $fileMeta = ["belongsId"=>Auth::guard('client')->user()->id, "belongsType"=>"app\Models\Client"];
                 $this->fileService->updateFileObj($fileMeta, $res['file']);
             }
+            $oldIdentificationPhotoId = null;
+            if($request->hasFile('identificationPhoto')) {
+                $purpose = FilePurpose::CLIENT_IDENTIFICATION_PHOTO->value;
+                if(Auth::guard('client')->user()->clientIdentification) $oldIdentificationPhotoId = Auth::guard('client')->user()->clientIdentification->file_id;
+                $res = $this->fileService->save($request->file('identificationPhoto'), 'image', Auth::guard('client')->user()->id, $purpose, Client::$userType, 'client-identification-photos');
+                if($res['status'] != 200) return Utilities::error402('Sorry Photo could not be uploaded '.$res['message']);
+
+                $data['identificationFileId'] = $res['file']->id;
+                $fileMeta = ["belongsId"=>Auth::guard('client')->user()->id, "belongsType"=>"app\Models\Client"];
+                $this->fileService->updateFileObj($fileMeta, $res['file']);
+            }
 
             $client = $this->clientService->update($data, Auth::guard('client')->user());
 
             // delete the old photo if it exists
             if($oldPhotoId) $this->fileService->deleteFile($oldPhotoId);
+            // delete the old Identification photo if it exists
+            if($oldIdentificationPhotoId) $this->fileService->deleteFile($oldIdentificationPhotoId);
 
             DB::commit();
             return Utilities::okay("Profile Updated Successfully", new ClientBriefResource($client));
@@ -65,6 +78,11 @@ class ClientController extends Controller
             DB::rollBack();
             return Utilities::error($e, 'An error occurred while trying to Perform this operation, Please try again later or contact support');
         }
+    }
+
+    public function profile()
+    {
+        return Utilities::ok(new ClientBriefResource(Auth::guard("client")->user()));
     }
 
     public function addNextOfKin(AddNextOfKin $request)

@@ -30,7 +30,7 @@ class UpdateClient extends BaseRequest
             "firstname" => "string|nullable",
             "lastname" => "string|nullable",
             // "photoId" => "integer|nullable",
-            'photo' => 'nullable|image|max:10000|mimes:jpeg,png,jpg,gif',
+            'photo' => 'nullable|image|max:10000|mimes:jpeg,png,jpg,webp',
             "gender" => ["nullable","string", Rule::in(EnumClass::genders())],
             "phoneNumber" => "nullable|string|min:8|max:22",
             "address" => "string|nullable",
@@ -39,7 +39,8 @@ class UpdateClient extends BaseRequest
             "maritalStatus" => ["nullable", "string", Rule::in(EnumClass::maritalStatus())],
             "employmentStatus" => ["nullable","string", Rule::in(EnumClass::employmentStatuses())],
             "occupation" => "string|nullable",
-            "identificationId" => "nullable|integer|exists:identifications,id",
+            "identificationId" => "required_with:identificationPhoto|integer|exists:identifications,id",
+            "identificationPhoto" => "required_with:identificationId|image|max:10000|mimes:jpeg,png,jpg,webp",
             "postalCode" => "string|nullable",
             "dob" => "date|date_format:Y-m-d",
         ];

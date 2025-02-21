@@ -60,9 +60,9 @@ class Client extends Authenticatable implements JWTSubject
         return $this->belongsTo("app\Models\File");
     }
 
-    public function identification()
+    public function clientIdentification()
     {
-        return $this->belongsTo(Identification::class);
+        return $this->belongsTo(ClientIdentification::class);
     }
 
     // public function referer()

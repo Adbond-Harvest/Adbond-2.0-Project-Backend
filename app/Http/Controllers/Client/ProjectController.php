@@ -126,13 +126,20 @@ class ProjectController extends Controller
         $this->projectService->typeId = $project->project_type_id;
         $summary = $this->projectService->projectPackageSummary();
 
-        $packages = $this->packageService->packages();
-        $packages->load("media");
+        $page = ($request->query('page')) ?? 1;
+        $perPage = ($request->query('perPage'));
+        if(!is_int((int) $page) || $page <= 0) $page = 1;
+        if(!is_int((int) $perPage) || $perPage==null) $perPage = env('PAGINATION_PER_PAGE');
+        $offset = $perPage * ($page-1);
 
-        return Utilities::ok([
+        $packages = $this->packageService->packages(['media'], $offset, $perPage);
+        $this->packageService->count = true;
+        $packagesCount = $this->packageService->packages();
+
+        return Utilities::paginatedOkay([
             "project" => new ProjectResource($project),
             "packages" => PackageResource::collection($packages)
-        ]);
+        ], $page, $perPage, $packagesCount);
     }
 
     public function projectType(Request $request, $projectTypeId)
