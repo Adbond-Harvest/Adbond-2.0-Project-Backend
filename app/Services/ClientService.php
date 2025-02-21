@@ -122,6 +122,7 @@ class ClientService
         if(isset($data['maritalStatus'])) $client->marital_status = $data['maritalStatus'];
         if(isset($data['employmentStatus'])) $client->employment_status = $data['employmentStatus'];
         if(isset($data['occupation'])) $client->occupation = $data['occupation'];
+        if(isset($data['identificationId'])) $client->identification_id = $data['identificationId'];
         // /if(array_key_exists('occupation', $data));
         if(isset($data['postalCode'])) $client->postal_code = $data['postalCode'];
         if(isset($data['ageGroupId'])) $client->age_group_id = $data['ageGroupId'];

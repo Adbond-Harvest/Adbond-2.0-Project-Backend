@@ -60,6 +60,11 @@ class Client extends Authenticatable implements JWTSubject
         return $this->belongsTo("app\Models\File");
     }
 
+    public function identification()
+    {
+        return $this->belongsTo(Identification::class);
+    }
+
     // public function referer()
     // {
     //     return $this->morphOne();

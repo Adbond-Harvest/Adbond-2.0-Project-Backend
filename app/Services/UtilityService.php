@@ -10,6 +10,7 @@ use app\Models\Benefit;
 use app\Models\Bank;
 use app\Models\ResellOrder;
 use app\Models\BankAccount;
+use app\Models\Identification;
 
 use app\Helpers;
 use app\Utilities;
@@ -54,6 +55,11 @@ class UtilityService
     public function resellOrders()
     {
         return ResellOrder::all();
+    }
+
+    public function identifications()
+    {
+        return Identification::all();
     }
 
 }

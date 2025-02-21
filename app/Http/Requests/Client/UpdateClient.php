@@ -39,6 +39,7 @@ class UpdateClient extends BaseRequest
             "maritalStatus" => ["nullable", "string", Rule::in(EnumClass::maritalStatus())],
             "employmentStatus" => ["nullable","string", Rule::in(EnumClass::employmentStatuses())],
             "occupation" => "string|nullable",
+            "identificationId" => "nullable|integer|exists:identifications,id",
             "postalCode" => "string|nullable",
             "dob" => "date|date_format:Y-m-d",
         ];

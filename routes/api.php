@@ -220,6 +220,7 @@ Route::group(['prefix' => '/v2',], function () {
     Route::group(['prefix' => '/'], function () {    
         Route::get('benefits', [UtilityController::class, 'benefits']);
         Route::get('banks', [UtilityController::class, 'banks']);
+        Route::get('identifications', [UtilityController::class, 'identifications']);
     });
 
 

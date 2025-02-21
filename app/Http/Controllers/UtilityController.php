@@ -9,6 +9,7 @@ use app\Http\Resources\BenefitResource;
 use app\Http\Resources\BankResource;
 use app\Http\Resources\WalletBankAccountResource;
 use app\Http\Resources\ResellOrderResource;
+use app\Http\Resources\ClientIdentificationResource;
 
 use app\Services\UtilityService;
 use app\Utilities;
@@ -54,5 +55,11 @@ class UtilityController extends Controller
     {
         $resellOrders = $this->utilityService->resellOrders();
         return Utilities::ok(ResellOrderResource::collection($resellOrders));
+    }
+
+    public function identifications()
+    {
+        $identifications = $this->utilityService->identifications();
+        return Utilities::ok(ClientIdentificationResource::collection($identifications));
     }
 }
