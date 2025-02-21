@@ -5,6 +5,8 @@ namespace app\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+use app\Http\Resources\ClientIdentificationResource;
+
 use app\Helpers;
 
 class ClientBriefResource extends JsonResource
@@ -21,6 +23,7 @@ class ClientBriefResource extends JsonResource
             'title' => $this->title,
             'firstname' => $this->firstname,
             'lastname' => $this->lastname,
+            'othernames' => $this->othernames,
             'email' => $this->email,
             'photo' => new FileResource($this->photo),
             'phoneNumber' => $this->phone_number,
@@ -29,8 +32,10 @@ class ClientBriefResource extends JsonResource
             'dob' => $this->dob,
             'country' => ($this->country) ? $this->country->name : null,
             'maritalStatus' => $this->marital_status,
+            'employmentStatus' => $this->employment_status,
             'occupation' => $this->occupation,
             'kycStatus' => $this->kyc_status,
+            'identification' => new ClientIdentificationResource($this->identification)
             // 'passwordSet' => ($this->password_set)
             // 'kyc_completed' => Helpers::kycCompleted($this),
         ];
