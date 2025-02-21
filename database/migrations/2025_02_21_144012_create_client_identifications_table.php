@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('clients', function (Blueprint $table) {
-            $table->foreignId("client_identification_id")->nullable()->after("photo_id");
+        Schema::create('client_identifications', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId("client_id");
+            $table->foreignId("identification_id");
+            $table->foreignId("file_id");
+            $table->timestamps();
         });
     }
 
@@ -21,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('clients', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('client_identifications');
     }
 };

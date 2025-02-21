@@ -5,6 +5,10 @@ namespace app\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+use app\Http\Resources\IdentificationResource;
+use app\Http\Resources\ClientBriefResource;
+use app\Http\Resources\FileResource;
+
 class ClientIdentificationResource extends JsonResource
 {
     /**
@@ -16,7 +20,9 @@ class ClientIdentificationResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "name" => $this->name
+            "client" => new ClientBriefResource($this->whenLoaded("client")),
+            "identification" => new IdentificationResource($this->identification),
+            "photo" => new FileResource($this->photo)
         ];
     }
 }

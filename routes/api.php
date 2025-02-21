@@ -235,6 +235,7 @@ Route::group(['prefix' => '/v2',], function () {
         });
         // Client Profile
         Route::group(['prefix' => '/profile',], function () {
+            Route::get('', [ClientController::class, 'profile']);
             Route::post('/update', [ClientController::class, 'update']);
             Route::post('/save_next_of_kin', [ClientController::class, 'addNextOfKin']);
             Route::get('/generate_referer_code', [ClientController::class, 'generateRefererCode']);

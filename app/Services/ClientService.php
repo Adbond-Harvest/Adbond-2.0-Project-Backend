@@ -14,6 +14,7 @@ use app\Models\Client;
 use app\Models\ClientNextOfKin;
 use app\Models\ClientSummaryView;
 use app\Models\ClientCommissionEarning;
+use app\Models\ClientIdentification;
 
 use app\Enums\KYCStatus;
 use app\Enums\ActiveToggle;
@@ -107,6 +108,17 @@ class ClientService
 
     public function update($data, $client)
     {
+        if(isset($data['identificationId'])) {
+            $clientIdentification = $client->clientIdentification;
+            if(!$clientIdentification) $clientIdentification = new ClientIdentification;
+            $clientIdentification->client_id = $client->id;
+            $clientIdentification->identification_id = $data['identificationId'];
+            $clientIdentification->file_id = $data['identificationFileId'];
+            $clientIdentification->save();
+
+            if(!$client->client_identification_id) $client->client_identification_id = $clientIdentification->id;
+        }
+
         if(isset($data['title'])) $client->title = $data['title'];
         if(isset($data['firstname'])) $client->firstname = $data['firstname'];
         if(isset($data['lastname'])) $client->lastname = $data['lastname'];
@@ -122,7 +134,7 @@ class ClientService
         if(isset($data['maritalStatus'])) $client->marital_status = $data['maritalStatus'];
         if(isset($data['employmentStatus'])) $client->employment_status = $data['employmentStatus'];
         if(isset($data['occupation'])) $client->occupation = $data['occupation'];
-        if(isset($data['identificationId'])) $client->identification_id = $data['identificationId'];
+        // if(isset($data['identificationId'])) $client->identification_id = $data['identificationId'];
         // /if(array_key_exists('occupation', $data));
         if(isset($data['postalCode'])) $client->postal_code = $data['postalCode'];
         if(isset($data['ageGroupId'])) $client->age_group_id = $data['ageGroupId'];
@@ -134,6 +146,7 @@ class ClientService
             $client->dob = $data['dob'];
         }
         $client->update();
+
 
         //Check and update the kyc status
         if($client->kyc_status == KYCStatus::NOTSTARTED->value || $client->kyc_status == KYCStatus::STARTED->value) {
