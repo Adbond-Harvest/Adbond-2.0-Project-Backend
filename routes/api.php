@@ -11,11 +11,12 @@ use app\Http\Controllers\User\ProjectTypeController as UserProjectTypeController
 use app\Http\Controllers\User\ProjectController as UserProjectController;
 use app\Http\Controllers\User\PackageController as UserPackageController;
 use app\Http\Controllers\User\IndexController as UserIndexController;
+use app\Http\Controllers\User\TransactionController as UserTransactionController;
 use app\Http\Controllers\User\StaffController as StaffController;
 use app\Http\Controllers\User\ClientController as UserClientController;
 use app\Http\Controllers\User\FileController as UserFileCOntroller;
 use app\Http\Controllers\User\Client\WalletController as UserClientWalletController;
-use app\Http\Controllers\User\Client\TransactionController as UserTransactionController;
+use app\Http\Controllers\User\Client\TransactionController as UserClientTransactionController;
 use app\Http\Controllers\User\PostController as UserPostController;
 use app\Http\Controllers\User\CommentController as UserCommentController;
 use app\Http\Controllers\User\PaymentController as UserPaymentController;
@@ -23,6 +24,7 @@ use app\Http\Controllers\User\AssetController as UserAssetController;
 use app\Http\Controllers\User\SiteTourController as UserSiteTourController;
 use app\Http\Controllers\User\OfferController as UserOfferController;
 use app\Http\Controllers\User\UtilityController as UserUtilityController;
+
 
 // Client Controllers
 use app\Http\Controllers\Client\PromoController;
@@ -73,6 +75,11 @@ Route::group(['prefix' => '/v2',], function () {
     //User/Admin/Staff Routes
     Route::group(['middleware' => UserAuth::class, 'prefix' => '/user', 'namespace' => 'User',], function () {
         Route::get('/dashboard', [UserIndexController::class, "dashboard"]);
+        Route::get('/dashboard/purchase_chart', [UserIndexController::class, "purchaseSummary"]);
+
+        Route::group(['prefix' => '/transactions'], function () {
+            Route::get('', [UserTransactionController::class, "transactions"]);
+        });
 
         Route::group(['prefix' => '/profile'], function () {
             Route::post('/set_password', 'ProfileController@setPassword');
@@ -186,14 +193,13 @@ Route::group(['prefix' => '/v2',], function () {
             });
             
             Route::group(['prefix' => '/transactions', 'namespace' => 'Client'], function () {
-                Route::get('/{clientId}', [UserTransactionController::class, "transactions"]);
-                Route::get('/show/{transactionId}', [UserTransactionController::class, "transaction"]);
+                Route::get('/{clientId}', [UserClientTransactionController::class, "transactions"]);
+                Route::get('/show/{transactionId}', [UserClientTransactionController::class, "transaction"]);
             });
-
-            Route::get('/roles', [UserUtilityController::class, "roles"]);
-            Route::get('/staff_types', [UserUtilityController::class, "staffTypes"]);
         });
 
+        Route::get('/roles', [UserUtilityController::class, "roles"]);
+        Route::get('/staff_types', [UserUtilityController::class, "staffTypes"]);
         Route::get('/bank_accounts', [UtilityController::class, "bankAccounts"]);
         Route::get('/resell_orders', [UtilityController::class, "resellOrders"]);
     });

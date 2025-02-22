@@ -26,6 +26,7 @@ use app\Helpers;
 class ClientService
 {
     public $count = false;
+    public $active = null;
 
     public function getClient($id, $with=[])
     {
@@ -47,6 +48,17 @@ class ClientService
         if($page <= 0) $page = 1;
         $offset = $perPage * ($page-1);
         return Client::limit($perPage)->offset($offset)->orderBy('created_at', 'DESC')->get();
+    }
+
+    public function clients($with=[], $offset=0, $perPage=null)
+    {
+        $query = Client::with($with);
+        if($this->active !== null) {
+            $query = ($this->active) ? $query->where("activated", 1) : $query->where("activated", 0);
+        }
+        if($this->count) return $query->count();
+        $query = $query->orderBy("created_at", "DESC")->offset($offset);
+        return ($perPage) ? $query->limit($perPage)->get() : $query->get();
     }
 
     public function searchClients($string)

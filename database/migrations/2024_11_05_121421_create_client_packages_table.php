@@ -21,6 +21,7 @@ return new class extends Migration
             $table->boolean("sold")->default(false);
             $table->string("origin");
             $table->foreignId("purchase_id");
+            $table->date("purchase_completed_at")->nullable();
             $table->string("purchase_type");
 
             $table->timestamps();

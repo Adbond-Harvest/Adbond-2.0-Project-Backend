@@ -25,7 +25,9 @@ class ClientPackageService
 {
     public $count = false;
     public $filter = null;
+    public $active = null;
 
+    // This method either saves or updates client package
     public function save($data)
     {
         $clientPackage = ClientPackage::where("purchase_id", $data['purchaseId'])->where("purchase_type", $data['purchaseType'])->where("package_id",$data['packageId'])->first();
@@ -42,6 +44,7 @@ class ClientPackageService
         $clientPackage->amount = $data['amount'];
         if(isset($data['units'])) $clientPackage->units = $data['units'];
         $clientPackage->unit_price = $data['unitPrice'];
+        if($clientPackage->purchase_complete == 1) $clientPackage->purchase_completed_at = now();
         $clientPackage->save();
 
         return $clientPackage;
@@ -137,6 +140,29 @@ class ClientPackageService
         }
         if($this->count) return $query->count();
         return $query->orderBy("created_at", "DESC")->offset($offset)->limit($perPage)->get();
+    }
+
+    public function assets($with=[], $offset=0, $perPage=null)
+    {
+        $query = ClientPackage::with($with);
+        if($this->active !== null) {
+            $query = ($this->active) ? $query->where("purchase_complete", 0) : $query->where("purchase_complete", 1);
+        }
+        if($this->filter && is_array($this->filter)) {
+            $filter = $this->filter;
+            if(isset($filter['text'])) {
+                $query->whereHas('package', function($packageQuery) use($filter) {
+                    $packageQuery->where("name", "LIKE", "%".$filter['text']."%")
+                    ->orWhereHas('project', function($projectQuery) use($filter) {
+                        $projectQuery->where("name", "LIKE", "%".$filter['text']."%");
+                    });
+                });
+            }
+            if(isset($filter['date'])) $query = $query->whereDate("created_at", $filter['date']);
+        }
+        if($this->count) return $query->count();
+        return $query->orderBy("created_at", "DESC")->offset($offset);
+        return ($perPage) ? $query->limit($perPage)->get() : $query->get();
     }
 
 }

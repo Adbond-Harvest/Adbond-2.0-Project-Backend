@@ -15,18 +15,18 @@ use app\Utilities;
 
 class UtilityController extends Controller
 {
-    private $staffTypeServices;
+    private $staffTypeService;
     private $roleService;
 
     public function __construct()
     {
-        $this->staffTypeServices = new StaffTypeService;
+        $this->staffTypeService = new StaffTypeService;
         $this->roleService = new RoleService;
     }
 
     public function staffTypes()
     {
-        $staffTypes = $this->staffTypeServices->getStaffTypes();
+        $staffTypes = $this->staffTypeService->getStaffTypes();
 
         return Utilities::ok(StaffTypeResource::collection($staffTypes));
     }
@@ -34,6 +34,8 @@ class UtilityController extends Controller
     public function roles()
     {
         $roles = $this->roleService->roles();
+
+        return Utilities::ok(RoleResource::collection($roles));
     }
     
 }
