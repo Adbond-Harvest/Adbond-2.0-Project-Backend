@@ -7,6 +7,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use app\Enums\PackagePaymentOption;
 use app\Models\Order;
 
+use app\Http\Resources\ClientBriefResource;
+
 class TransactionResource extends JsonResource
 {
     /**
@@ -18,6 +20,7 @@ class TransactionResource extends JsonResource
     {
         return [
             "id" => $this->id,
+            "client" => $this->whenLoaded('client', fn() => $this->client->name), // Updated line
             "refId" => $this->receipt_no,
             "package" => $this->purchase?->package?->name,
             "project" => $this->purchase?->package?->project?->name,

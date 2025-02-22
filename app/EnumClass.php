@@ -17,6 +17,7 @@ use app\Enums\PostType;
 use app\Enums\PackageType;
 use app\Enums\InvestmentRedemptionOption;
 use app\Enums\OfferApprovalStatus;
+use app\Enums\PurchaseSummaryDuration;
 
 class EnumClass
 {
@@ -158,6 +159,17 @@ class EnumClass
             OfferApprovalStatus::PENDING->value,
             OfferApprovalStatus::APPROVED->value,
             OfferApprovalStatus::REJECTED->value
+        ];
+    }
+
+    public static function purchaseSummaryDurations()
+    {
+        return [
+            PurchaseSummaryDuration::ALL->value,
+            PurchaseSummaryDuration::CUSTOM->value,
+            PurchaseSummaryDuration::MONTH->value,
+            PurchaseSummaryDuration::WEEK->value,
+            PurchaseSummaryDuration::YEAR->value
         ];
     }
 }

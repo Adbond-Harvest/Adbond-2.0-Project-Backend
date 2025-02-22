@@ -29,6 +29,7 @@ class UpdateClient extends BaseRequest
             "title" => "string|nullable",
             "firstname" => "string|nullable",
             "lastname" => "string|nullable",
+            "othernames" => "nullable|string",
             // "photoId" => "integer|nullable",
             'photo' => 'nullable|image|max:10000|mimes:jpeg,png,jpg,webp',
             "gender" => ["nullable","string", Rule::in(EnumClass::genders())],
