@@ -10,6 +10,8 @@ class Offer extends Model
 {
     use HasFactory;
 
+    public static $type = "app\Models\Offer";
+
     public function asset()
     {
         return $this->belongsTo(ClientPackage::class, 'client_package_id');

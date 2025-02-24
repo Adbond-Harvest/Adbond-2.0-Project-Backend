@@ -241,6 +241,15 @@ class Utilities
         return $processingId;
     }
 
+    public static function getOfferProcessingId()
+    {
+        do{
+            $processingId  = rand(10000, 99999);
+            $exists = Cache::has('offer_processing_' . $processingId);
+        }while($exists);
+        return $processingId;
+    }
+
     public static function convertTo12HrsTimeFormat($time)
     {
         $timeArr = explode(':', $time);

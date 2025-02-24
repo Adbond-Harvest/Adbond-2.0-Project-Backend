@@ -76,7 +76,7 @@ class OrderController extends Controller
                 "appliedDiscounts" => $amountDetail
             ]);
         }catch(\Exception $e){
-            return Utilities::error($e, 'An error occurred while trying to send verification mail, Please try again later or contact support');
+            return Utilities::error($e, 'An error occurred while trying to perform this operation, Please try again later or contact support');
         }
     }
 }
