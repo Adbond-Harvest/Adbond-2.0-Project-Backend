@@ -10,6 +10,8 @@ use app\Http\Resources\TransactionResource;
 use app\Services\TransactionService;
 use app\Utilities;
 
+use app\Enums\ProjectType;
+
 class TransactionController extends Controller
 {
     private $transactionService;
@@ -26,6 +28,18 @@ class TransactionController extends Controller
         if(!is_int((int) $page) || $page <= 0) $page = 1;
         if(!is_int((int) $perPage) || $perPage==null) $perPage = env('PAGINATION_PER_PAGE');
         $offset = $perPage * ($page-1);
+
+        $filter = [];
+        if($request->query('text')) $filter["text"] = $request->query('text');
+        if($request->query('date')) $filter["date"] = $request->query('date');
+        if($request->query('projectType')) {
+            $validTypes = [ProjectType::LAND->value, ProjectType::AGRO->value, ProjectType::HOMES->value];
+            $validTypesString = '';
+            foreach($validTypes as $valid) $validTypesString .= $valid.', ';
+            if(!in_array($request->query('projectType'), $validTypes)) return Utilities::error402("Valid Project Types are: ".$validTypesString);
+            $filter["projectType"] = $request->query('projectType');
+        }
+        $this->transactionService->filters = $filter;
 
         $transactions = $this->transactionService->transactions(['client'], $offset, $perPage);
         $pending = $transactions->filter(fn($transaction) => $transaction->confirmed === null);

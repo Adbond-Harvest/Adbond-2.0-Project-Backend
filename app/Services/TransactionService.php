@@ -7,6 +7,7 @@ use app\Notifications\APIPasswordResetNotification;
 use app\Exceptions\UserNotFoundException;
 
 use app\Models\Payment;
+use app\Models\Order;
 
 use app\Exports\TransactionExport;
 
@@ -19,11 +20,30 @@ class TransactionService
 {
     public $clientId = null;
     public $count = null;
+    public $filters = [];
 
     public function transactions($with=[], $offset=0, $perPage=null)
     {
-        $query = Payment::with($with);
+        $filter = $this->filters;
+        $query = Payment::with($with)->where("purchase_type", Order::$type);
         if($this->clientId) $query->where("client_id", $this->clientId);
+        if(isset($filter['text'])) $query->where("receipt_no", "LIKE", "%".$filter['text']."%")->orWhereHas('purchase', function($query2) use($filter) {
+            $query2->whereHas('package', function($query3) use($filter) {
+                $query3->where("name", "LIKE", "%".$filter['text']."%")->orWhereHas('project', function($query4) use($filter) {
+                    $query4->where("name", "LIKE", "%".$filter['text']."%");
+                });
+            });
+        });
+        if(isset($filter['date'])) $query = $query->whereDate("created_at", $filter['date']);
+        if(isset($filter['projectType'])) $query = $query->whereHas('purchase', function($query1) use($filter) {
+            $query1->whereHas('package', function($query2) use($filter) {
+                $query2->whereHas('project', function($query3) use($filter) {
+                    $query3->whereHas("projectType", function($query4) use($filter) {
+                        $query4->where("name", $filter['projectType']);
+                    });
+                });
+            });
+        });
         if($this->count) return $query->count();
 
         if($perPage==null) $perPage=config('pagination.PER_PAGE');
