@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId("client_id");
             $table->double("price");
             $table->boolean("accepted")->nullable();
+            $table->boolean("cancelled")->nullable();
             $table->timestamps();
         });
     }

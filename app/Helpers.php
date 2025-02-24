@@ -30,6 +30,8 @@ use app\Http\Resources\OrderMinResource;
 
 use PDF;
 
+use app\Utilities;
+
 Class Helpers
 {
     public static function companyInfo()
@@ -261,24 +263,31 @@ Class Helpers
         return $selectedId;
     }
 
-    public static function getTarget($target_type, $target)
-    {
-        switch($target_type) {
-            case Notification::$customInspection : return new MonthlyWeekDaysResource($target); 
-            case Notification::$generalInspection : return new InspectionDayMinResource($target);
-            case Notification::$assessment : return new VirtualStaffAssessmentResource($target);
-            case Notification::$offer : return new OfferMinResource($target);
-            case Notification::$bid : return new OfferBidMinResource($target);
-            case Notification::$payment : return new PaymentMinResource($target);
-            case Notification::$offerPayment : return new OfferPaymentResource($target);
-            case Notification::$order : return new OrderMinResource($target);
-            default : return null;
-        }
-    }
+    // public static function getTarget($target_type, $target)
+    // {
+    //     switch($target_type) {
+    //         case Notification::$customInspection : return new MonthlyWeekDaysResource($target); 
+    //         case Notification::$generalInspection : return new InspectionDayMinResource($target);
+    //         case Notification::$assessment : return new VirtualStaffAssessmentResource($target);
+    //         case Notification::$offer : return new OfferMinResource($target);
+    //         case Notification::$bid : return new OfferBidMinResource($target);
+    //         case Notification::$payment : return new PaymentMinResource($target);
+    //         case Notification::$offerPayment : return new OfferPaymentResource($target);
+    //         case Notification::$order : return new OrderMinResource($target);
+    //         default : return null;
+    //     }
+    // }
 
-    public static function generateReceiptNo($purchaseId, $clientId, $processingId)
+    public static function generateReceiptNo($purchaseId, $clientId, $processingId=null)
     {
-        return $purchaseId.$processingId.$clientId;
+        $i = 0;
+        do{
+            if(!$processingId || $i > 0) $processingId = Utilities::generateRandomNumber(5);
+            $receiptNo = $purchaseId.$processingId.$clientId;
+            $exists = Payment::where("receipt_no", $receiptNo)->first();
+            $i++;
+        }while($exists);
+        return $receiptNo;
     }
 
     public static function generateOfferReceiptNo($payment)

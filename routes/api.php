@@ -40,6 +40,7 @@ use app\Http\Controllers\Client\OfferController;
 use app\Http\Controllers\Client\OfferBidController;
 use app\Http\Controllers\Client\ClientController;
 use app\Http\Controllers\Client\SiteTourController;
+use app\Http\Controllers\Client\OfferPaymentController;
 
 //Public Controllers
 use app\Http\Controllers\ProjectController;
@@ -295,6 +296,9 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('/active', [OfferController::class, "activeOffers"]);
             Route::post('/make_bid', [OfferBidController::class, 'bid']);
             Route::get('/{offerId}', [OfferController::class, 'offer']);
+            Route::post('/prepare_payment', [OfferPaymentController::class, 'preparePayment']);
+            Route::post('/initialize_card_payment', [OfferPaymentController::class, 'initializeCardPayment']);
+            Route::post('/pay', [OfferPaymentController::class, 'makePayment']);
         });
 
         //Offer Bid Routes

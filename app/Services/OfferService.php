@@ -25,9 +25,12 @@ class OfferService
         $offer->project_id = $data['projectId'];
         $offer->price = $data['price'];
         $offer->package_price = $data['packagePrice'];
-        if(isset($data['resellOrderId'])) $offer->resell_order_id = $data['resellOrderId'];
+        if(isset($data['resellOrderId'])) {
+            $offer->resell_order_id = $data['resellOrderId'];
+            $offer->payment_status_id = PaymentStatus::pending()->id;
+        }
         if(isset($data['active'])) $offer->active = $data['active'];
-        $offer->payment_status_id = PaymentStatus::pending()->id;
+        // $offer->payment_status_id = PaymentStatus::pending()->id;
 
         $offer->save();
 
@@ -40,6 +43,7 @@ class OfferService
             $offer->price = $data['price'];
             if($offer->approved == 0) $offer->approved = null;
         }
+        if(isset($data['paymentStatusId'])) $offer->payment_status_id = $data['paymentStatusId'];
         $offer->update();
 
         return $offer;

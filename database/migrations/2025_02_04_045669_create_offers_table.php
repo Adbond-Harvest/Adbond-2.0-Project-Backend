@@ -26,7 +26,7 @@ return new class extends Migration
             $table->boolean("approved")->nullable();
             $table->text("rejected_reason")->nullable();
             $table->boolean("completed")->default(false);
-            $table->foreignId("payment_status_id");
+            $table->foreignId("payment_status_id")->nullable();
             $table->foreignId("user_id")->nullable();
             $table->date("approval_date")->nullable();
             $table->timestamps();

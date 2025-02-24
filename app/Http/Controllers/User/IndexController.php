@@ -7,12 +7,14 @@ use Illuminate\Http\Request;
 
 use app\Http\Resources\ProjectResource;
 use app\Http\Resources\ProjectTypeResource;
+use app\Http\Resources\TransactionResource;
 
 use app\Services\ProjectTypeService;
 use app\Services\ProjectService;
 use app\Services\ClientService;
 use app\Services\ClientPackageService;
 use app\Services\PurchaseService;
+use app\Services\TransactionService;
 
 use app\Models\ClientPurchasesSummaryView;
 
@@ -29,6 +31,7 @@ class IndexController extends Controller
     private $clientService;
     private $clientPackageService;
     private $purchaseService;
+    private $transactionService;
 
     public function __construct()
     {
@@ -37,6 +40,7 @@ class IndexController extends Controller
         $this->clientService = new ClientService;
         $this->clientPackageService = new ClientPackageService;
         $this->purchaseService = new PurchaseService;
+        $this->transactionService = new TransactionService;
     }
 
     public function dashboard(Request $request)
@@ -99,13 +103,20 @@ class IndexController extends Controller
             "activeAssetsCount" => $activeAssetsCount
         ];
 
+        // transactions
+        $perPage = 10;
+        $offset = 0;
+
+        $transactions = $this->transactionService->transactions(['client'], $offset, $perPage);
+
         return Utilities::ok([
             "summary" => $summary,
             "purchaseTotal" => $purchaseTotal,
             "purchaseChart" => $purchaseChart,
             "projectTypes" => $projectTypesCounts,
             "projects" => ProjectResource::collection($projects),
-            "activeProjectType" => new ProjectTypeResource($projectTypeObj)
+            "activeProjectType" => new ProjectTypeResource($projectTypeObj),
+            "transactions" => TransactionResource::collection($transactions)
         ]);
     }
 

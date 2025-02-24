@@ -28,11 +28,19 @@ class TransactionController extends Controller
         $offset = $perPage * ($page-1);
 
         $transactions = $this->transactionService->transactions(['client'], $offset, $perPage);
+        $pending = $transactions->filter(fn($transaction) => $transaction->confirmed === null);
+        $successful = $transactions->filter(fn($transaction) => $transaction->confirmed == 1);
+        $failed = $transactions->filter(fn($transaction) => $transaction->confirmed == 0);
 
         $this->transactionService->count = true;
         $transactionsCount = $this->transactionService->transactions();
 
-        return Utilities::paginatedOkay(TransactionResource::collection($transactions), $page, $perPage, $transactionsCount);
+        return Utilities::paginatedOkay([
+            "transactions" => TransactionResource::collection($transactions),
+            "pending" => TransactionResource::collection($pending),
+            "successful" => TransactionResource::collection($successful),
+            "failed" => TransactionResource::collection($failed)
+        ], $page, $perPage, $transactionsCount);
     }
 
     public function transaction($transactionId)

@@ -5,6 +5,7 @@ namespace app\Services;
 use Illuminate\Support\Facades\Mail;
 
 use app\Models\Order;
+use app\Models\Offer;
 use app\Models\Payment;
 use app\Models\Discount;
 use app\Models\PaymentMode;
@@ -27,10 +28,22 @@ use app\Utilities;
  */
 class PaymentService
 {
+    public $count = false;
 
     public function getPayment($id, $with=[])
     {
         return Payment::with($with)->where("id", $id)->first();
+    }
+
+    public function offerPayments($with, $offset=0, $perPage=null)
+    {
+        $query = Payment::with($with)->where("purchase_type", Offer::$type);
+
+        if($this->count) return $query->count();
+
+        $query = $query->orderBy("created_at", "DESC");
+        if($perPage) $query = $query->limit($perPage);
+        return $query->offset($offset)->get();
     }
 
     public function getPayable($data, $promos, $promoCodeDiscount=null)
@@ -202,12 +215,14 @@ class PaymentService
             $uploadedReceipt = 'files/receipt'.$payment->receipt_no.'.pdf';
             // dd('time to move..'.$uploadedReceipt);
             $response = Helpers::moveUploadedFileToCloud($uploadedReceipt, FileTypes::PDF->value, $user->id, 
-            FilePurpose::PAYMENT_RECEIPT->value, UserType::CLIENT->value, "client-receipts");
-            $fileMeta = ["belongsId"=>$payment->id, "belongsType"=>"app\Models\Payment"];
-            $fileService->updateFileObj($fileMeta, $response['upload']['file']);
-            
+                                FilePurpose::PAYMENT_RECEIPT->value, UserType::CLIENT->value, "client-receipts");
             if($response['success']) {
+                $fileMeta = ["belongsId"=>$payment->id, "belongsType"=>"app\Models\Payment"];
+                $fileService->updateFileObj($fileMeta, $response['upload']['file']);
+
                 $this->update(['receiptFileId' => $response['upload']['file']->id], $payment);
+
+                unlink($uploadedReceipt);
                 // dd("got here");
                 try{
                     // Send Payment Mail
