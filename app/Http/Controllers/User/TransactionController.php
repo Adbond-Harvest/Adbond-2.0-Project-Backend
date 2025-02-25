@@ -30,6 +30,17 @@ class TransactionController extends Controller
         $offset = $perPage * ($page-1);
 
         $filter = [];
+        if($request->query('status')) {
+            $validStatuses = ['pending', 'successful', 'failed'];
+            $validStatusesString = '';
+            foreach($validStatuses as $valid) $validStatusesString .= $valid.', ';
+            if(!in_array($request->query('status'), $validStatuses)) return Utilities::error402("Valid Statuses are: ".$validStatusesString);
+            switch($request->query('status')) {
+                case "pending" : $filter['status'] = null; break;
+                case "successful" : $filter['status'] = 1; break;
+                case "failed" : $filter['status'] = 0; break;
+            }
+        }
         if($request->query('text')) $filter["text"] = $request->query('text');
         if($request->query('date')) $filter["date"] = $request->query('date');
         if($request->query('projectType')) {
@@ -42,19 +53,39 @@ class TransactionController extends Controller
         $this->transactionService->filters = $filter;
 
         $transactions = $this->transactionService->transactions(['client'], $offset, $perPage);
-        $pending = $transactions->filter(fn($transaction) => $transaction->confirmed === null);
-        $successful = $transactions->filter(fn($transaction) => $transaction->confirmed == 1);
-        $failed = $transactions->filter(fn($transaction) => $transaction->confirmed == 0);
+        // $pending = $transactions->filter(fn($transaction) => $transaction->confirmed === null);
+        // $successful = $transactions->filter(fn($transaction) => $transaction->confirmed == 1);
+        // $failed = $transactions->filter(fn($transaction) => $transaction->confirmed == 0);
 
         $this->transactionService->count = true;
         $transactionsCount = $this->transactionService->transactions();
 
+        $this->transactionService->filters = ['status'=>1];
+        $successfulCount = $this->transactionService->transactions();
+
+        $this->transactionService->filters = ['status'=>0];
+        $failedCount = $this->transactionService->transactions();
+
+        $this->transactionService->filters = ['status'=>null];
+        $pendingCount = $this->transactionService->transactions();
+
+        if(isset($filter['status'])) {
+            switch($filter['status']) {
+                case null : $defaultTotal = $pendingCount; break;
+                case 1 : $defaultTotal = $successfulCount; break;
+                case 0 : $defaultTotal = $failedCount; break;
+            }
+        }else{
+            $defaultTotal = $transactionsCount;
+        }
+
         return Utilities::paginatedOkay([
             "transactions" => TransactionResource::collection($transactions),
-            "pending" => TransactionResource::collection($pending),
-            "successful" => TransactionResource::collection($successful),
-            "failed" => TransactionResource::collection($failed)
-        ], $page, $perPage, $transactionsCount);
+            "transactionsCount" => $transactionsCount,
+            "successfulCount" => $successfulCount,
+            "pendingCount" => $pendingCount,
+            "failedCount" => $failedCount
+        ], $page, $perPage, $defaultTotal);
     }
 
     public function transaction($transactionId)

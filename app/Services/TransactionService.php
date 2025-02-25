@@ -26,6 +26,11 @@ class TransactionService
     {
         $filter = $this->filters;
         $query = Payment::with($with)->where("purchase_type", Order::$type);
+
+        if(array_key_exists('status', $filter)) {
+            ($filter['status'] === null) ? $query->whereNull("confirmed") : $query->where("confirmed", $filter['status']);
+        }
+
         if($this->clientId) $query->where("client_id", $this->clientId);
         if(isset($filter['text'])) $query->where("receipt_no", "LIKE", "%".$filter['text']."%")->orWhereHas('purchase', function($query2) use($filter) {
             $query2->whereHas('package', function($query3) use($filter) {
