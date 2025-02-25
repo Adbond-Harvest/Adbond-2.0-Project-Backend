@@ -7,10 +7,12 @@ use app\Http\Controllers\Controller;
 
 use app\Http\Requests\User\ApproveOffer;
 use app\Http\Requests\User\RejectOffer;
+use app\Http\Requests\User\CompleteOffer;
 
 use app\Http\Resources\OfferResource;
 
 use app\Services\OfferService;
+use app\Services\ClientPackageService;
 
 use app\Enums\OfferApprovalStatus;
 
@@ -19,10 +21,12 @@ use app\Utilities;
 class OfferController extends Controller
 {
     private $offerService;
+    private $clientPackageService;
 
     public function __construct()
     {
         $this->offerService = new OfferService;
+        $this->clientPackageService = new ClientPackageService;
     }
 
     public function offers(Request $request)
@@ -80,7 +84,29 @@ class OfferController extends Controller
             return Utilities::okay("Offer Rejected");
 
         }catch(\Exception $e){
-            return Utilities::error($e, 'An error occurred while trying to send verification mail, Please try again later or contact support');
+            return Utilities::error($e, 'An error occurred while trying to perform this operation, Please try again later or contact support');
+        }
+    }
+
+
+    // handles completing the offer sale and transferring the property to the new client
+    public function complete(CompleteOffer $request)
+    {
+        try{
+            $offer = $this->offerService->offer($request->validated("offerId"));
+            if(!$offer) return Utilities::error402("Offer not found");
+
+            // create letter of happiness
+            
+
+            // create contract
+
+
+            $this->clientPackageService->saveClientPackageOffer($offer);
+
+
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to perform this operation, Please try again later or contact support');
         }
     }
 }

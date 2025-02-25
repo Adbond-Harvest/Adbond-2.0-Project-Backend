@@ -30,10 +30,14 @@ use app\Http\Resources\OrderMinResource;
 
 use PDF;
 
+use app\Enums\ClientPackageOrigin;
+
 use app\Utilities;
 
 Class Helpers
 {
+    public static $purchaseOrigin = ClientPackageOrigin::ORDER->value;
+
     public static function companyInfo()
     {
         return Company_info::first();
@@ -518,24 +522,25 @@ Class Helpers
 
 
 
-    private static function prepareContract($order)
+    private static function prepareContract($purchase)
     {
-        // $itemPrice = Helpers::item_price($order->packageItem);
-        $data['package'] = $order->package?->name;
-        $data['project'] = $order?->package?->project?->name;
-        $data['client'] =  ucfirst($order->client->full_name);
-        $data['address'] = $order->client->address;
-        // $data['location'] = $order?->packageItem?->package?->project_location?->location?->name;
-        $projectAddress = $order?->package?->address;
-        $state = $order?->package?->state.' State';
+        // $itemPrice = Helpers::item_price($purchase->packageItem);
+        $client = (self::$purchaseOrigin==ClientPackageOrigin::OFFER->value) ? $purchase?->acceptedBid?->client : $purchase->client;
+        $data['package'] = $purchase->package?->name;
+        $data['project'] = $purchase?->package?->project?->name;
+        $data['client'] =  ucfirst($purchase->client->full_name);
+        $data['address'] = $client?->address;
+        // $data['location'] = $purchase?->packageItem?->package?->project_location?->location?->name;
+        $projectAddress = $purchase?->package?->address;
+        $state = $purchase?->package?->state.' State';
         $data['location'] = ($projectAddress) ? $projectAddress.', '.$state : $state;
         $data['state'] = $state;
-        $data['price'] = $order->amount;
-        $data['installment'] = ($order->installment == 1) ? true : false;
-        $data['installment_duration'] = $order?->package->installment_duration;
-        // if the units ordered is more than 1, multiply by units
-        if($order->units && $order->units > 1) $data['price'] = $data['price'] * $order->units; 
-        $data['size'] = ($order?->package?->size && $order->units > 0) ? $order?->package?->size * $order->units : null;
+        $data['price'] = (self::$purchaseOrigin==ClientPackageOrigin::OFFER->value) ? $purchase?->acceptedBid?->price : $purchase->amount;
+        $data['installment'] = (self::$purchaseOrigin != ClientPackageOrigin::OFFER->value && $purchase->installment == 1) ? true : false;
+        $data['installment_duration'] = $purchase?->package->installment_duration;
+        // if the units purchaseed is more than 1, multiply by units
+        // if($purchase->units && $purchase->units > 1) $data['price'] = $data['price'] * $purchase->units; 
+        $data['size'] = ($purchase?->package?->size && $purchase->units > 0) ? $purchase?->package?->size * $purchase->units : null;
         // Helpers::wordDoc($data);
         // return Helpers::generateContract($data);
         return $data;
