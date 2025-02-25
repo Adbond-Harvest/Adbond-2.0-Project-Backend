@@ -23,6 +23,7 @@ use app\Http\Controllers\User\PaymentController as UserPaymentController;
 use app\Http\Controllers\User\AssetController as UserAssetController;
 use app\Http\Controllers\User\SiteTourController as UserSiteTourController;
 use app\Http\Controllers\User\OfferController as UserOfferController;
+use app\Http\Controllers\User\OfferPaymentController as UserOfferPaymentController;
 use app\Http\Controllers\User\UtilityController as UserUtilityController;
 
 
@@ -151,6 +152,8 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('', [UserOfferController::class, "offers"]);
             Route::post('/approve', [UserOfferController::class, "approve"]);
             Route::post('/reject', [UserOfferController::class, "reject"]);
+
+            Route::get('/payments', [UserOfferPaymentController::class, "payments"]);
         });
 
         Route::group(['prefix' => '/site_tour'], function () {

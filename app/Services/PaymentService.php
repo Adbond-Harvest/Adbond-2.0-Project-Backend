@@ -29,15 +29,27 @@ use app\Utilities;
 class PaymentService
 {
     public $count = false;
+    public $filters = [];
 
     public function getPayment($id, $with=[])
     {
         return Payment::with($with)->where("id", $id)->first();
     }
 
-    public function offerPayments($with, $offset=0, $perPage=null)
+    public function offerPayments($with=[], $offset=0, $perPage=null)
     {
         $query = Payment::with($with)->where("purchase_type", Offer::$type);
+        $filter = $this->filters;
+
+        if(array_key_exists('status', $filter)) {
+            ($filter['status'] === null) ? $query->whereNull("confirmed") : $query->where("confirmed", $filter['status'])
+            // $query->whereHas("paymentStatus", function($paymentQuery) use($filter) {
+            //     $paymentQuery->where("name", $filter['status']);
+            // })
+            ->whereHas("purchase", function($purchaseQuery) {
+                $purchaseQuery->where("completed", 0);
+            });
+        }
 
         if($this->count) return $query->count();
 
