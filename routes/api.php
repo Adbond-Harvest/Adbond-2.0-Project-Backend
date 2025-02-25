@@ -154,6 +154,11 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/reject', [UserOfferController::class, "reject"]);
 
             Route::get('/payments', [UserOfferPaymentController::class, "payments"]);
+            Route::post('/payments/confirm', [UserOfferPaymentController::class, "confirm"]);
+            Route::post('/payments/reject', [UserOfferPaymentController::class, "reject"]);
+            Route::post('/payments/flag', [UserOfferPaymentController::class, "flag"]);
+
+            Route::post('/complete', [UserOfferController::class, "complete"]);
         });
 
         Route::group(['prefix' => '/site_tour'], function () {

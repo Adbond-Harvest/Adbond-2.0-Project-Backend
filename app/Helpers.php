@@ -402,7 +402,7 @@ Class Helpers
             $uploadRes = $fileService->save($filePath, $fileType, $userId, $purpose, $userType, $folder);
             if($uploadRes['status'] == 200) {
                 $success = true;
-                // unlink($filePath);
+                unlink($filePath);
             }else{
                 Utilities::logStuff("Receipt could not be uploaded... ".$uploadRes['message']);
             }

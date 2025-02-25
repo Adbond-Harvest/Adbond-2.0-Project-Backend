@@ -5,19 +5,27 @@ namespace app\Http\Controllers\User;
 use Illuminate\Http\Request;
 use app\Http\Controllers\Controller;
 
+use app\Http\Requests\User\ConfirmPayment;
+use app\Http\Requests\User\DeclinePayment;
+
 use app\Http\Resources\OfferPaymentResource;
 
 use app\Services\PaymentService;
+use app\Services\OfferService;
+
+use app\Models\PaymentStatus;
 
 use app\Utilities;
 
 class OfferPaymentController extends Controller
 {
     private $paymentService;
+    private $offerService;
 
     public function __construct()
     {
         $this->paymentService = new PaymentService;
+        $this->offerService = new OfferService;
     }
 
     public function payments(Request $request)
@@ -80,5 +88,68 @@ class OfferPaymentController extends Controller
 
     }
 
-    
+    public function confirm(ConfirmPayment $request)
+    {
+        try{
+            DB::beginTransaction();
+            $payment = $this->paymentService->getPayment($request->validated("paymentId"));
+            if(!$payment) return Utilities::error402("Payment not found");
+
+            $payment = $this->paymentService->confirm($payment);
+
+            $offer = $payment->purchase;
+            // dd($payment->purchase);
+            $data['paymentStatusId'] = PaymentStatus::complete()->id;
+            $offer = $this->offerService->update($data, $offer);
+
+            $this->paymentService->uploadReceipt($payment, $payment->client); 
+
+            DB::commit();
+
+            return Utilities::ok([
+                "message" => "payment has been Confirmed",
+                "payment" => new PaymentResource($payment)
+            ]);
+        }catch(\Exception $e){
+            DB::rollBack();
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
+    }
+
+    public function reject(DeclinePayment $request)
+    {
+        try{
+            $payment = $this->paymentService->getPayment($request->validated("paymentId"));
+            if(!$payment) return Utilities::error402("Payment not found");
+
+            $payment = $this->paymentService->reject($payment, $request->validated("message"));
+
+            
+
+            return Utilities::ok([
+                "message" => "payment has been Rejected",
+                "payment" => new PaymentResource($payment)
+            ]);
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
+    }
+
+    public function flag(DeclinePayment $request)
+    {
+        try{
+            $payment = $this->paymentService->getPayment($request->validated("paymentId"));
+            if(!$payment) return Utilities::error402("Payment not found");
+
+            $payment = $this->paymentService->flag($payment, $request->validated("message"));
+
+            return Utilities::ok([
+                "message" => "payment has been Flagged",
+                "payment" => new PaymentResource($payment)
+            ]);
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
+    }
+
 }
