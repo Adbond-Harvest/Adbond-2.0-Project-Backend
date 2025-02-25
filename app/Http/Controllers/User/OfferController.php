@@ -3,6 +3,7 @@
 namespace app\Http\Controllers\User;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use app\Http\Controllers\Controller;
 
 use app\Http\Requests\User\ApproveOffer;
@@ -12,7 +13,10 @@ use app\Http\Requests\User\CompleteOffer;
 use app\Http\Resources\OfferResource;
 
 use app\Services\OfferService;
+use app\Services\PaymentService;
 use app\Services\ClientPackageService;
+
+use app\Models\Offer;
 
 use app\Enums\OfferApprovalStatus;
 
@@ -22,11 +26,13 @@ class OfferController extends Controller
 {
     private $offerService;
     private $clientPackageService;
+    private $paymentService;
 
     public function __construct()
     {
         $this->offerService = new OfferService;
         $this->clientPackageService = new ClientPackageService;
+        $this->paymentService = new PaymentService;
     }
 
     public function offers(Request $request)
@@ -96,16 +102,20 @@ class OfferController extends Controller
             $offer = $this->offerService->offer($request->validated("offerId"));
             if(!$offer) return Utilities::error402("Offer not found");
 
-            // create letter of happiness
-            
+            $offerPayment = $this->paymentService->getPurchasePayment($offer->id, Offer::$type);
+            if(!$offerPayment) return Utilities::error402("The payment for this offer was not found");
 
-            // create contract
+            DB::beginTransaction();
 
+            $offer = $this->offerService->completeOffer($offer, $offerPayment);
 
-            $this->clientPackageService->saveClientPackageOffer($offer);
+            $this->clientPackageService->markAsSold($offer->asset);
 
+            DB::commit();
 
+            return Utilities::ok(new OfferResource($offer));
         }catch(\Exception $e){
+            DB::rollBack();
             return Utilities::error($e, 'An error occurred while trying to perform this operation, Please try again later or contact support');
         }
     }

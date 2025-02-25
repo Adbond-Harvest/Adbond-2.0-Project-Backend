@@ -65,7 +65,8 @@ class Offer extends Model
 
     public function acceptedBid()
     {
-        return $this->bids()->where('cancelled', 0)->where("accepted", 1)->first();
+        // return $this->bids()->where('cancelled', 0)->where("accepted", 1)->first();
+        return $this->belongsTo(OfferBid::class, "accepted_bid_id", "id");
     }
 
     protected static function boot()

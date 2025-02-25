@@ -36,6 +36,11 @@ class PaymentService
         return Payment::with($with)->where("id", $id)->first();
     }
 
+    public function getPurchasePayment($purchaseId, $purchaseType)
+    {
+        return Payment::where("purchase_id", $purchaseId)->where("purchase_type", $purchaseType)->first();
+    }
+
     public function offerPayments($with=[], $offset=0, $perPage=null)
     {
         $query = Payment::with($with)->where("purchase_type", Offer::$type);
@@ -233,8 +238,6 @@ class PaymentService
                 $fileService->updateFileObj($fileMeta, $response['upload']['file']);
 
                 $this->update(['receiptFileId' => $response['upload']['file']->id], $payment);
-
-                unlink($uploadedReceipt);
                 // dd("got here");
                 try{
                     // Send Payment Mail

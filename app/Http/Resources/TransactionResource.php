@@ -26,7 +26,7 @@ class TransactionResource extends JsonResource
             "project" => $this->purchase?->package?->project?->name,
             "projectType" => $this->purchase?->package?->project?->projectType?->name,
             "amount" => $this->amount,
-            "status" => ($this->confirmed == 1) ? "Successful" : (($this->success === 0) ? "Failed" : "Pending"),
+            "status" => ($this->confirmed == 1) ? "Successful" : (($this->confirmed === 0) ? "Failed" : "Pending"),
             "paymentMode" => $this->paymentMode?->name,
             "date" => $this->created_at->format('F j, Y'),
             "plan" => ($this->purchase && $this->purchase_type==Order::$type && $this->purchase?->is_installment==1) ?  PackagePaymentOption::INSTALLMENT->value : PackagePaymentOption::ONE_OFF->value,
