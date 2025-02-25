@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use app\Http\Controllers\Controller;
 
-use app\Http\Requests\client\MakeOfferPayment;
-use app\Http\Requests\client\PrepareOfferPayment;
-use app\Http\Requests\client\InitializeCardPayment;
+use app\Http\Requests\Client\MakeOfferPayment;
+use app\Http\Requests\Client\PrepareOfferPayment;
+use app\Http\Requests\Client\InitializeCardPayment;
 
 use app\Http\Resources\PaymentResource;
 

@@ -63,6 +63,11 @@ class Offer extends Model
         return $this->hasMany(OfferBid::class);
     }
 
+    public function acceptedBid()
+    {
+        return $this->bids()->where('cancelled', 0)->where("accepted", 1)->first();
+    }
+
     protected static function boot()
     {
         parent::boot();

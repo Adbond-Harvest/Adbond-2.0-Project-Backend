@@ -67,6 +67,22 @@ class ClientPackageService
         return $clientPackage;
     }
 
+    public function saveClientPackageOffer($offer, $files=[]) {
+        $data['clientId'] = $offer->acceptedBid->client_id;
+        $data['packageId'] = $offer->package_id;
+        $data['origin'] = ClientPackageOrigin::OFFER->value;
+        $data['purchaseId'] = $offer->id;
+        $data['purchaseType'] = Offer::$type;
+        if(isset($files['contractFileId'])) $data['contractFileId'] = $files['contractFileId'];
+        if(isset($files['happinessLetterFileId'])) $data['happinessLetterFileId'] = $files['happinessLetterFileId'];
+        $data['purchaseComplete'] = true;
+        $data['amount'] = $offer->acceptedBid->price;
+        $data['units'] = $offer->units;
+        $data['unitPrice'] = $offer->package->amount;
+        $clientPackage = $this->save($data);
+        return $clientPackage;
+    }
+
     public function saveClientPackageInvestment($clientInvestment) {
         $data['clientId'] = $clientInvestment->client->id;
         $data['packageId'] = $clientInvestment->package_id;
@@ -110,6 +126,12 @@ class ClientPackageService
         if(isset($data['doaFileId'])) $clientPackage->doa_file_id = $data['doaFileId'];
         $clientPackage->update();
         return $clientPackage;
+    }
+
+    public function markAsSold($clientPackage)
+    {
+        $clientPackage->sold = true;
+        $clientPackage->update();
     }
 
     public function clientPackage($id, $with=[])

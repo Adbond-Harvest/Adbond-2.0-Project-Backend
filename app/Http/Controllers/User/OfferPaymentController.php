@@ -79,4 +79,6 @@ class OfferPaymentController extends Controller
         ], $page, $perPage, $defaultTotal);
 
     }
+
+    
 }
