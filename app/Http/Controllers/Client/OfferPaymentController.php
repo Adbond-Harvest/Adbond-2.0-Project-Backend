@@ -148,6 +148,8 @@ class OfferPaymentController extends Controller
             if($data['cardPayment'] && isset($paymentData['confirmed'])) {
                 $this->paymentService->uploadReceipt($payment, Auth::guard('client')->user());
                 $this->offerService->update(['paymentStatusId' => PaymentStatus::complete()->id], $offer);
+            }else{
+                $this->offerService->update(['paymentStatusId' => PaymentStatus::pending()->id], $offer);
             }
 
             DB::commit();

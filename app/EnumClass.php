@@ -18,6 +18,7 @@ use app\Enums\PackageType;
 use app\Enums\InvestmentRedemptionOption;
 use app\Enums\OfferApprovalStatus;
 use app\Enums\PurchaseSummaryDuration;
+use app\Enums\AssetSwitchType;
 
 class EnumClass
 {
@@ -170,6 +171,14 @@ class EnumClass
             PurchaseSummaryDuration::MONTH->value,
             PurchaseSummaryDuration::WEEK->value,
             PurchaseSummaryDuration::YEAR->value
+        ];
+    }
+
+    public static function assetSwitchTypes()
+    {
+        return [
+            AssetSwitchType::DOWNGRADE->value,
+            AssetSwitchType::UPGRADE->value
         ];
     }
 }

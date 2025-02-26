@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
+use app\Models\PaymentStatus;
+
 class Offer extends Model
 {
     use HasFactory;
@@ -77,6 +79,14 @@ class Offer extends Model
             if($offer->resell_order_id) {
                 $offer->approved = 1;
             }
+        });
+
+        self::updating(function (Offer $offer) {
+            if($offer->accepted_bid_id && !$offer->payment_status_id) {
+                $offer->payment_status_id = PaymentStatus::awaiting_payment()->id;
+            }
+            $offer->acceptedBid->payment_status_id = $offer->payment_status_id;
+            $offer->acceptedBid->update();
         });
     }
 

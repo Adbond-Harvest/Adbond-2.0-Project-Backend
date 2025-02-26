@@ -37,6 +37,7 @@ use app\Http\Controllers\Client\TransactionController;
 use app\Http\Controllers\Client\ProjectController as ClientProjectController;
 use app\Http\Controllers\Client\PackageController as ClientPackageController;
 use app\Http\Controllers\Client\AssetController;
+use app\Http\Controllers\Client\AssetSwitchController;
 use app\Http\Controllers\Client\OfferController;
 use app\Http\Controllers\Client\OfferBidController;
 use app\Http\Controllers\Client\ClientController;
@@ -294,6 +295,9 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('/summary', [AssetController::class, 'summary']);
             Route::get('', [AssetController::class, 'assets']);
             Route::get('/{assetId}', [AssetController::class, 'asset']);
+
+            Route::get('/downgrade_packages/{packageId}', [AssetSwitchController::class, 'downgradePackages']);
+            Route::post('/request_downgrade', [AssetSwitchController::class, 'requestDowngrade']);
         });
 
         //Offer Routes

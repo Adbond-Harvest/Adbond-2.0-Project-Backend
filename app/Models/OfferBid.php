@@ -18,4 +18,9 @@ class OfferBid extends Model
     {
         return $this->belongsTo(CLient::class);
     }
+
+    public function paymentStatus()
+    {
+        return $this->belongsTo(PaymentStatus::class);
+    }
 }
