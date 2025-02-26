@@ -581,8 +581,9 @@ Class Helpers
         $pdf->save($path);
     }
 
-    public static function generateLetterOfHappiness($payment)
+    public static function generateLetterOfHappiness($payment, $isPayment=true)
     {
+        $date = ($isPayment) ? $payment->payment_date : now();
         $addressArr = [];
         $addressArr = self::formatAddress($payment?->client?->address);
         $unitSize = $payment?->purchase?->package->size;
@@ -596,10 +597,10 @@ Class Helpers
             'project' => $payment?->purchase?->package?->package?->project?->project?->name,
             'location' => $payment?->purchase?->package?->package?->project?->location?->name,
             'price' => $payment?->purchase?->amount_payable,
-            'amount_paid' => $payment->amount,
+            'amount_paid' => ($isPayment) ? $payment->amount : 0,
             'units' => $payment?->purchase?->units,
             'size' => $size,
-            'payment_date' => date('d/m/Y', strtotime($payment->payment_date))
+            'payment_date' => date('d/m/Y', strtotime($date))
         ];
         // dd($pdfData);
         $pdf = PDF::loadView('pdf/letter_of_happiness', $pdfData);

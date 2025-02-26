@@ -379,4 +379,10 @@ class Utilities
         return trim($formatted);
     }
 
+    public static function downgradePenaltyAmount($fromPackage, $units, $penalty)
+    {
+        $assetAmount = $fromPackage->amount * $units;
+        return round(($penalty/100) * $assetAmount, 2);
+    }
+
 }

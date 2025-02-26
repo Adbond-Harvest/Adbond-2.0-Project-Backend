@@ -135,7 +135,7 @@ class PaymentController extends Controller
                         $data['paymentStatusId'] = PaymentStatus::pending()->id;
                     }else{
                         $data['paymentStatusId'] = ($processedData['isInstallment']) ? PaymentStatus::deposit()->id : PaymentStatus::complete()->id;
-                        $data['balance'] = ($processedData['isInstallment']) ? $processedData['amountDetail']['amount'] - $processedData['amountPayable'] : 0;
+                        // $data['balance'] = ($processedData['isInstallment']) ? $processedData['amountDetail']['amount'] - $processedData['amountPayable'] : 0;
                     }
                 }else{
                     $data['paymentStatusId'] = PaymentStatus::pending()->id;
@@ -251,9 +251,9 @@ class PaymentController extends Controller
         if($processedData['isInstallment']) $data['installmentCount'] = $processedData['installmentCount'];
         if(isset($processedData['promoCode'])) $data['promoCodeId'] = $this->promoCodeService->promoCode($processedData['promoCode'])->id;
         $data['amountPayable'] = $processedData['amountDetail']['amount'];
-        if(isset($data['balance'])) {
-            $data['amountPayed'] = $processedData['amountPayable'];
-        }
+        // if(isset($data['balance'])) {
+        //     $data['amountPayed'] = $processedData['amountPayable'];
+        // }
         // $data['amountPayed'] = $processedData['amountPayable'];
         $data['unitPrice'] = $package->amount;
         // $data['balance'] = ($data['isInstallment']) ? ($data['amountPayable'] - $data['amountPayed']) : 0;
@@ -344,6 +344,8 @@ class PaymentController extends Controller
                     $this->orderService->completeOrder($order, $payment, $clientInvestment) 
                     : 
                     (($order->package->type==PackageType::INVESTMENT->value) ? $this->clientPackageService->saveClientPackageInvestment($clientInvestment) : $this->clientPackageService->saveClientPackageOrder($order));
+            }else{
+                (($order->package->type==PackageType::INVESTMENT->value) ? $this->clientPackageService->saveClientPackageInvestment($clientInvestment) : $this->clientPackageService->saveClientPackageOrder($order));
             }
             // dd('skipped'.$data);
         }

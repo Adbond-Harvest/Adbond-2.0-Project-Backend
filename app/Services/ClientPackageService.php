@@ -28,10 +28,12 @@ class ClientPackageService
     public $active = null;
 
     // This method either saves or updates client package
-    public function save($data)
+    public function save($data, $clientPackage=null)
     {
-        $clientPackage = ClientPackage::where("purchase_id", $data['purchaseId'])->where("purchase_type", $data['purchaseType'])->where("package_id",$data['packageId'])->first();
-        if(!$clientPackage) $clientPackage = new ClientPackage;
+        if(!$clientPackage) {
+            $clientPackage = ClientPackage::where("purchase_id", $data['purchaseId'])->where("purchase_type", $data['purchaseType'])->where("package_id",$data['packageId'])->first();
+            if(!$clientPackage) $clientPackage = new ClientPackage;
+        }
         $clientPackage->client_id = $data['clientId'];
         $clientPackage->package_id = $data['packageId'];
         if(isset($data['contractFileId'])) $clientPackage->contract_file_id = $data['contractFileId'];
@@ -50,7 +52,7 @@ class ClientPackageService
         return $clientPackage;
     }
 
-    public function saveClientPackageOrder($order, $files=[]) {
+    public function saveClientPackageOrder($order, $files=[], $clientPackage=null) {
         $data['clientId'] = $order->client->id;
         $data['packageId'] = $order->package_id;
         $data['origin'] = ClientPackageOrigin::ORDER->value;
@@ -63,7 +65,7 @@ class ClientPackageService
         $data['amount'] = $order->amount_payable;
         $data['units'] = $order->units;
         $data['unitPrice'] = $order->unit_price;
-        $clientPackage = $this->save($data);
+        $clientPackage = (!$clientPackage) ? $this->save($data) : $this->save($data, $clientPackage);
         return $clientPackage;
     }
 

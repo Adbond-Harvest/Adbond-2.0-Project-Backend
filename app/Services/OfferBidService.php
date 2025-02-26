@@ -27,6 +27,15 @@ class OfferBidService
         return $bid;
     }
 
+    public function update($data, $bid)
+    {
+        if(isset($data['paymentStatusId'])) $bid->payment_status_id = $data['paymentStatusId'];
+        if(isset($data['price'])) $bid->price = $data['price'];
+        $bid->update();
+
+        return $bid;
+    }
+
     public function bids($with=[], $offset=0, $perPage=null)
     {
         $query = OfferBid::with($with);

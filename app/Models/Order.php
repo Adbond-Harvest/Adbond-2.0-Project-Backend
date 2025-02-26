@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 use app\Models\PaymentPeriodStatus;
+use app\Models\PaymentStatus;
 
 class Order extends Model
 {
@@ -56,10 +57,13 @@ class Order extends Model
 
         static::creating(function ($order) {
             $order->payment_period_status_id = PaymentPeriodStatus::normal()->id;
+            $order->balance = $order->amount_payable - $order->amount_payed;
+            if($order->payment_status_id == PaymentStatus::complete()->id && $order->is_installment == 0) $order->balance = 0;
             // if(!$order->balance) $order->bala
             if($order->balance < 0) $order->balance = 0;
         });
         self::updating(function (Order $order) {
+            $order->balance = $order->amount_payable - $order->amount_payed;
             if($order->balance < 0) $order->balance = 0;
         });
     }

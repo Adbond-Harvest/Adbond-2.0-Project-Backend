@@ -19,7 +19,7 @@ class DeductibleFees extends Seeder
     {
         $fees = [
             ["name" => Enum::COMMISSION_TAX->value, "percentage" => 7.5], 
-            ["name" => Enum::DOWNGRADE_PENALTY->value, "percentage" => "5"]
+            ["name" => Enum::DOWNGRADE_PENALTY->value, "percentage" => "7"]
         ];
 
         foreach($fees as $fee) {
