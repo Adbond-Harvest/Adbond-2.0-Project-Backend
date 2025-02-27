@@ -94,6 +94,13 @@ class OfferController extends Controller
         }
     }
 
+    public function readyOffers(Request $request)
+    {
+        $offers = $this->offerService->readyOffers();
+
+        return Utilities::ok(OfferResource::collection($offers));
+    }
+
 
     // handles completing the offer sale and transferring the property to the new client
     public function complete(CompleteOffer $request)
