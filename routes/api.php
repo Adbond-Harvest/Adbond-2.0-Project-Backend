@@ -313,6 +313,9 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/prepare_payment', [OfferPaymentController::class, 'preparePayment']);
             Route::post('/initialize_card_payment', [OfferPaymentController::class, 'initializeCardPayment']);
             Route::post('/pay', [OfferPaymentController::class, 'makePayment']);
+
+            Route::get('/ready', [OfferController::class, "readyOffers"]);
+            Route::get('/my_ready', [OfferController::class, "myReadyOffers"]);
         });
 
         //Offer Bid Routes
