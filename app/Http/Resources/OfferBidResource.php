@@ -21,7 +21,7 @@ class OfferBidResource extends JsonResource
             "id" => $this->id,
             "price" => $this->price,
             "status" =>  ($this->accepted === null) ?  "Pending" : (($this->accepted == 1) ? "Accepted" : "Rejected"),
-            "paymentStatus" => $this->paymentStatus->name,
+            "paymentStatus" => $this->paymentStatus?->name,
             "date" => $this->created_at->format('F j, Y'),
             "offer" => new OfferResource($this->whenLoaded('offer')),
             "client" => new ClientBriefResource($this->whenLoaded("client"))
