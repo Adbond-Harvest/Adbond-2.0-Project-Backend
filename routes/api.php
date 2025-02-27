@@ -159,6 +159,8 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/payments/reject', [UserOfferPaymentController::class, "reject"]);
             Route::post('/payments/flag', [UserOfferPaymentController::class, "flag"]);
 
+            Route::get('/ready', [UserOfferController::class, "readyOffers"]);
+
             Route::post('/complete', [UserOfferController::class, "complete"]);
         });
 

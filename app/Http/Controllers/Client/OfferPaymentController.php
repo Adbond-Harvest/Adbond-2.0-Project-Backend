@@ -124,8 +124,6 @@ class OfferPaymentController extends Controller
                 "paymentDate" => ($data['cardPayment']) ? now() : $data['paymentDate']
             ];
 
-            $paymentData['amount'] = $bid->price;
-
             if($data['cardPayment']) {
                 $res = $this->paymentService->paystackVerify($data['reference'], $bid->price);
                 if($res['success']) {
@@ -136,7 +134,9 @@ class OfferPaymentController extends Controller
                         $paymentData['flag'] = true;
                         $paymentData['flagMessage'] = $res['message'];
                     }
+                    $paymentData['amount'] = $res['amount'];
                 }else{
+                    $paymentData['amount'] = 0;
                     $paymentData['failureMessage'] = $res['message'];
                     $paymentData['success'] = false;
                 }

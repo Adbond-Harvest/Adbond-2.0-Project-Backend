@@ -94,6 +94,12 @@ class OfferService
         return $query->orderBy("created_at", "DESC")->offset($offset)->limit($perPage)->get();
     }
 
+    //offers that are ready to be completed
+    public function readyOffers($with=[])
+    {
+        return Offer::with($with)->whereNotNull("resell_order_id")->orWhere("payment_status_id", PaymentStatus::complete()->id)->get();
+    }
+
     public function getOffersByAssetId($clientPackageId)
     {
         return Offer::where("client_package_id", $clientPackageId)->first();
