@@ -172,6 +172,23 @@ class OfferController extends Controller
         return Utilities::paginatedOkay(OfferResource::collection($offers), $page, $perPage, $offersCount);
     }
 
+    public function readyOffers(Request $request)
+    {
+        $this->offerService->clientId = Auth::guard("client")->user()->id;
+        $this->offerService->mine = false;
+        $offers = $this->offerService->readyOffers();
+
+        return Utilities::ok(OfferResource::collection($offers));
+    }
+
+    public function myReadyOffers(Request $request)
+    {
+        $this->offerService->clientId = Auth::guard("client")->user()->id;
+        $offers = $this->offerService->readyOffers();
+
+        return Utilities::ok(OfferResource::collection($offers));
+    }
+
     public function offer($offerId, Request $request)
     {
         if ($offerId && (!is_numeric($offerId) || !ctype_digit($offerId))) return Utilities::error402("Invalid parameter offerID");

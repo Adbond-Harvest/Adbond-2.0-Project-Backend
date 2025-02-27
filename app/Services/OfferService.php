@@ -15,6 +15,7 @@ use app\Helpers;
 class OfferService
 {
     public $clientId = null;
+    public $mine = true;
     public $filter = null;
     public $count = null;
     public $sales = null;
@@ -97,7 +98,19 @@ class OfferService
     //offers that are ready to be completed
     public function readyOffers($with=[])
     {
-        return Offer::with($with)->whereNotNull("resell_order_id")->orWhere("payment_status_id", PaymentStatus::complete()->id)->get();
+        $query = Offer::with($with);
+
+        if($this->clientId) {
+            if($this->mine) {
+                $query->$query->where("client_id", $this->clientId);
+            }else{
+                $query = $query->whereHas("acceptedBid", function($bidQuery) {
+                    $bidQuery->where("client_id", $this->clientId);
+                });
+            }
+        }
+        
+        $query = $query->whereNotNull("resell_order_id")->orWhere("payment_status_id", PaymentStatus::complete()->id);
     }
 
     public function getOffersByAssetId($clientPackageId)
