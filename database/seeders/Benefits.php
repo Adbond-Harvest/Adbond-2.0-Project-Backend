@@ -25,10 +25,16 @@ class Benefits extends Seeder
         ];
 
         foreach($benefits as $benefit) {
-            Benefit::firstOrCreate([
-                "name" => $benefit['name'],
-                "icon" => $benefit['icon']
-            ]);
+            $benefitObj = Benefit::where("name", $benefit['name']);
+            if(!$benefitObj) {
+                $benefitObj->name = $benefit['name'];
+                $benefitObj->icon = $benefit['icon'];
+                $benefitObj->save();
+            }
+            // Benefit::firstOrCreate([
+            //     "name" => $benefit['name'],
+            //     "icon" => $benefit['icon']
+            // ]);
         }
     }
 }

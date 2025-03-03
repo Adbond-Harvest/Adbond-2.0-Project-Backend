@@ -1,0 +1,127 @@
+<?php
+
+namespace app\Http\Controllers\User;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use app\Http\Controllers\Controller;
+
+use app\Http\Requests\User\ApproveAssetSwitch;
+use app\Http\Requests\User\RejectAssetSwitch;
+
+use app\Http\Resources\AssetSwitchRequestResource;
+
+use app\Services\AssetSwitchService;
+use app\Services\PackageService;
+use app\Services\ClientPackageService;
+
+use app\Enums\AssetSwitchType;
+
+use App\Utilities;
+
+class AssetSwitchController extends Controller
+{
+    private $assetSwitchService;
+    private $packageService;
+    private $clientPackageService;
+
+    public function __construct()
+    {
+        $this->assetSwitchService = new AssetSwitchService;
+        $this->packageService = new PackageService;
+        $this->clientPackageService = new ClientPackageService;
+    }
+
+    public function assetSwitchRequests(Request $request)
+    {
+        $page = ($request->query('page')) ?? 1;
+        $perPage = ($request->query('perPage'));
+        if(!is_int((int) $page) || $page <= 0) $page = 1;
+        if(!is_int((int) $perPage) || $perPage==null) $perPage = env('PAGINATION_PER_PAGE');
+        $offset = $perPage * ($page-1);
+
+        $default = false;
+        if($request->query('status')) {
+            $this->assetSwitchService->setStatus = true;
+            $validStatuses = ['pending', 'approved', 'rejected'];
+            $validStatusesString = '';
+            foreach($validStatuses as $valid) $validStatusesString .= $valid.', ';
+            if(!in_array($request->query('status'), $validStatuses)) return Utilities::error402("Valid Statuses are: ".$validStatusesString);
+            switch($request->query('status')) {
+                case "pending" : $this->assetSwitchService->approved = null; break;
+                case "approved" : $this->assetSwitchService->approved = 1; break;
+                case "rejected" : $this->assetSwitchService->approved = 0; break;
+            }
+            $default = $this->assetSwitchService->approved;
+        }
+        $requests = $this->assetSwitchService->assetSwitchRequests([], $offset, $perPage);
+
+        $this->assetSwitchService->count = true;
+        $requestsCount = $this->assetSwitchService->assetSwitchRequests();
+
+        $this->assetSwitchService->approved = 1;
+        $approvedCount = $this->assetSwitchService->assetSwitchRequests();
+
+        $this->assetSwitchService->approved = 0;
+        $rejectedCount = $this->assetSwitchService->assetSwitchRequests();
+
+        $this->assetSwitchService->approved = null;
+        $pendingCount = $this->assetSwitchService->assetSwitchRequests();
+
+        if($default !== false) {
+            switch($default) {
+                case null : $defaultTotal = $pendingCount; break;
+                case 1 : $defaultTotal = $approvedCount; break;
+                case 0 : $defaultTotal = $rejectedCount; break;
+            }
+        }else{
+            $defaultTotal = $requestsCount;
+        }
+
+        return Utilities::paginatedOkay([
+            "requests" => AssetSwitchRequestResource::collection($requests),
+            "requestsCount" => $requestsCount,
+            "approvedCount" => $approvedCount,
+            "pendingCount" => $pendingCount,
+            "rejectedCount" => $rejectedCount
+        ], $page, $perPage, $defaultTotal);
+    }
+
+    public function approve(ApproveAssetSwitch $request)
+    {
+        try{
+            DB::beginTransaction();
+
+            $data = $request->validated();
+            $request = $this->assetSwitchService->assetSwitchRequest($data['requestId']);
+            if(!$request) return Utilities::error402("Asset Switch Request not found");
+
+            $request = $this->assetSwitchService->approve($request);
+            if($request->type == AssetSwitchType::DOWNGRADE->value) {
+                $this->assetSwitchService->downgrade($request, $request->packageTo);
+            }
+
+            DB::commit();
+
+            return Utilities::okay("Asset has been ".$request->type."d successfully");
+        }catch(\Exception $e){
+            DB::rollBack();
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
+    }
+
+    public function reject(RejectAssetSwitch $request)
+    {
+        try{
+            $data = $request->validated();
+            $request = $this->assetSwitchService->assetSwitchRequest($data['requestId']);
+            if(!$request) return Utilities::error402("Asset Switch Request not found");
+
+            $request = $this->assetSwitchService->reject($request, $data['reason']);
+
+            return Utilities::okay("Asset Switch Request rejected");
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
+    }
+}

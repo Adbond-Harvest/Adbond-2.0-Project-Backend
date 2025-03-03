@@ -10,6 +10,8 @@ use app\Models\PackageSize;
 use app\Models\PackageMedia;
 
 use app\Enums\ProjectFilter;
+use app\Enums\PackageType;
+
 
 use app\Exports\PackageExport;
 
@@ -46,12 +48,14 @@ class PackageService
             if(isset($data['vrUrl'])) $package->vr_url = $data['vrUrl'];
 
             if(isset($data['type'])) $package->type = $data['type'];
-            if(isset($data['interestReturnDuration'])) $package->interest_return_duration = $data['interestReturnDuration'];
-            if(isset($data['interestReturnTimeline'])) $package->interest_return_timeline = $data['interestReturnTimeline'];
-            if(isset($data['interestReturnPercentage'])) $package->interest_return_percentage = $data['interestReturnPercentage'];
-            if(isset($data['interestReturnAmount'])) $package->interest_return_amount = $data['interestReturnAmount'];
-            if(isset($data['redemptionOptions'])) $package->redemption_options = json_encode($data['redemptionOptions']);
-            if(isset($data['redemptionPackageId'])) $package->redemption_package_id = $data['redemptionPackageId'];
+            if(isset($data['type']) && $data['type'] == PackageType::INVESTMENT->value) {
+                $package->interest_return_duration = $data['interestReturnDuration'];
+                $package->interest_return_timeline = $data['interestReturnTimeline'];
+                $package->interest_return_percentage = $data['interestReturnPercentage'];
+                $package->interest_return_amount = $data['interestReturnAmount'];
+                $package->redemption_options = json_encode($data['redemptionOptions']);
+                $package->redemption_package_id = $data['redemptionPackageId'];
+            }
             $package->save();
 
             if(isset($data['benefits'])) $package->benefits()->attach($data['benefits']);

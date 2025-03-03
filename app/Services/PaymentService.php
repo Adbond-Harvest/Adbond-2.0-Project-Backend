@@ -60,7 +60,7 @@ class PaymentService
 
         $query = $query->orderBy("created_at", "DESC");
         if($perPage) $query = $query->limit($perPage);
-        return $query->offset($offset)->get();
+        return $query->offset($offset)->orderBy("created_at", "Desc")->get();
     }
 
     public function getPayable($data, $promos, $promoCodeDiscount=null)

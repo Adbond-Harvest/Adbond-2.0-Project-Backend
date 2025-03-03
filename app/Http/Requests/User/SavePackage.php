@@ -35,9 +35,13 @@ class SavePackage extends BaseRequest
         return [
             "projectId" => "required|integer|exists:projects,id",
             "name" => ["required","string", new PackageNameUnique()],
+            "type" => ["nullable", "string", Rule::in(EnumClass::packageTypes())],
             "state" => "required|string",
             "address" => "nullable|string",
-            "size" => "numeric|required_if:type,".PackageType::NON_INVESTMENT->value,
+            "size" => ["numeric", Rule::requiredIf(function () {
+                                        return $this->type && $this->type === PackageType::NON_INVESTMENT->value;
+                                    }),
+                        ],
             "amount" => "required|numeric",
             "units" => "required|integer",
             "discount" => "nullable|numeric",
@@ -53,7 +57,6 @@ class SavePackage extends BaseRequest
             "vrUrl" => "nullable|string",
             "packageMediaIds" => "nullable|array",
             "packageMediaIds.*" => ["integer", new ValidPackageMediaFile()],
-            "type" => ["nullable", "string", Rule::in(EnumClass::packageTypes())],
             "interestReturnDuration" => "integer|required_if:type,".PackageType::INVESTMENT->value,
             "interestReturnTimeline" => "integer|required_if:type,".PackageType::INVESTMENT->value,
             "interestReturnPercentage" => ["integer", Rule::requiredIf(function () {

@@ -25,6 +25,7 @@ use app\Http\Controllers\User\SiteTourController as UserSiteTourController;
 use app\Http\Controllers\User\OfferController as UserOfferController;
 use app\Http\Controllers\User\OfferPaymentController as UserOfferPaymentController;
 use app\Http\Controllers\User\UtilityController as UserUtilityController;
+use app\Http\Controllers\User\AssetSwitchController as UserAssetSwitchController;
 
 
 // Client Controllers
@@ -146,6 +147,10 @@ Route::group(['prefix' => '/v2',], function () {
         //Assets Routes
         Route::group(['prefix' => '/assets'], function () {
             Route::get('', [UserAssetController::class, "assets"]);
+
+            Route::get('/switch_requests', [UserAssetSwitchController::class, 'assetSwitchRequests']);
+            Route::post('/approve_switch_request', [UserAssetSwitchController::class, 'approve']);
+            Route::post('/reject_switch_request', [UserAssetSwitchController::class, 'reject']);
         });
 
         //Offers Routes
