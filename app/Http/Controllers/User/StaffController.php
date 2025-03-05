@@ -31,6 +31,7 @@ class StaffController extends Controller
     {
         try{
             $data = $request->validated();
+            $data['password'] = '12345';
             $user = $this->userService->save($data, Auth::user()->id);
 
             return Utilities::ok(new UserResource($user));

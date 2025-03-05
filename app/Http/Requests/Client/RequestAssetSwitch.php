@@ -1,11 +1,14 @@
 <?php
 
-namespace app\Http\Requests\User;
+namespace app\Http\Requests\Client;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use app\Http\Requests\BaseRequest;
 
-class CreateUser extends BaseRequest
+use app\EnumClass;
+
+class RequestAssetSwitch extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,13 +26,9 @@ class CreateUser extends BaseRequest
     public function rules(): array
     {
         return [
-            "firstname" => "required|string",
-            "lastname" => "required|string",
-            "email" => "required|email|unique:users,email",
-            "phoneNumber" => "string|max:15|min:11",
-            "staffTypeId" => "required|integer|exists:staff_types,id",
-            "roleId" => "required|integer|exists:roles,id",
-            "dateJoined" => "nullable|date|before:today"
+            "type" => ["required", Rule::in(EnumClass::assetSwitchTypes())],
+            "assetId" => "required|integer",
+            "toPackageId" => "required|integer|exists:packages,id",
         ];
     }
 }

@@ -11,6 +11,7 @@ use app\Enums\FilePurpose;
 use app\Enums\ClientPackageOrigin;
 use app\Enums\FileTypes;
 use app\Enums\PackageType;
+use app\Enums\OrderType;
 
 use app\Helpers;
 use app\Utilities;
@@ -225,6 +226,15 @@ class OrderService
         $fileMeta = ["belongsId"=>$clientPackage->id, "belongsType"=>"app\Models\ClientPackage"];
         if($contractFileObj) $fileService->updateFileObj($fileMeta, $contractFileObj);
         if($letterOfHappinessFileObj) $fileService->updateFileObj($fileMeta, $letterOfHappinessFileObj);
+
+        //if its an upgrade order, 
+        if($order->type == OrderType::UPGRADE->value) {
+            $order->upgrade->complete = true;
+            $order->upgrade->update();
+
+            $order->upgrade->asset->upgraded = true;
+            $order->upgrade->asset->update();
+        }
 
         return $clientPackage;
     }

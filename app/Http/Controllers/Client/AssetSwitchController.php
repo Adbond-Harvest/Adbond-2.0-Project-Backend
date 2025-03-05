@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use app\Http\Controllers\Controller;
 
 use app\Http\Requests\Client\RequestDowngrade;
+use app\Http\Requests\Client\RequestAssetSwitch;
 
 use app\Http\Resources\AssetSwitchRequestResource;
 
@@ -16,6 +17,8 @@ use app\Models\ClientPackage;
 use app\Services\AssetSwitchService;
 use app\Services\PackageService;
 use app\Services\ClientPackageService;
+
+use app\Enums\AssetSwitchType;
 
 use App\Utilities;
 
@@ -47,7 +50,7 @@ class AssetSwitchController extends Controller
         return Utilities::ok(PackageResource::collection($packages));
     }
 
-    public function requestDowngrade(RequestDowngrade $request)
+    public function requestSwitch(RequestAssetSwitch $request)
     {
         try{
             $data = $request->validated();
@@ -55,7 +58,17 @@ class AssetSwitchController extends Controller
             $asset = $this->clientPackageService->clientPackage($data['assetId']);
             if(!$asset) return Utilities::error402("Asset not found");
 
-            if($asset->purchase_complete === 1)return Utilities::error402("This asset is not eligible for downgrade");
+            if($asset->client_id != Auth::guard("client")->user()->id) return Utilities::error402("You are not authorized to perform this operation on this asset");
+
+            $validSwitchPackages = ($data['type'] == AssetSwitchType::DOWNGRADE->value) ? 
+                                        $this->assetSwitchService->getDownGradePackages($asset->package, true)
+                                        :
+                                        $this->assetSwitchService->getUpGradePackages($asset->package, true);
+            if(count($validSwitchPackages) == 0) return Utilities::error402("You cannot ".$data['type']." to this package");
+            // dd($validSwitchPackages);
+            if(!in_array($data['toPackageId'], $validSwitchPackages)) return Utilities::error402("You cannot ".$data['type']." to this package");
+            // dd('got here');
+            if($data['type'] == AssetSwitchType::DOWNGRADE->value && $asset->purchase_complete === 1) return Utilities::error402("This asset is not eligible for downgrade");
 
             $data['clientId'] = Auth::guard("client")->user()->id;
             $data['fromPackageId'] = $asset->package_id;

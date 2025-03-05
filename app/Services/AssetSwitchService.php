@@ -3,15 +3,23 @@
 namespace app\Services;
 
 use app\Models\AssetDowngrade;
+use app\Models\AssetUpgrade;
 use app\Models\DowngradeUpgradeRequest;
 use app\Models\Package;
 use app\Models\DeductibleFee;
+use app\Models\Order;
+use app\Models\PaymentStatus;
+use app\Models\PaymentPeriodStatus;
+use app\Models\ClientPackage;
 
 use app\Services\OrderService;
 
 use app\Enums\PackageType;
 use app\Enums\DeductibleFee as DeductibleFeeEnum;
 use app\Enums\AssetSwitchType;
+use app\Enums\UpgradeType;
+use app\Enums\OrderType;
+use app\Enums\ClientPackageOrigin;
 
 use app\Utilities;
 
@@ -21,15 +29,29 @@ class AssetSwitchService
     public $approved = null;
     public $setStatus = false;
 
-    public function getDownGradePackages($package)
+    public function getDownGradePackages($package, $ids=false)
     {
         $projectType = $package->project->projectType;
-        return Package::where("amount", "<", $package->amount)->where("type", PackageType::NON_INVESTMENT->value)
+        $query = Package::where("amount", "<", $package->amount)->where("type", PackageType::NON_INVESTMENT->value)
             ->whereHas("project", function($projectQuery) use($projectType) {
             $projectQuery->whereHas("projectType", function($projectTypeQuery) use($projectType) {
                 $projectTypeQuery->where("id", $projectType->id);
             });
-        })->get();
+        });
+        return ($ids===false) ? $query->get() : $query->pluck("id")->toArray();
+    }
+
+    public function getUpGradePackages($package, $ids=false)
+    {
+        // dd($package->amount);
+        $projectType = $package->project->projectType;
+        $query = Package::where("amount", ">", $package->amount)->where("type", PackageType::NON_INVESTMENT->value)
+            ->whereHas("project", function($projectQuery) use($projectType) {
+            $projectQuery->whereHas("projectType", function($projectTypeQuery) use($projectType) {
+                $projectTypeQuery->where("id", $projectType->id);
+            });
+        });
+        return ($ids===false) ? $query->get() : $query->pluck("id")->toArray();
     }
 
     public function requestAssetSwitch($data)
@@ -140,5 +162,83 @@ class AssetSwitchService
         }
 
         return $assetDowngrade;
+    }
+
+    public function upgrade($request, $toPackage)
+    {
+        $asset = $request->asset;
+        $order = $asset->purchase;
+        $fromPackage = $asset->package;
+
+        $assetUpgrade = new AssetUpgrade;
+        $assetUpgrade->type = ($asset->purchase_complete == 0) ? UpgradeType::ORDER->value : UpgradeType::ASSET->value;
+        $assetUpgrade->client_id = $request->client_id;
+        $assetUpgrade->request_id = $request->id;
+        $assetUpgrade->from_package_id = $asset->package_id;
+        $assetUpgrade->to_package_id = $toPackage->id;
+        $assetUpgrade->client_package_id = $asset->id;
+        $assetUpgrade->save();
+
+        if($asset->purchase_complete == 0) {
+            $amountPayable = $toPackage->amount * $toPackage->units;
+            $balance = $amountPayable - $order->amount_payed;
+
+            $order->package_id = $request->to_package_id;
+            $order->amount_payable = $amountPayable;
+            $order->unit_price = $toPackage->amount;
+            $order->upgrade_id = $assetUpgrade->id;
+            $order->update();
+
+            $asset->package_id = $request->to_package_id;
+            $asset->upgrade_id = $assetUpgrade->id;
+            $asset->amount = $amountPayable;
+            $asset->unit_price = $toPackage->amount;
+            if($balance > 0) {
+                $asset->purchase_complete = false;
+                $asset->purchase_completed_at = null;
+            }
+
+            $asset->update();
+        }else{
+            $order = new Order;
+            $order->type = OrderType::UPGRADE->value;
+            $order->client_id = $request->client_id;
+            $order->package_id = $toPackage->id;
+            $order->units = $asset->units;
+            $order->amount_payed = 0;
+            $order->amount_payable = ($toPackage->amount * $toPackage->units) - $asset->amount;
+            $order->unit_price = $toPackage->amount;
+            $order->payment_status_id = PaymentStatus::pending()->id;
+            $order->order_date = now();
+            $order->payment_period_status_id = PaymentPeriodStatus::normal()->id;
+            $order->save();
+
+            $assetUpgrade->order_id = $order->id;
+            $assetUpgrade->update();
+
+            $asset->upgrade_id = $assetUpgrade->id;
+            $asset->update();
+
+            $newAsset = new ClientPackage;
+            $newAsset->client_id = $request->client_id;
+            $newAsset->package_id = $toPackage->id;
+            $newAsset->amount = $toPackage->amount * $asset->units;
+            $newAsset->units = $asset->units;
+            $newAsset->unit_price = $toPackage->amount;
+            $newAsset->origin = ClientPackageOrigin::ORDER->value;
+            $newAsset->purchase_type = Order::$type;
+            $newAsset->purchase_id = $order->id;
+            $newAsset->upgrade_id = $assetUpgrade->id;
+            $newAsset->save();
+
+        }
+
+        $fromPackage->units += $order->units;
+        $fromPackage->update();
+
+        $toPackage->units -= $order->units;
+        $toPackage->update();
+
+        return $assetUpgrade;
     }
 }
