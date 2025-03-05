@@ -51,6 +51,16 @@ class Order extends Model
         return $this->morphMany(ClientPackage::class, 'purchase');
     }
 
+    public function upgrade()
+    {
+        return $this->belongsTo(AssetUpgrade::class, "upgrade_id", "id");
+    }
+
+    public function downgrade()
+    {
+        return $this->belongsTo(AssetDowngrade::class, "downgrade_id", "id");
+    }
+
     protected static function boot()
     {
         parent::boot();

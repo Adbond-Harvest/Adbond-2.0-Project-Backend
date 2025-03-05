@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId("happiness_letter_file_id")->nullable()->references("id")->on("files");
             $table->foreignId("doa_file_id")->nullable()->references("id")->on("files");
             $table->boolean("sold")->default(false);
+            $table->boolean("upgraded")->default(false);
             $table->string("origin");
             $table->foreignId("purchase_id");
             $table->date("purchase_completed_at")->nullable();

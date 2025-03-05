@@ -304,7 +304,7 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('/{assetId}', [AssetController::class, 'asset']);
 
             Route::get('/downgrade_packages/{packageId}', [AssetSwitchController::class, 'downgradePackages']);
-            Route::post('/request_downgrade', [AssetSwitchController::class, 'requestDowngrade']);
+            Route::post('/request_asset_switch', [AssetSwitchController::class, 'requestSwitch']);
         });
 
         //Offer Routes

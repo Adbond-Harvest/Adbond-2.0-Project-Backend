@@ -89,7 +89,7 @@ class AssetSwitchController extends Controller
 
     public function approve(ApproveAssetSwitch $request)
     {
-        try{
+        // try{
             DB::beginTransaction();
 
             $data = $request->validated();
@@ -99,15 +99,17 @@ class AssetSwitchController extends Controller
             $request = $this->assetSwitchService->approve($request);
             if($request->type == AssetSwitchType::DOWNGRADE->value) {
                 $this->assetSwitchService->downgrade($request, $request->packageTo);
+            }else{
+                $this->assetSwitchService->upgrade($request, $request->packageTo);
             }
 
             DB::commit();
 
             return Utilities::okay("Asset has been ".$request->type."d successfully");
-        }catch(\Exception $e){
-            DB::rollBack();
-            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
-        }
+        // }catch(\Exception $e){
+        //     DB::rollBack();
+        //     return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        // }
     }
 
     public function reject(RejectAssetSwitch $request)

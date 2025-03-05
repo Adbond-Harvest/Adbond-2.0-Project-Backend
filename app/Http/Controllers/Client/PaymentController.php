@@ -39,6 +39,8 @@ use app\Enums\FilePurpose;
 use app\Enums\FileTypes;
 use app\Enums\PackageType;
 use app\Enums\UserType;
+use app\Enums\OrderType;
+
 use app\Utilities;
 use app\Helpers;
 
@@ -95,13 +97,17 @@ class PaymentController extends Controller
         if(!$order) return Utilities::error402("Order not found");
 
         //confirm that its an installment order, else, return error
-        if($order->is_installment == 0) return Utilities::error402("This is not an Installment order, so no additional payments can be made");
+        if($order->type == OrderType::PURCHASE->value && $order->is_installment == 0) return Utilities::error402("This is not an Installment order, so no additional payments can be made");
 
         // confirm that the order is not complete
         if($order->completed == 1) return Utilities::error402("This order has already been completed!");
 
         //get the amount to be paid
-        $amount = $order->amount_payable/$order->installment_count;
+        if($order->type == OrderType::PURCHASE->value) {
+            $amount = $order->amount_payable/$order->installment_count;
+        }else{
+            $amount = ($order->is_installment == 1) ? $order->amount_payable/$order->installment_count : $order->amount_payable;
+        }
         $processingId = Utilities::getOrderProcessingId();
 
         // Save in Cache
@@ -202,8 +208,10 @@ class PaymentController extends Controller
                 // dd($res);
                 if($res['success']==true) {
                     if(!$res['paymentError']) {
-                        $data['installmentsPayed'] = $order->installments_payed + 1;
-                        $data['paymentStatusId'] = ($data['installmentsPayed'] < $order->installment_count) ? PaymentStatus::deposit()->id : PaymentStatus::complete()->id;
+                        if($order->type == OrderType::PURCHASE->value || $order->is_installment==1) {
+                            $data['installmentsPayed'] = $order->installments_payed + 1;
+                        }
+                        $data['paymentStatusId'] = (($order->type == OrderType::PURCHASE->value || $order->is_installment==1) && ($data['installmentsPayed'] < $order->installment_count)) ? PaymentStatus::deposit()->id : PaymentStatus::complete()->id;
                         $data['amountPayed'] = $order->amount_payed + $processedData['amountPayable'];
                         $data['balance'] = $order->balance - $processedData['amountPayable'];
 
