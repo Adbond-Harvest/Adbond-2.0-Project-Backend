@@ -4,12 +4,15 @@ namespace app\Http\Controllers\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use app\Http\Controllers\Controller;
 
 use app\Http\Requests\User\CreateUser;
 use app\Http\Requests\User\UpdateUser;
 
 use app\Http\Resources\UserResource;
+
+use app\Mail\NewStaff;
 
 use app\Services\UserService;
 use app\Services\UserActivityLogService;
@@ -33,6 +36,12 @@ class StaffController extends Controller
             $data = $request->validated();
             $data['password'] = '12345';
             $user = $this->userService->save($data, Auth::user()->id);
+
+            try{
+                Mail::to($user->email)->send(new NewStaff($user, $data['password']));
+            }catch(\Exception $e){
+                Utilities::logStuff($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+            }
 
             return Utilities::ok(new UserResource($user));
         }catch(\Exception $e){
