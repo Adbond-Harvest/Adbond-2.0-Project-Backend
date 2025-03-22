@@ -385,4 +385,9 @@ class Utilities
         return round(($penalty/100) * $assetAmount, 2);
     }
 
+    public static function getPercentage($val, $total)
+    {
+        return round(($val/$total) * 100, 2);
+    }
+
 }

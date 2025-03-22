@@ -64,6 +64,11 @@ class Package extends Model
         return $this->belongsToMany(File::class, "package_media", "package_id", "file_id", "id");
     }
 
+    public function assets()
+    {
+        return $this->hasMany(ClientPackage::class, "package_id", "id");
+    }
+
     /**
      * Get all promos for this package
      */

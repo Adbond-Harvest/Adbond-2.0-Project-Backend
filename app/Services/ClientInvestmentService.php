@@ -18,7 +18,7 @@ class ClientInvestmentService
 
     public function runningInvestments()
     {
-        return ClientInvestment::where("started", 1)->where("ended", 0)->get();
+        return ClientInvestment::where("started", 1)->where("ended", 0)->orderBy("created_at", "DESC")->get();
     }
 
     public function save($data)
