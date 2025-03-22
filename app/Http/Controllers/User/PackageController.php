@@ -359,7 +359,7 @@ class PackageController extends Controller
             if(!$package) return Utilities::error402("Package not found");
 
             if($package->active) return Utilities::error402("Cannot delete an active Package");
-            if(!$package->canDelete()) return Utilities::error402("Cannot delete this Package");
+            if($package->assets->count() > 0) return Utilities::error402("Cannot delete this Package");
             $this->packageService->delete($package);
 
         } catch(\Exception $e){

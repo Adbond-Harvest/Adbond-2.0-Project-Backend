@@ -76,8 +76,11 @@ class IndexController extends Controller
         if(!is_int((int) $page) || $page <= 0) $page = 1;
         if(!is_int((int) $perPage) || $perPage==null) $perPage = null;
         $offset = $perPage * ($page-1);
+        
         $this->projectService->typeId = $projectTypeObj->id;
         $projects = $this->projectService->projects([], $offset, $perPage);
+
+        $this->projectService->typeId = null;
 
         $this->projectService->count = true;
         $projectsCount = $this->projectService->projects();
