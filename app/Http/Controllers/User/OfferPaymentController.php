@@ -3,6 +3,7 @@
 namespace app\Http\Controllers\User;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use app\Http\Controllers\Controller;
 
 use app\Http\Requests\User\ConfirmPayment;
