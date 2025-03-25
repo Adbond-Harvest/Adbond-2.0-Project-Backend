@@ -129,7 +129,6 @@ class PaymentService
         if(isset($data['receiptNumber'])) $payment->receipt_no = $data['receiptNumber'];
         $payment->purpose = $data['purpose'];
         if(isset($data['userId'])) $payment->user_id = $data['userId'];
-
         $payment->save();
         return $payment;
     }
