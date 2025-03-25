@@ -29,7 +29,7 @@ class PaymentResource extends JsonResource
             "id" => $this->id,
             "receiptNumber" => $this->receipt_no,
             "amount" => $this->amount,
-            "confirmed" => ($this->confirmed == 1),
+            "confirmed" => ($this->confirmed === null) ? null : ($this->confirmed == 1),
             "rejectedMessage" => $this->rejected_message,
             "reference" => $this->reference,
             "success" => ($this->success == 1),
