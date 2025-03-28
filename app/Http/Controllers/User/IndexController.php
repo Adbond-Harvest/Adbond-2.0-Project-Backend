@@ -15,6 +15,7 @@ use app\Services\ClientService;
 use app\Services\ClientPackageService;
 use app\Services\PurchaseService;
 use app\Services\TransactionService;
+use app\Services\MetricService;
 
 use app\Models\ClientPurchasesSummaryView;
 
@@ -23,6 +24,7 @@ use app\Enums\PurchaseSummaryDuration;
 
 use app\Utilities;
 use app\EnumClass;
+use app\Enums\MetricDuration;
 
 class IndexController extends Controller
 {
@@ -32,6 +34,7 @@ class IndexController extends Controller
     private $clientPackageService;
     private $purchaseService;
     private $transactionService;
+    private $metricService;
 
     public function __construct()
     {
@@ -41,6 +44,7 @@ class IndexController extends Controller
         $this->clientPackageService = new ClientPackageService;
         $this->purchaseService = new PurchaseService;
         $this->transactionService = new TransactionService;
+        $this->metricService = new MetricService;
     }
 
     public function dashboard(Request $request)
@@ -76,7 +80,11 @@ class IndexController extends Controller
         if(!is_int((int) $page) || $page <= 0) $page = 1;
         if(!is_int((int) $perPage) || $perPage==null) $perPage = null;
         $offset = $perPage * ($page-1);
-        
+
+        $duration = ($request->query('duration'));
+        $validDurations = [MetricDuration::TODAY->value, MetricDuration::WEEK->value, MetricDuration::MONTH->value, MetricDuration::YEAR->value];
+        if(!in_array($duration, $validDurations)) $duration = MetricDuration::TODAY->value;
+
         $this->projectService->typeId = $projectTypeObj->id;
         $projects = $this->projectService->projects([], $offset, $perPage);
 
@@ -98,12 +106,20 @@ class IndexController extends Controller
         $this->clientPackageService->active = true;
         $activeAssetsCount = $this->clientPackageService->assets();
 
+        $projectMetric = $this->metricService->projectMetric($duration);
+        $assetMetric = $this->metricService->assetMetric($duration);
+        $clientMetric = $this->metricService->clientMetric($duration);
+
         $summary = [
             "projectsCount" => $projectsCount,
             "activeProjectsCount" => $projectsActiveCount,
             "activeClientsCount" => $activeClientsCount,
             "assetsCount" => $assetsCount,
-            "activeAssetsCount" => $activeAssetsCount
+            "activeAssetsCount" => $activeAssetsCount,
+            "activeProjectsMetric" => $projectMetric['active'],
+            "activeClientsMetric" => $clientMetric['active'],
+            "totalAssetsMetric" => $assetMetric['total'],
+            "activeAssetsMetric" => $assetMetric['active']
         ];
 
         // transactions

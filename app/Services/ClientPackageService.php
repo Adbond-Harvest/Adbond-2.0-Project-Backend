@@ -21,6 +21,10 @@ use app\Enums\InvestmentRedemptionOption;
 
 use app\Exports\PackageExport;
 
+use app\Services\MetricService;
+
+use app\Enums\MetricType;
+
 class ClientPackageService
 {
     public $count = false;
@@ -66,6 +70,12 @@ class ClientPackageService
         $data['units'] = $order->units;
         $data['unitPrice'] = $order->unit_price;
         $clientPackage = (!$clientPackage) ? $this->save($data) : $this->save($data, $clientPackage);
+
+        // Add Asset Metric;
+        $metricService = new MetricService;
+
+        ($order->is_installment == 1) ? $metricService->addAssetMetric(MetricType::BOTH->value) : $metricService->addAssetMetric(MetricType::TOTAL->value);
+        
         return $clientPackage;
     }
 
