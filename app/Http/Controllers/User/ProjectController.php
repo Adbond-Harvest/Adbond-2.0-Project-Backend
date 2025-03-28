@@ -18,8 +18,10 @@ use app\Http\Resources\Min\ProjectTypeResource;
 use app\Services\ProjectService;
 use app\Services\FileService;
 use app\Services\ProjectTypeService;
+use app\Services\MetricService;
 
 use app\Enums\ProjectFilter;
+use app\Enums\MetricType;
 
 use app\Utilities;
 
@@ -28,12 +30,14 @@ class ProjectController extends Controller
     private $projectService;
     private $projectTypeService;
     private $fileService;
+    private $metricService;
 
     public function __construct()
     {
         $this->projectService = new ProjectService;
         $this->projectTypeService = new ProjectTypeService;
         $this->fileService = new FileService;
+        $this->metricService = new MetricService;
     }
 
     public function save(SaveProject $request)
@@ -43,6 +47,9 @@ class ProjectController extends Controller
             $data = $request->validated();
             $project = $this->projectService->save($data);
             // $this->projectService->addLocation($project, $data);
+
+            //Add the Project metric
+            $this->metricService->addProjectMetric(MetricType::BOTH->value);
 
             DB::commit();
             return Utilities::okay("Project created Successfully", new ProjectResource($project));
@@ -178,10 +185,19 @@ class ProjectController extends Controller
             if(!$project) return Utilities::error402("Project not found");
 
             if($project->active) return Utilities::error402("Project is already active");
+
+            DB::beginTransaction();
+
             $project = $this->projectService->activate($project);
+
+            //Add new Project Metric;
+            $this->metricService->addProjectMetric(MetricType::ACTIVE->value);
+
+            DB::commit();
 
             return Utilities::okay("Project Activated Successfully", new ProjectResource($project));
         }catch(\Exception $e){
+            DB::rollBack();
             return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }
     }
@@ -194,10 +210,19 @@ class ProjectController extends Controller
             if(!$project) return Utilities::error402("Project not found");
 
             if(!$project->active) return Utilities::error402("Project is already inactive");
+
+            DB::beginTransaction();
+            
             $project = $this->projectService->deactivate($project);
+
+            //Add new Project Metric;
+            $this->metricService->addProjectMetric(MetricType::ACTIVE->value, true, false);
+
+            DB::commit();
 
             return Utilities::okay("Project Deactivated Successfully", new ProjectResource($project));
         }catch(\Exception $e){
+            DB::rollBack();
             return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }
     }
@@ -211,9 +236,18 @@ class ProjectController extends Controller
 
             if($project->active) return Utilities::error402("Cannot delete an active Project");
             if(!$project->canDelete()) return Utilities::error402("Cannot delete a Project with Packages");
+
+            DB::beginTransaction();
+
             $this->projectService->delete($project);
 
+            // Add new Project Metric;
+            $this->metricService->addProjectMetric(MetricType::TOTAL->value, false, true);
+
+            DB::commit();
+
         } catch(\Exception $e){
+            DB::rollBack();
             return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }
     }

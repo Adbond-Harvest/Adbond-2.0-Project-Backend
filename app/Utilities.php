@@ -358,7 +358,9 @@ class Utilities
         $difference = $worth - $purchaseWorth;
         $positive = ($difference > 0) ? true : false;
         $absDifference = abs($difference);
+        if($purchaseWorth == 0) $purchaseWorth = $absDifference;
         $percentage = ($purchaseWorth && $purchaseWorth > 0) ? ($absDifference/$purchaseWorth) * 100 : null;
+        if($percentage) $percentage = number_format($percentage, 2);
         if($percentage) $percentage = ($positive) ? $percentage : 0 - $percentage;
         $amount = $difference;
         return ["percentage" => $percentage, "amount" => $amount];

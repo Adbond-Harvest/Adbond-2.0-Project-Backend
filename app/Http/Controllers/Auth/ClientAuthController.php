@@ -2,30 +2,32 @@
 
 namespace app\Http\Controllers\Auth;
 
+use app\Enums\MetricType;
 use app\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 use app\Mail\EmailVerification;
-
-use app\Services\ClientService;
-use app\Services\EmailService;
-use app\Services\UserService;
-use app\Services\WalletService;
 
 use app\Http\Resources\ClientBriefResource;
 use app\Http\Resources\ClientResource;
 
 use app\Http\Requests\Client\Register;
 use app\Http\Requests\Client\VerifyEmail;
-use Illuminate\Http\Request;
-
-use app\Helpers;
 use app\Http\Requests\Login;
 use app\Http\Requests\Client\ValidateEmailToken;
+
+use app\Services\ClientService;
+use app\Services\EmailService;
+use app\Services\UserService;
+use app\Services\WalletService;
+use app\Services\MetricService;
+
+use app\Helpers;
 use app\Utilities;
 
 class ClientAuthController extends Controller
@@ -34,6 +36,7 @@ class ClientAuthController extends Controller
     private $emailService;
     private $userService;
     private $walletService;
+    private $metricService;
 
     /**
      * Create a new AuthController instance.
@@ -46,6 +49,7 @@ class ClientAuthController extends Controller
         $this->emailService = new EmailService;
         $this->userService = new UserService;
         $this->walletService = new WalletService;
+        $this->metricService = new MetricService;
         // $this->emailService = new EmailService;
         // $this->authService = new AuthService;
     }
@@ -119,6 +123,8 @@ class ClientAuthController extends Controller
 
             // Create a wallet for the client
             $this->walletService->create($client->id);
+
+            $this->metricService->addClientMetric(MetricType::TOTAL->value);
             
             DB::commit();
 
