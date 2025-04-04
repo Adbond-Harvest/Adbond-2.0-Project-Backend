@@ -36,7 +36,13 @@ class SiteTourController extends Controller
 
             if($schedule->slots == 0) return Utilities::error402("Sorry.. There are no more slots available for this Site Tour");
 
-            $booking = $this->siteTourService->book($schedule, Auth::guard('client')->user()->id);
+            $data['clientId'] = Auth::guard('client')->user()->id;
+            $data['firstname'] = Auth::guard('client')->user()->firstname;
+            $data['lastname'] = Auth::guard('client')->user()->lastname;
+            $data['email'] = Auth::guard('client')->user()->email;
+            if(Auth::guard('client')->user()->phone_number) $data['phoneNumber'] = Auth::guard('client')->user()->phone_number;
+
+            $booking = $this->siteTourService->book($schedule, $data);
             $this->siteTourService->deductSlots($schedule);
 
             return Utilities::ok(new SiteTourBookingResource($booking));
@@ -48,6 +54,23 @@ class SiteTourController extends Controller
     public function schedules(Request $request)
     {
         $schedules = Auth::guard('client')->user()->siteTourSchedules;
+
+        return Utilities::ok(SiteTourScheduleResource::collection($schedules));
+    }
+
+    public function filterSchedules(Request $request)
+    {
+        $filter = [];
+        if($request->query('projectTypeId')) $filter['projectTypeId'] = $request->query('projectTypeId');
+        if($request->query('projectId')) $filter['projectId'] = $request->query('projectId');
+        if($request->query('packageId')) $filter['packageId'] = $request->query('packageId');
+        if($request->query('date')) $filter['date'] = $request->query('date');
+        if($request->query('time')) $filter['time'] = $request->query('time');
+
+        $this->siteTourService->filter = $filter;
+        $this->siteTourService->future = true;
+
+        $schedules = $this->siteTourService->schedules();
 
         return Utilities::ok(SiteTourScheduleResource::collection($schedules));
     }

@@ -55,6 +55,12 @@ class SiteTourService
         $siteTourSchedule->delete();
     }
 
+    public function getScheduleByDate($packageId, $date, $time)
+    {
+        $time = Carbon::createFromFormat('h:i A', $time)->format('H:i:s');
+        return SiteTourSchedule::where("package_id", $packageId)->where("available_date", $date)->where("available_time", $time)->first();
+    }
+
     public function schedules($with=[], $offset=0, $perPage=null)
     {
         $query = SiteTourSchedule::with($with);
@@ -84,11 +90,16 @@ class SiteTourService
         }
         if($this->future) $query->where("available_date", ">", Carbon::now());
         if($this->filter) {
+            // dd($this->filter);
             $filter = $this->filter;
             if(isset($filter['projectTypeId'])) $query->where("project_type_id", $filter['projectTypeId']);
             if(isset($filter['projectId'])) $query->where("project_id", $filter['projectId']);
             if(isset($filter['packageId'])) $query->where("package_id", $filter['packageId']);
             if(isset($filter['date'])) $query = $query->whereDate("available_date", $filter['date']);
+            if(isset($filter['time'])) {
+                $time = Carbon::createFromFormat('h:i A', $filter['time'])->format('H:i:s');
+                $query = $query->whereTime("available_time", $time);
+            }
             if(isset($filter['text'])) {
                 $query->whereHas('package', function($packageQuery) use($filter) {
                     $packageQuery->where("name", "LIKE", "%".$filter['text']."%");
@@ -102,9 +113,12 @@ class SiteTourService
         if($this->cancelled) $query->where("cancelled", $this->cancelled);
 
         if($this->count) return $query->count();
-        return $query->orderBy("created_at", "DESC")->offset($offset)->limit($perPage)->get();
+        $query =  $query->orderBy("created_at", "DESC");
+        return ($perPage) ? $query->offset($offset)->limit($perPage)->get() : $query->get();
         // return $query->orderBy("available_date", "DESC")->get();
     }
+
+
 
     // public function unbookedSchedules($with=[])
     // {
@@ -133,11 +147,15 @@ class SiteTourService
         Site Tour Bookings
     */
 
-    public function book($schedule, $clientId)
+    public function book($schedule, $data)
     {
         $booking = new SiteTourBooking;
 
-        $booking->client_id = $clientId;
+        if(isset($data['clientId'])) $booking->client_id = $data['clientId'];
+        $booking->firstname = $data['firstname'];
+        $booking->lastname = $data['lastname'];
+        $booking->email = $data['email'];
+        if(isset($data['phoneNumber'])) $booking->phone_number = $data['phoneNumber'];
         $booking->site_tour_schedule_id = $schedule->id;
         $booking->save();
 
