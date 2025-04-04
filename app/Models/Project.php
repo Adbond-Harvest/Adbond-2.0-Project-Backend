@@ -37,9 +37,10 @@ class Project extends Model
     //     return $this->hasMany("app\Models\ProjectLocation");
     // }
 
-    public function packages()
+    public function packages($limit = null)
     {
-        return $this->hasMany(Package::class);
+        $query = $this->hasMany(Package::class)->orderBy('created_at', 'DESC');
+        return ($limit) ? $query->limit($limit) : $query;
     }
 
     /**

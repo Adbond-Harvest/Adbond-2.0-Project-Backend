@@ -39,6 +39,10 @@ class SiteTourController extends Controller
             $data['projectTypeId'] = $package?->project?->project_type_id;
             if(!$data['projectTypeId']) return Utilities::error402("Project Type Not found");
 
+            if($this->siteTourService->getScheduleByDate($package->id, $data['availableDate'], $data['availableTime'])) {
+                return Utilities::error402("This Schedule already exists");
+            }
+
             $siteTourSchedule = $this->siteTourService->save($data);
 
             return Utilities::ok(new SiteTourScheduleResource($siteTourSchedule));

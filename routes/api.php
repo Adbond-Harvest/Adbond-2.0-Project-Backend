@@ -353,6 +353,7 @@ Route::group(['prefix' => '/v2',], function () {
         Route::group(['prefix' => '/site_tours',], function () {
             Route::post('/book', [SiteTourController::class, 'book']);
             Route::get('/schedules', [SiteTourController::class, 'schedules']);
+            Route::get('/filter_schedules', [SiteTourController::class, 'filterSchedules']);
             Route::get('', [SiteTourController::class, 'siteTours']);
         });
 
