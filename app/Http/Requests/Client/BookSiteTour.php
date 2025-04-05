@@ -23,7 +23,8 @@ class BookSiteTour extends BaseRequest
     public function rules(): array
     {
         return [
-            "siteTourScheduleId" => "required|integer"
+            "siteTourScheduleId" => "required|integer",
+            "bookedDate" => "required|date_format:Y-m-d|after:today",
         ];
     }
 }

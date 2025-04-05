@@ -19,6 +19,7 @@ use app\Enums\InvestmentRedemptionOption;
 use app\Enums\OfferApprovalStatus;
 use app\Enums\PurchaseSummaryDuration;
 use app\Enums\AssetSwitchType;
+use app\Enums\Weekday;
 
 class EnumClass
 {
@@ -179,6 +180,20 @@ class EnumClass
         return [
             AssetSwitchType::DOWNGRADE->value,
             AssetSwitchType::UPGRADE->value
+        ];
+    }
+
+    public static function weekdays()
+    {
+        return [
+            Weekday::MONDAY->value,
+            Weekday::TUESDAY->value,
+            Weekday::WEDNESDAY->value,
+            Weekday::THURSDAY->value,
+            Weekday::FRIDAY->value,
+            Weekday::SATURDAY->value,
+            Weekday::SUNDAY->value,
+            Weekday::ALL->value
         ];
     }
 }

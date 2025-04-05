@@ -6,6 +6,9 @@ use Carbon\Carbon;
 
 use app\Models\SiteTourSchedule;
 use app\Models\SiteTourBooking;
+use app\Models\SiteTourBookedSchedule;
+
+use app\Enums\Weekday;
 
 class SiteTourService
 {
@@ -27,8 +30,12 @@ class SiteTourService
         $siteTourSchedule->package_id = $data['packageId'];
         $siteTourSchedule->fee = $data['fee'];
         $siteTourSchedule->slots = $data['slots'];
-        $siteTourSchedule->available_date = $data['availableDate'];
+        if(isset($data['availableDate'])) $siteTourSchedule->available_date = $data['availableDate'];
         $siteTourSchedule->available_time = Carbon::createFromFormat('h:i A', $data['availableTime'])->format('H:i:s');
+        if(isset($data['recurrent']) && $data['recurrent'] == true) {
+            $siteTourSchedule->recurrent = true;
+            $siteTourSchedule->recurrent_day = $data['recurrentDay'];
+        }
 
         $siteTourSchedule->save();
 
@@ -44,6 +51,10 @@ class SiteTourService
         if(isset($data['slots'])) $siteTourSchedule->slots = $data['slots'];
         if(isset($data['availableDate'])) $siteTourSchedule->available_date = $data['availableDate'];
         if(isset($data['availableTime'])) $siteTourSchedule->available_time = Carbon::createFromFormat('h:i A', $data['availableTime'])->format('H:i:s');
+        if(isset($data['recurrent']) && $data['recurrent'] == true) {
+            $siteTourSchedule->recurrent = true;
+            $siteTourSchedule->recurrent_day = $data['recurrentDay'];
+        }
 
         $siteTourSchedule->update();
 
@@ -58,7 +69,19 @@ class SiteTourService
     public function getScheduleByDate($packageId, $date, $time)
     {
         $time = Carbon::createFromFormat('h:i A', $time)->format('H:i:s');
-        return SiteTourSchedule::where("package_id", $packageId)->where("available_date", $date)->where("available_time", $time)->first();
+        return SiteTourSchedule::where("package_id", $packageId)->where("available_time", $time)->where(function($query) use($date) {
+            $query->where("available_date", $date)->orWhere(function($query2) use($date) {
+                $query2->where("recurrent", 1)->where(function($query3) use($date) {
+                    $query3->where("recurrent_day", Weekday::ALL->value)->orWhere("recurrent_day", Carbon::parse($date)->format('l'));
+                });
+            });
+        })->first();
+    }
+
+    public function getRecurrent($packageId, $time, $recurrentDay=Weekday::ALL->value)
+    {
+        return SiteTourSchedule::where("package_id", $packageId)->where("available_time", $time)->where("recurrent", 1)
+        ->where("recurrent_day", $recurrentDay)->first();
     }
 
     public function schedules($with=[], $offset=0, $perPage=null)
@@ -95,11 +118,21 @@ class SiteTourService
             if(isset($filter['projectTypeId'])) $query->where("project_type_id", $filter['projectTypeId']);
             if(isset($filter['projectId'])) $query->where("project_id", $filter['projectId']);
             if(isset($filter['packageId'])) $query->where("package_id", $filter['packageId']);
-            if(isset($filter['date'])) $query = $query->whereDate("available_date", $filter['date']);
-            if(isset($filter['time'])) {
-                $time = Carbon::createFromFormat('h:i A', $filter['time'])->format('H:i:s');
-                $query = $query->whereTime("available_time", $time);
-            }
+            if(isset($filter['date'])) $query = $query->where(function($q) use($filter) {
+                $q = $q->whereDate("available_date", $filter['date']);
+                if(isset($filter['time'])) {
+                    $time = Carbon::createFromFormat('h:i A', $filter['time'])->format('H:i:s');
+                    $q->whereTime("available_time", $time);
+                }
+                })->orWhere(function($q1) use($filter) {
+                    $q1->where("recurrent", 1)->where(function($q2) use($filter) {
+                        $q2->where("recurrent_day", Weekday::ALL->value)->orWhere("recurrent_day", Carbon::parse($filter['date'])->format('l'));
+                    });
+            });
+            // if(isset($filter['time'])) {
+            //     $time = Carbon::createFromFormat('h:i A', $filter['time'])->format('H:i:s');
+            //     $query = $query->whereTime("available_time", $time);
+            // }
             if(isset($filter['text'])) {
                 $query->whereHas('package', function($packageQuery) use($filter) {
                     $packageQuery->where("name", "LIKE", "%".$filter['text']."%");
@@ -114,6 +147,7 @@ class SiteTourService
 
         if($this->count) return $query->count();
         $query =  $query->orderBy("created_at", "DESC");
+        // dd($query->toSql());
         return ($perPage) ? $query->offset($offset)->limit($perPage)->get() : $query->get();
         // return $query->orderBy("available_date", "DESC")->get();
     }
@@ -142,12 +176,42 @@ class SiteTourService
         return $siteTourSchedule;
     }
 
+    /*
+        Site Tour Booked Schedules
+    */
+    public function saveBookedSchedule($scheduleId, $date, $bookedSchedule=null)
+    {
+        // $bookedSchedule = SiteTourBookedSchedule::where("site_tour_schedule_id", $scheduleId)->where("booked_date", $date)->first();
+        if(!$bookedSchedule) {
+            $bookedSchedule = new SiteTourBookedSchedule;
+            $bookedSchedule->site_tour_schedule_id = $scheduleId;
+            $bookedSchedule->booked_date = $date;
+            $bookedSchedule->total = 1;
+        }else{
+            $bookedSchedule->total = $bookedSchedule->total + 1;
+        }
+
+        $bookedSchedule->save();
+
+        return $bookedSchedule;
+    }
+
+    public function getBookedSchedule($scheduleId, $date)
+    {
+        return SiteTourBookedSchedule::where("site_tour_schedule_id", $scheduleId)->where("booked_date", $date)->first();
+    }
+
+    public function bookedSchedules($with=[])
+    {
+        return SiteTourBookedSchedule::with($with)->orderBy("booked_date", "ASC")->get();
+    }
+
 
     /*
         Site Tour Bookings
     */
 
-    public function book($schedule, $data)
+    public function book($bookedSchedule, $data)
     {
         $booking = new SiteTourBooking;
 
@@ -156,7 +220,7 @@ class SiteTourService
         $booking->lastname = $data['lastname'];
         $booking->email = $data['email'];
         if(isset($data['phoneNumber'])) $booking->phone_number = $data['phoneNumber'];
-        $booking->site_tour_schedule_id = $schedule->id;
+        $booking->booked_schedules_id = $bookedSchedule->id;
         $booking->save();
 
         return $booking;

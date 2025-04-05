@@ -175,6 +175,7 @@ Route::group(['prefix' => '/v2',], function () {
                 Route::patch('/{id}', [UserSiteTourController::class, 'updateSchedule']);
                 Route::delete('/{id', [UserSiteTourController::class, 'deleteSchedule']);
                 Route::get('', [UserSiteTourController::class, 'schedules']);
+                Route::get('/booked', [UserSiteTourController::class, 'bookedSchedules']);
                 Route::get('/{id}', [UserSiteTourController::class, 'schedule']);
             });
         });
