@@ -9,9 +9,9 @@ class SiteTourBooking extends Model
 {
     use HasFactory;
 
-    public function schedule()
+    public function bookedSchedule()
     {
-        return $this->belongsTo(SiteTourSchedule::class);
+        return $this->belongsTo(SiteTourBookedSchedule::class, "booked_schedules_id", "id");
     }
 
     public function client()

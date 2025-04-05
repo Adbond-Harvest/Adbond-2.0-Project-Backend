@@ -20,7 +20,11 @@ class SiteTourBookingResource extends JsonResource
         return [
             "id" => $this->id,
             "schedule" => new SiteTourScheduleResource($this->whenLoaded("schedule")),
-            "client" => new ClientBriefResource($this->whenLoaded("client"))
+            "firstname" => $this->firstname,
+            "lastname" => $this->lastname,
+            "email" => $this->email,
+            "phoneNumber" => $this->phone_number
+            // "client" => new ClientBriefResource($this->whenLoaded("client"))
         ];
     }
 }

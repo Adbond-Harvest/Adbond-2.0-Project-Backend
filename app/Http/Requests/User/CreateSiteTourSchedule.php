@@ -3,7 +3,11 @@
 namespace app\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use app\Http\Requests\BaseRequest;
+
+
+use app\EnumClass;
 
 class CreateSiteTourSchedule extends BaseRequest
 {
@@ -24,8 +28,10 @@ class CreateSiteTourSchedule extends BaseRequest
     {
         return [
             "packageId" => "required|integer",
-            "availableDate" => "required|date|date_format:Y-m-d|after:today",
+            "availableDate" => "nullable|required_without:recurrent|required_if:recurrent,false|date_format:Y-m-d|after:today",
             "availableTime" => "required|date_format:h:i A",
+            "recurrent" => "nullable|required_without:availableDate|boolean",
+            "recurrentDay" => ["required_if:recurrent,true", Rule::in(EnumClass::weekdays())],
             "fee" => "required|numeric",
             "slots" => "required|integer"
         ];

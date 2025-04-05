@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('site_tour_bookings', function (Blueprint $table) {
+        Schema::create('site_tour_booked_schedules', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("booked_schedules_id");
-            $table->foreignId("client_id")->nullable();
-            $table->string("firstname");
-            $table->string("lastname");
-            $table->string("email");
-            $table->string("phone_number")->nullable();
+            $table->foreignId("site_tour_schedule_id");
+            $table->date("booked_date");
+            $table->boolean("cancelled")->default(false);
+            $table->boolean("visited")->default(false);
+            $table->integer("total");
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('site_tour_bookings');
+        Schema::dropIfExists('site_tour_booked_schedules');
     }
 };

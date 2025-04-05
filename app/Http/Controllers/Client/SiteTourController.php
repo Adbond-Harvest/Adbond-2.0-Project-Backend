@@ -14,6 +14,8 @@ use app\Http\Resources\SiteTourScheduleResource;
 
 use app\Services\SiteTourService;
 
+use app\Enums\Weekday;
+
 use app\Utilities;
 
 class SiteTourController extends Controller
@@ -31,10 +33,14 @@ class SiteTourController extends Controller
             $schedule = $this->siteTourService->schedule($request->validated("siteTourScheduleId"));
             if(!$schedule) return Utilities::error402("Site Tour Schedule not found");
 
-            if($schedule->cancelled == 1) return Utilities::error402("This site Tour has been cancelled");
-            if (Carbon::parse($schedule->available_date)->isPast())  return Utilities::error402("This site Tour has passed");
+            $bookedSchedule = $this->siteTourService->getBookedSchedule($schedule->id, $request->validated("bookedDate"));
 
-            if($schedule->slots == 0) return Utilities::error402("Sorry.. There are no more slots available for this Site Tour");
+            if($bookedSchedule) {
+                if($bookedSchedule->cancelled == 1) return Utilities::error402("This site Tour schedule has been cancelled");
+                if($bookedSchedule->total >= $schedule->slots) return Utilities::error402("This Schedule is fully booked");
+            }
+
+            $bookedSchedule = $this->siteTourService->saveBookedSchedule($schedule->id, $request->validated("bookedDate"), $bookedSchedule);
 
             $data['clientId'] = Auth::guard('client')->user()->id;
             $data['firstname'] = Auth::guard('client')->user()->firstname;
@@ -42,10 +48,9 @@ class SiteTourController extends Controller
             $data['email'] = Auth::guard('client')->user()->email;
             if(Auth::guard('client')->user()->phone_number) $data['phoneNumber'] = Auth::guard('client')->user()->phone_number;
 
-            $booking = $this->siteTourService->book($schedule, $data);
-            $this->siteTourService->deductSlots($schedule);
+            $booking = $this->siteTourService->book($bookedSchedule, $data);
 
-            return Utilities::ok(new SiteTourBookingResource($booking));
+            return Utilities::okay("Site Tour Booked Successfully");
         }catch (\Exception $e) {
             return Utilities::error($e, 'An error occurred while attempting to carry out this operation');
         }
@@ -72,7 +77,50 @@ class SiteTourController extends Controller
 
         $schedules = $this->siteTourService->schedules();
 
+        if(!isset($filter['date']) && isset($filter['packageId'])) {
+            $dates = ($schedules->count() > 0) ? $this->getScheduleDates($schedules) : [];
+            return Utilities::ok($dates);
+        }
+        if(isset($filter['date'])) {
+            $scheduleTimes = [];
+            if($schedules->count() > 0) {
+                $recurrentTime = [];
+                // make sure that recurrent time takes precedence over non-recurrent time
+                foreach($schedules as $schedule) {
+                    if($schedule->recurrent == 1) {
+                        $scheduleTimes[$schedule->id] = $schedule->available_time;
+                        $recurrentTime[] = $schedule->available_time;
+                    }
+                }
+                foreach($schedules as $schedule) {
+                    if($schedule->recurrent == 0) {
+                        if(!in_array($schedule->available_time, $recurrentTime)) $scheduleTimes[$schedule->id] = $schedule->available_time;
+                    }
+                }
+            }
+            return Utilities::ok($scheduleTimes);
+        }
         return Utilities::ok(SiteTourScheduleResource::collection($schedules));
+    }
+
+    private function getScheduleDates($schedules)
+    {
+        $dates = [];
+        foreach($schedules as $schedule) {
+            if($schedule->recurrent == 1) {
+                if($schedule->recurrent_day == Weekday::ALL->value) {
+                    $monthDates = Utilities::getDatesForAMonth();
+                    foreach($monthDates as $date) if(!in_array($date, $dates)) $dates[] = $date;
+                    break;
+                }else{
+                    $monthDates = Utilities::getMonthDatesForWeekday($schedule->recurrent_day);
+                    foreach($monthDates as $date) if(!in_array($date, $dates)) $dates[] = $date;
+                }
+            }else{
+                $dates[] = $schedule->available_date;
+            }
+        }
+        return $dates;
     }
 
     public function siteTours(Request $request)

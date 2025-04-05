@@ -11,6 +11,7 @@ use app\Http\Requests\User\CreateSiteTourSchedule;
 use app\Http\Requests\User\UpdateSiteTourSchedule;
 
 use app\Http\Resources\SiteTourScheduleResource;
+use app\Http\Resources\SiteTourBookedScheduleResource;
 
 use app\Services\SiteTourService;
 use app\Services\PackageService;
@@ -39,8 +40,16 @@ class SiteTourController extends Controller
             $data['projectTypeId'] = $package?->project?->project_type_id;
             if(!$data['projectTypeId']) return Utilities::error402("Project Type Not found");
 
-            if($this->siteTourService->getScheduleByDate($package->id, $data['availableDate'], $data['availableTime'])) {
-                return Utilities::error402("This Schedule already exists");
+            if(isset($data['availableDate'])) {
+                if($this->siteTourService->getScheduleByDate($package->id, $data['availableDate'], $data['availableTime'])) {
+                    return Utilities::error402("This Schedule already exists");
+                }
+            }
+
+            if(isset($data['recurrent'])) {
+                if($this->siteTourService->getRecurrent($package->id, $data['availableTime'], $data['recurrentDay'])) {
+                    return Utilities::error402("This Schedule already exists");
+                }
             }
 
             $siteTourSchedule = $this->siteTourService->save($data);
@@ -109,5 +118,12 @@ class SiteTourController extends Controller
         if(!$schedule) return Utilities::error402("Schedule not found");
 
         return Utilities::ok(new SiteTourScheduleResource($schedule));
+    }
+
+    public function bookedSchedules()
+    {
+        $booked = $this->siteTourService->bookedSchedules(['bookings']);
+
+        return Utilities::ok(SiteTourBookedScheduleResource::collection($booked));
     }
 }

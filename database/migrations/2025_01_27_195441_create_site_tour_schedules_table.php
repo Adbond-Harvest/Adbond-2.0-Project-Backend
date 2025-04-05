@@ -20,8 +20,6 @@ return new class extends Migration
             $table->time("available_time");
             $table->integer("slots");
             $table->double("fee");
-            $table->boolean("cancelled")->default(false);
-            $table->boolean("visited")->default(false);
             $table->timestamps();
         });
     }

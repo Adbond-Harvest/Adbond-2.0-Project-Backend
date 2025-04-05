@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Carbon\Carbon;
 
 use app\Services\AuthService;
 use app\Models\User;
@@ -174,6 +175,37 @@ class Utilities
             // It's a "normal" week.
             return $weekOfYear;
         }
+    }
+
+    public static function getDatesForAMonth()
+    {
+        $dates = [];
+        $startDate = Carbon::today();
+        $endDate = Carbon::today()->addMonth();
+
+        while ($startDate->lte($endDate)) {
+            $dates[] = $startDate->toDateString();
+            $startDate->addDay();
+        }
+
+        return $dates;
+    }
+
+    //Get all the dates that falls on a given weekday from now till next one month
+    public static function getMonthDatesForWeekday($weekday)
+    {
+        $dates = [];
+        $today = Carbon::now();
+        $endDate = $today->copy()->addMonth();
+
+        while ($today->lessThanOrEqualTo($endDate)) {
+            if (Carbon::parse($today)->format('l') === $weekday) {
+                $dates[] = $today->toDateString();
+            }
+            $today->addDay();
+        }
+
+        return $dates;
     }
 
     public static function getDiscount($amount, $discount)
