@@ -31,6 +31,7 @@ class AssetResource extends JsonResource
             "project" => $this->package?->project?->name,
             "projectType" => $this->package?->project?->projectType?->name,
             "purchaseAt" => $this->created_at->format('F j, Y'), 
+            "purchaseId" => $this->purchase_id,
             "amount" => $this->amount, //($this->origin == ClientPackageOrigin::ORDER->value) ? $this->purchase?->amount_payable : $this->purchase?->price,
             "location" => $this->package?->state,
             "address" => $this->package?->address,
@@ -38,6 +39,7 @@ class AssetResource extends JsonResource
             "units" => $this->units,
             "size" => $this->package?->size,
             "amountPaid" => $this->amountPaid(),
+            "makePayment" => $this->makePaymentFlag(),
             "paymentPlan" => $this->paymentPlan(),
             "installmentCount" => $this->installmentCount(),
             "valuation" => ($this->package) ? $this->package->amount * $this->units : null,
@@ -124,5 +126,14 @@ class AssetResource extends JsonResource
             }
         }
         return null;
+    }
+
+    private function makePaymentFlag()
+    {
+        $flag = false;
+        if($this->origin == ClientPackageOrigin::ORDER->value && $this->purchase->is_installment == 1) {
+            $flag = ($this->purchase->installment_count > $this->purchase->installments_payed);
+        }
+        return $flag;
     }
 }
