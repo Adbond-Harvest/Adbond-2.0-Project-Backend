@@ -48,6 +48,7 @@ use app\Http\Controllers\Client\OfferPaymentController;
 //Public Controllers
 use app\Http\Controllers\ProjectController;
 use app\Http\Controllers\PackageController;
+use app\Http\Controllers\SiteTourController as PublicSiteTourController;
 use app\Http\Controllers\UtilityController;
 
 use app\Http\Controllers\TestController;
@@ -238,6 +239,11 @@ Route::group(['prefix' => '/v2',], function () {
         Route::get('{projectId}', [PackageController::class, 'getPackages']);
         // Route::get('/types', [ProjectController::class, 'getTypes']);
         Route::get('/view/{packageId}', [PackageController::class, 'getPackage']);
+    });
+
+    Route::group(['prefix' => '/site_tours',], function () {
+        Route::post('/book', [PublicSiteTourController::class, 'book']);
+        Route::get('/filter_schedules', [PublicSiteTourController::class, 'filterSchedules']);
     });
 
     //Utitlity Routes

@@ -78,7 +78,6 @@ class TransactionController extends Controller
         }else{
             $defaultTotal = $transactionsCount;
         }
-
         return Utilities::paginatedOkay([
             "transactions" => TransactionResource::collection($transactions),
             "transactionsCount" => $transactionsCount,
