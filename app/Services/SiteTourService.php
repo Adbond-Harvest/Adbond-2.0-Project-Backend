@@ -87,30 +87,30 @@ class SiteTourService
     public function schedules($with=[], $offset=0, $perPage=null)
     {
         $query = SiteTourSchedule::with($with);
-        if($this->booked === true) {
-            // if we are getting schedules that are booked
-            if($this->clientId) {
-                // if the booking we are looking for is for a particular client
-                $query->whereHas("clients", function($clientQuery) {
-                    $clientQuery->where("client_id", $this->clientId);
-                });
-            }else{
-                // if its not for a particular client
-                $query->whereHas("clients");
-            }
-        }
-        if($this->booked === false) {
-            // if we are getting schedules that are not booked
-            if($this->clientId) {
-                // if we are looking for schedules not booked by a particular client
-                $query->whereDoesntHave("clients", function($clientQuery) {
-                    $clientQuery->where("client_id", $this->clientId);
-                });
-            }else{
-                // if its not for a particular client
-                $query->whereDoesntHave("clients");
-            }
-        }
+        // if($this->booked === true) {
+        //     // if we are getting schedules that are booked
+        //     if($this->clientId) {
+        //         // if the booking we are looking for is for a particular client
+        //         $query->whereHas("clients", function($clientQuery) {
+        //             $clientQuery->where("client_id", $this->clientId);
+        //         });
+        //     }else{
+        //         // if its not for a particular client
+        //         $query->whereHas("clients");
+        //     }
+        // }
+        // if($this->booked === false) {
+        //     // if we are getting schedules that are not booked
+        //     if($this->clientId) {
+        //         // if we are looking for schedules not booked by a particular client
+        //         $query->whereDoesntHave("clients", function($clientQuery) {
+        //             $clientQuery->where("client_id", $this->clientId);
+        //         });
+        //     }else{
+        //         // if its not for a particular client
+        //         $query->whereDoesntHave("clients");
+        //     }
+        // }
         if($this->future) $query->where("available_date", ">", Carbon::now());
         if($this->filter) {
             // dd($this->filter);
