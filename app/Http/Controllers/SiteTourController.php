@@ -71,6 +71,22 @@ class SiteTourController extends Controller
 
         $schedules = $this->siteTourService->schedules();
 
+        $result = [];
+
+        if(isset($filter['projectTypeId']) && !isset($filter['projectId'])) {
+            if($schedules->count() > 0) {
+                foreach($schedules as $schedule) $result[$schedule->project->id] = $schedule->project;
+            }
+            return Utilities::ok($result);
+        }
+
+        if(isset($filter['projectId']) && !isset($filter['packageId'])) {
+            if($schedules->count() > 0) {
+                foreach($schedules as $schedule) $result[$schedule->package_id] = $schedule->package;
+            }
+            return Utilities::ok($result);
+        }
+
         if(!isset($filter['date']) && isset($filter['packageId'])) {
             $dates = ($schedules->count() > 0) ? $this->getScheduleDates($schedules) : [];
             return Utilities::ok($dates);
@@ -111,7 +127,7 @@ class SiteTourController extends Controller
                     foreach($monthDates as $date) if(!in_array($date, $dates)) $dates[] = $date;
                 }
             }else{
-                $dates[] = $schedule->available_date;
+                if(!in_array($schedule->available_date, $dates)) $dates[] = $schedule->available_date;
             }
         }
         return $dates;
