@@ -50,6 +50,21 @@ class AssetSwitchController extends Controller
         return Utilities::ok(PackageResource::collection($packages));
     }
 
+    public function upgradePackages($packageId)
+    {
+        if ($packageId && (!is_numeric($packageId) || !ctype_digit($packageId))) return Utilities::error402("Invalid parameter packageID");
+        $package = $this->packageService->package($packageId);
+        if(!$package) return Utilities::error402("Package not found");
+
+        if(!$package?->project) return Utilities::error402("Package Project not found");
+
+        if(!$package?->project?->projectType) return Utilities::error402("Package Project Type not found");
+
+        $packages = $this->assetSwitchService->getUpGradePackages($package);
+
+        return Utilities::ok(PackageResource::collection($packages));
+    }
+
     public function requestSwitch(RequestAssetSwitch $request)
     {
         try{

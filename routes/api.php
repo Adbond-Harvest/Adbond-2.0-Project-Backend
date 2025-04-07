@@ -311,6 +311,7 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('/{assetId}', [AssetController::class, 'asset']);
 
             Route::get('/downgrade_packages/{packageId}', [AssetSwitchController::class, 'downgradePackages']);
+            Route::get('/upgrade_packages/{packageId}', [AssetSwitchController::class, 'upgradePackages']);
             Route::post('/request_asset_switch', [AssetSwitchController::class, 'requestSwitch']);
         });
 
