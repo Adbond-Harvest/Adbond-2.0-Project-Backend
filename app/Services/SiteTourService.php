@@ -111,24 +111,47 @@ class SiteTourService
         //         $query->whereDoesntHave("clients");
         //     }
         // }
-        if($this->future) $query->where("available_date", ">", Carbon::now());
+        if($this->future) $query->where(function($q) { 
+            $q->where("available_date", ">", Carbon::now())->orWhere("recurrent", 1);
+        });
         if($this->filter) {
             // dd($this->filter);
             $filter = $this->filter;
             if(isset($filter['projectTypeId'])) $query->where("project_type_id", $filter['projectTypeId']);
             if(isset($filter['projectId'])) $query->where("project_id", $filter['projectId']);
             if(isset($filter['packageId'])) $query->where("package_id", $filter['packageId']);
-            if(isset($filter['date'])) $query = $query->where(function($q) use($filter) {
-                $q = $q->whereDate("available_date", $filter['date']);
-                if(isset($filter['time'])) {
-                    $time = Carbon::createFromFormat('h:i A', $filter['time'])->format('H:i:s');
-                    $q->whereTime("available_time", $time);
-                }
-                })->orWhere(function($q1) use($filter) {
-                    $q1->where("recurrent", 1)->where(function($q2) use($filter) {
-                        $q2->where("recurrent_day", Weekday::ALL->value)->orWhere("recurrent_day", Carbon::parse($filter['date'])->format('l'));
-                    });
+            // if(isset($filter['date'])) $query = $query->where(function($q) use($filter) {
+            //     $q = $q->whereDate("available_date", $filter['date']);
+            //     if(isset($filter['time'])) {
+            //         $time = Carbon::createFromFormat('h:i A', $filter['time'])->format('H:i:s');
+            //         $q->whereTime("available_time", $time);
+            //     }
+            //     })->orWhere(function($q1) use($filter) {
+            //         $q1->where("recurrent", 1)->where(function($q2) use($filter) {
+            //             $q2->where("recurrent_day", Weekday::ALL->value)->orWhere("recurrent_day", Carbon::parse($filter['date'])->format('l'));
+            //         });
+            // });
+
+            if(isset($filter['date'])) $query->where(function($q) use ($filter) {
+                $q->where(function($q1) use($filter) {
+                    $q1->whereDate("available_date", $filter['date']);
+                    if (isset($filter['time'])) {
+                        $time = Carbon::createFromFormat('h:i A', $filter['time'])->format('H:i:s');
+                        $q1->whereTime("available_time", $time);
+                    }
+                })->orWhere(function($q2) use($filter) {
+                    $q2->where("recurrent", 1)
+                        ->where(function($q3) use($filter) {
+                            $q3->where("recurrent_day", Weekday::ALL->value)
+                                ->orWhere("recurrent_day", Carbon::parse($filter['date'])->format('l'));
+                        });
+                    if (isset($filter['time'])) {
+                        $time = Carbon::createFromFormat('h:i A', $filter['time'])->format('H:i:s');
+                        $q2->whereTime("available_time", $time);
+                    }
+                });
             });
+            
             // if(isset($filter['time'])) {
             //     $time = Carbon::createFromFormat('h:i A', $filter['time'])->format('H:i:s');
             //     $query = $query->whereTime("available_time", $time);
