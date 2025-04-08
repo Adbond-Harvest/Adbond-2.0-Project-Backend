@@ -20,7 +20,7 @@ use app\Services\ClientPackageService;
 
 use app\Enums\AssetSwitchType;
 
-use App\Utilities;
+use app\Utilities;
 
 class AssetSwitchController extends Controller
 {
@@ -74,6 +74,8 @@ class AssetSwitchController extends Controller
             if(!$asset) return Utilities::error402("Asset not found");
 
             if($asset->client_id != Auth::guard("client")->user()->id) return Utilities::error402("You are not authorized to perform this operation on this asset");
+
+            if($data['type'] == AssetSwitchType::DOWNGRADE->value && $asset->purchase_complete == 1) return Utilities::error402("You cannot downgrade this asset");
 
             $validSwitchPackages = ($data['type'] == AssetSwitchType::DOWNGRADE->value) ? 
                                         $this->assetSwitchService->getDownGradePackages($asset->package, true)
