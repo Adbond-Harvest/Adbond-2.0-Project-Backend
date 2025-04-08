@@ -13,6 +13,7 @@ use app\Http\Requests\User\DeclinePayment;
 use app\Http\Resources\PaymentResource;
 
 use app\Models\PaymentStatus;
+use app\Models\Order;
 
 use app\Services\PaymentService;
 use app\Services\OrderService;
@@ -49,6 +50,9 @@ class PaymentController extends Controller
             $payment = $this->paymentService->getPayment($request->validated("paymentId"));
             if(!$payment) return Utilities::error402("Payment not found");
 
+            if($payment->confirmed === 0) return Utilities::error402("This Payment has been rejected, let another request be made");
+            if($payment->confirmed === 1) return Utilities::error402("This Payment is already Confirmed");
+
             $payment = $this->paymentService->confirm($payment);
 
             $order = $payment->purchase;
@@ -56,7 +60,7 @@ class PaymentController extends Controller
             // update order table to reflect amount_payed and balance;
             $order = $this->orderService->saveAmountPaid($order, $payment->amount);
             $data['paymentStatusId'] = ($order->balance <= 0) ? PaymentStatus::complete()->id : PaymentStatus::deposit()->id;
-            $data['installmentsPayed'] = $order->installments_payed+1;
+            // $data['installmentsPayed'] = $order->installments_payed+1;
             $order = $this->orderService->update($data, $order);
 
             // update staff commission
@@ -104,7 +108,10 @@ class PaymentController extends Controller
 
             $payment = $this->paymentService->reject($payment, $request->validated("message"));
 
-            
+            if($payment->purchase_type == Order::$type && $payment->purchase->is_installment == 1) {
+                $installmentsPayed = $payment->purchase->installments_payed - 1;
+                $this->orderService->update(['installmentsPayed' => $installmentsPayed], $payment->purchase);
+            }
 
             return Utilities::ok([
                 "message" => "payment has been Rejected",
