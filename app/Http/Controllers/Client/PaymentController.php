@@ -102,6 +102,8 @@ class PaymentController extends Controller
         // confirm that the order is not complete
         if($order->completed == 1) return Utilities::error402("This order has already been completed!");
 
+        if($order->installment_count == $order->installments_payed) return Utilities::error402("No more payment is required for this order at this time");
+
         //get the amount to be paid
         if($order->type == OrderType::PURCHASE->value) {
             $amount = $order->amount_payable/$order->installment_count;
@@ -202,22 +204,23 @@ class PaymentController extends Controller
             $order = $this->orderService->order($processedData['orderId']);
             if(!$order) return Utilities::error402("Order not found");
 
+            if($order->type == OrderType::PURCHASE->value || $order->is_installment==1) {
+                $data['installmentsPayed'] = $order->installments_payed + 1;
+            }
+
             if($data['cardPayment']) { // if it is a card payment
                 // verify card payment
                 $res = $this->paymentService->paystackVerify($data['reference'], $processedData['amountPayable']);
                 // dd($res);
                 if($res['success']==true) {
-                    if(!$res['paymentError']) {
-                        if($order->type == OrderType::PURCHASE->value || $order->is_installment==1) {
-                            $data['installmentsPayed'] = $order->installments_payed + 1;
-                        }
+                    // if(!$res['paymentError']) {
                         $data['paymentStatusId'] = (($order->type == OrderType::PURCHASE->value || $order->is_installment==1) && ($data['installmentsPayed'] < $order->installment_count)) ? PaymentStatus::deposit()->id : PaymentStatus::complete()->id;
                         $data['amountPayed'] = $order->amount_payed + $processedData['amountPayable'];
                         $data['balance'] = $order->balance - $processedData['amountPayable'];
 
                         //update order
                         $order = $this->orderService->update($data, $order);
-                    }
+                    // }
 
                 }
                 // Save the payment
@@ -227,6 +230,10 @@ class PaymentController extends Controller
                 // Send email to client about the receipt
 
             }else{ // if its a bank payment
+
+                //update order
+                $order = $this->orderService->update($data, $order);
+
                 // Save Payment evidence
                 $purpose = FilePurpose::PAYMENT_EVIDENCE->value;
                 $fileType = (str_starts_with($request->file('evidence')->getMimeType(), 'image/')) ? 'image' : 'pdf';

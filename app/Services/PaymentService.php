@@ -241,6 +241,7 @@ class PaymentService
                 try{
                     // Send Payment Mail
                     Mail::to($payment->client->email)->send(new NewPayment($payment, $uploadedReceipt));
+                    unlink($response['path']);
                 }catch(\Exception $e) {
                     Utilities::logStuff("Error Occurred while attempting to send Payment Email..".$e);
                 }
