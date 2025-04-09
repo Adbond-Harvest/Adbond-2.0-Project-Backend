@@ -17,7 +17,7 @@ use app\Services\ClientPackageService;
 
 use app\Enums\AssetSwitchType;
 
-use App\Utilities;
+use app\Utilities;
 
 class AssetSwitchController extends Controller
 {
