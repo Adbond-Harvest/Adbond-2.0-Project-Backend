@@ -59,11 +59,14 @@ class AssetSwitchController extends Controller
         $this->assetSwitchService->count = true;
         $requestsCount = $this->assetSwitchService->assetSwitchRequests();
 
+        $this->assetSwitchService->setStatus = true;
         $this->assetSwitchService->approved = 1;
         $approvedCount = $this->assetSwitchService->assetSwitchRequests();
+        // dd($approvedCount);
 
         $this->assetSwitchService->approved = 0;
         $rejectedCount = $this->assetSwitchService->assetSwitchRequests();
+        // dd($rejectedCount);
 
         $this->assetSwitchService->approved = null;
         $pendingCount = $this->assetSwitchService->assetSwitchRequests();
