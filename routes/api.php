@@ -26,6 +26,9 @@ use app\Http\Controllers\User\OfferController as UserOfferController;
 use app\Http\Controllers\User\OfferPaymentController as UserOfferPaymentController;
 use app\Http\Controllers\User\UtilityController as UserUtilityController;
 use app\Http\Controllers\User\AssetSwitchController as UserAssetSwitchController;
+use app\Http\Controllers\User\AssessmentController as UserAssessmentController;
+use app\Http\Controllers\User\AssessmentQuestionController;
+use app\Http\Controllers\User\AssessmentQuestionOptionController;
 
 
 // Client Controllers
@@ -216,6 +219,26 @@ Route::group(['prefix' => '/v2',], function () {
                 Route::get('/show/{transactionId}', [UserClientTransactionController::class, "transaction"]);
             });
         });
+
+        // assessments
+        Route::group(['prefix' => '/assessments'], function () {
+            Route::group(['prefix' => '/questions'], function () {
+                Route::group(['prefix' => '/options'], function () {
+                    Route::post('', [AssessmentQuestionOptionController::class, "save"]);
+                    Route::post('/{optionId}', [AssessmentQuestionOptionController::class, "update"]);
+                    Route::delete('/{optionId}', [AssessmentQuestionOptionController::class, "delete"]);
+                });
+                Route::post('', [AssessmentQuestionController::class, "save"]);
+                Route::post('/{questionId}', [AssessmentQuestionController::class, "update"]);
+                Route::get('/{assessmentId}', [AssessmentQuestionController::class, "assessmentQuestions"]);
+                Route::delete('/{questionId}', [AssessmentQuestionController::class, "delete"]);
+            });
+            Route::post('', [UserAssessmentController::class, "create"]);
+            Route::get('', [UserAssessmentController::class, "assessments"]);
+            Route::post('/{assessmentId}', [UserAssessmentController::class, "update"]);
+            Route::get('/{assessmentId}', [UserAssessmentController::class, "assessment"]);
+        });
+        
 
         Route::get('/roles', [UserUtilityController::class, "roles"]);
         Route::get('/staff_types', [UserUtilityController::class, "staffTypes"]);

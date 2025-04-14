@@ -20,6 +20,20 @@ class AssessmentQuestionOptionService
         return $option;
     }
 
+    public function saveQuestionOptions($options, $questionId)
+    {
+        // dd($options);
+        foreach($options as $option) {
+            // dd($option);
+            $data = [
+                "questionId" => $questionId,
+                "value" => $option['value'],
+                "answer" => $option['answer']
+            ];
+            $this->save($data);
+        }
+    }
+
     public function update($data, $option)
     {
         if(isset($data['questionId'])) $option->question_id = $data['questionId'];

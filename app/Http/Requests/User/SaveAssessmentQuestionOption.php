@@ -1,17 +1,18 @@
 <?php
 
-namespace app\Http\Requests;
+namespace app\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use app\Http\Requests\BaseRequest;
 
-class SaveAssessmentQuestion extends FormRequest
+class SaveAssessmentQuestionOption extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +23,11 @@ class SaveAssessmentQuestion extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "questionId" => "required|exists:questions,id",
+            "options" => "required|array",
+            "options.*" => "array",
+            "options.*.value" => "required",
+            "options.*.answer" => "required|boolean"
         ];
     }
 }
