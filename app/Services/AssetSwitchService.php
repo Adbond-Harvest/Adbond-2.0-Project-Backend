@@ -180,7 +180,7 @@ class AssetSwitchService
         $assetUpgrade->save();
 
         if($asset->purchase_complete == 0) {
-            $amountPayable = $toPackage->amount * $toPackage->units;
+            $amountPayable = $toPackage->amount * $asset->units;
             $balance = $amountPayable - $order->amount_payed;
 
             $order->package_id = $request->to_package_id;

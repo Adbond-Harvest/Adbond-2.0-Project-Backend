@@ -20,7 +20,7 @@ class QuestionOptionResource extends JsonResource
             "id" => $this->id,
             "value" => $this->value,
             "answer" => ($this->answer == 1) ? true : false,
-            "question" => new QuestionResource($this->question)
+            "question" => new QuestionResource($this->whenLoaded('question'))
         ];
     }
 }

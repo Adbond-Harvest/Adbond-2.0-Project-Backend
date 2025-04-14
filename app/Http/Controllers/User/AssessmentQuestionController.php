@@ -3,34 +3,47 @@
 namespace app\Http\Controllers\User;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use app\Http\Controllers\Controller;
 
-use App\Http\Requests\User\SaveAssessmentQuestion;
-use App\Http\Requests\User\UpdateAssessmentQuestion;
+use app\Http\Requests\User\SaveAssessmentQuestion;
+use app\Http\Requests\User\UpdateAssessmentQuestion;
 
-use App\Http\Resources\QuestionResource;
+use app\Http\Resources\QuestionResource;
 
-use App\Services\AssessmentQuestionService;
+use app\Services\AssessmentQuestionService;
+use app\Services\AssessmentQuestionOptionService;
 
-use App\Utilities;
+use app\Utilities;
 
 class AssessmentQuestionController extends Controller
 {
     private $assessmentQuestionService;
+    private $questionOptionService;
 
     public function __construct()
     {
         $this->assessmentQuestionService = new AssessmentQuestionService;
+        $this->questionOptionService = new AssessmentQuestionOptionService;
     }
 
     public function save(SaveAssessmentQuestion $request)
     {
         try{
             $data = $request->validated();
+
+            DB::beginTransaction();
+
             $question = $this->assessmentQuestionService->save($data);
+
+            $this->questionOptionService->saveQuestionOptions($data['options'], $question->id);
+
+            $question = $this->assessmentQuestionService->question($question->id);
+            DB::commit();
 
             return Utilities::ok(new QuestionResource($question));
         }catch(\Exception $e){
+            DB::rollBack();
             return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }
     }

@@ -5,7 +5,7 @@ namespace app\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-use App\Http\Resources\AssessmentResource;
+use app\Http\Resources\AssessmentResource;
 
 class AssessmentAttemptResource extends JsonResource
 {

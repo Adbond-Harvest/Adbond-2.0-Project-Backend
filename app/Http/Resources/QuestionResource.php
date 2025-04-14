@@ -5,8 +5,8 @@ namespace app\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-use App\Http\Resources\AssessmentResource;
-use App\Http\Resources\QuestionOptionResource;
+use app\Http\Resources\AssessmentResource;
+use app\Http\Resources\QuestionOptionResource;
 
 class QuestionResource extends JsonResource
 {
@@ -20,7 +20,7 @@ class QuestionResource extends JsonResource
         return [
             "id" => $this->id,
             "question" => $this->question,
-            "assessment" => new AssessmentResource($this->assessment),
+            "assessment" => new AssessmentResource($this->whenLoaded('assessment')),
             "options" => QuestionOptionResource::collection($this->options)
         ];
     }

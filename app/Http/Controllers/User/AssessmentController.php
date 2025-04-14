@@ -5,14 +5,14 @@ namespace app\Http\Controllers\User;
 use Illuminate\Http\Request;
 use app\Http\Controllers\Controller;
 
-use App\Http\Requests\User\CreateAssessment;
-use App\Http\Requests\User\UpdateAssessment;
+use app\Http\Requests\User\CreateAssessment;
+use app\Http\Requests\User\UpdateAssessment;
 
-use App\Http\Resources\AssessmentResource;
+use app\Http\Resources\AssessmentResource;
 
-use App\Services\AssessmentService;
+use app\Services\AssessmentService;
 
-use App\Utilities;
+use app\Utilities;
 
 class AssessmentController extends Controller
 {
