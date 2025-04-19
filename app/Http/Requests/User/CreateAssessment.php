@@ -24,7 +24,10 @@ class CreateAssessment extends BaseRequest
     {
         return [
             "title" => "required|string",
-            "description" => "required|string",
+            "description" => "nullable|string",
+            "instructions" => "nullable|string",
+            "duration" => "nullable|integer",
+            "cutOffMark" => "nullable|numeric",
             "active" => "nullable|boolean",
             "questions" => "nullable|array",
             "questions.*" => "array",

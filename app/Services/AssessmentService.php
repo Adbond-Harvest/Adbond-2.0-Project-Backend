@@ -14,7 +14,10 @@ class AssessmentService
     {
         $assessment = new Assessment;
         $assessment->title = $data['title'];
-        $assessment->description = $data['description'];
+        if(isset($data['description'])) $assessment->description = $data['description'];
+        if(isset($data['instructions'])) $assessment->instructions = $data['instructions'];
+        if(isset($data['duration'])) $assessment->duration = $data['duration'];
+        if(isset($data['cutOffMark'])) $assessment->cut_off_mark = $data['cutOffMark'];
         if(isset($data['active'])) $assessment->active = $data['active'];
 
         $assessment->save();
@@ -26,6 +29,9 @@ class AssessmentService
     {
         if(isset($data['title'])) $assessment->title = $data['title'];
         if(isset($data['description'])) $assessment->description = $data['description'];
+        if(isset($data['instructions'])) $assessment->instructions = $data['instructions'];
+        if(isset($data['duration'])) $assessment->duration = $data['duration'];
+        if(isset($data['cutOffMark'])) $assessment->cut_off_mark = $data['cutOffMark'];
         if(isset($data['active'])) $assessment->active = $data['active'];
 
         $assessment->update();
