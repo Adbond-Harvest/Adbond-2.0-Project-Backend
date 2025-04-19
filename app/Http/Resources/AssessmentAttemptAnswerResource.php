@@ -16,7 +16,9 @@ class AssessmentAttemptAnswerResource extends JsonResource
     {
         return [
             "id" => $this->id,
+            "question" => $this->question,
             "answer" => $this->answer,
+            "correctAnswer" => $this->correct_answer,
             "correct" => ($this->correct == 1) ? true : false
         ];
     }

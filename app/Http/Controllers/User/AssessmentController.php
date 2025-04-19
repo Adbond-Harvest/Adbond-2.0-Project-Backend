@@ -10,10 +10,12 @@ use app\Http\Requests\User\CreateAssessment;
 use app\Http\Requests\User\UpdateAssessment;
 
 use app\Http\Resources\AssessmentResource;
+use app\Http\Resources\AssessmentAttemptResource;
 
 use app\Services\AssessmentService;
 use app\Services\AssessmentQuestionService;
 use app\Services\AssessmentQuestionOptionService;
+use app\Services\AssessmentAttemptService;
 
 use app\Utilities;
 
@@ -22,17 +24,19 @@ class AssessmentController extends Controller
     private $assessmentService;
     private $questionService;
     private $optionService;
+    private $assessmentAttemptService;
 
     public function __construct()
     {
         $this->assessmentService = new AssessmentService;
         $this->questionService = new AssessmentQuestionService;
         $this->optionService = new AssessmentQuestionOptionService;
+        $this->assessmentAttemptService = new AssessmentAttemptService;
     }
 
     public function create(CreateAssessment $request)
     {
-        // try{
+        try{
             $data = $request->validated();
 
             DB::beginTransaction();
@@ -52,10 +56,10 @@ class AssessmentController extends Controller
             $assessment = $this->assessmentService->assessment($assessment->id);
 
             return Utilities::ok(new AssessmentResource($assessment));
-        // }catch(\Exception $e){
-        //     DB::rollBack();
-        //     return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
-        // }
+        }catch(\Exception $e){
+            DB::rollBack();
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
     }
 
     public function update(UpdateAssessment $request, $assessmentId)
@@ -90,5 +94,14 @@ class AssessmentController extends Controller
         if(!$assessment) return Utilities::error402("Assessment not found");
 
         return Utilities::ok(new AssessmentResource($assessment));
+    }
+
+    public function attempts($assessmentId)
+    {
+        if (!is_numeric($assessmentId) || !ctype_digit($assessmentId)) return Utilities::error402("Invalid parameter assessmentID");
+
+        $attempts = $this->assessmentAttemptService->assessmentAttempts($assessmentId);
+
+        return Utilities::okay(AssessmentAttemptResource::collection($attempts));
     }
 }

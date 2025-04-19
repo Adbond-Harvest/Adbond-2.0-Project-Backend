@@ -5,7 +5,7 @@ namespace app\Http\Requests\User;
 use Illuminate\Foundation\Http\FormRequest;
 use app\Http\Requests\BaseRequest;
 
-class UpdateAssessment extends BaseRequest
+class SubmitAssessment extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,12 +23,11 @@ class UpdateAssessment extends BaseRequest
     public function rules(): array
     {
         return [
-            "title" => "nullable|string",
-            "description" => "nullable|string",
-            "instructions" => "nullable|string",
-            "duration" => "nullable|integer",
-            "cutOffMark" => "nullable|numeric",
-            "active" => "nullable|boolean"
+            "attemptId" => "required|integer",
+            "answers" => "required|array",
+            "answers.*" => "array",
+            "answers.*.questionId" => "required|integer|exists:questions,id",
+            "answers.*.selectedOptionId" => "nullable|integer|exists:question_options,id",
         ];
     }
 }

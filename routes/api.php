@@ -29,6 +29,7 @@ use app\Http\Controllers\User\AssetSwitchController as UserAssetSwitchController
 use app\Http\Controllers\User\AssessmentController as UserAssessmentController;
 use app\Http\Controllers\User\AssessmentQuestionController;
 use app\Http\Controllers\User\AssessmentQuestionOptionController;
+use app\Http\Controllers\User\AssessmentAttemptController;
 
 
 // Client Controllers
@@ -78,6 +79,12 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/verify_password_reset_code', 'UserAuthController@verifyPasswordResetToken');
             Route::post('/reset_password', 'UserAuthController@resetPassword');
         });
+    });
+
+    Route::group(['prefix' => '/assessments'], function () {
+        Route::post('/start', [AssessmentAttemptController::class, "start"]);
+        Route::post('/update', [AssessmentAttemptController::class, "update"]);
+        Route::post('/submit', [AssessmentAttemptController::class, "submit"]);
     });
 
     //User/Admin/Staff Routes
@@ -235,6 +242,8 @@ Route::group(['prefix' => '/v2',], function () {
             });
             Route::post('', [UserAssessmentController::class, "create"]);
             Route::get('', [UserAssessmentController::class, "assessments"]);
+            Route::get('/attempts/{assessmentId}', [UserAssessmentController::class, "attempts"]);
+            Route::get('/attempt/{attemptId}', [AssessmentAttemptController::class, "attempt"]);
             Route::post('/{assessmentId}', [UserAssessmentController::class, "update"]);
             Route::get('/{assessmentId}', [UserAssessmentController::class, "assessment"]);
         });

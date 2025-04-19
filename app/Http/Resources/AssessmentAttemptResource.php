@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 use app\Http\Resources\AssessmentResource;
+use app\Http\Resources\AssessmentAttemptAnswerResource;
 
 class AssessmentAttemptResource extends JsonResource
 {
@@ -27,6 +28,7 @@ class AssessmentAttemptResource extends JsonResource
             "occupation" => $this->occupation,
             "score" => $this->score,
             "passed" => ($this->passed === null) ? "pending" : (($this->passed == 1) ? true : false),
+            "answers" => AssessmentAttemptAnswerResource::collection($this->answers),
             "assessment" => new AssessmentResource($this->assessment)
         ];
     }
