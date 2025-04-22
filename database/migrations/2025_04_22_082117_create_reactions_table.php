@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -12,12 +13,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reactions', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->id();
             $table->morphs('user');
             $table->boolean('reaction')->nullable();
             $table->morphs('entity');
             $table->timestamps();
         });
+        DB::statement("ALTER TABLE reactions CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;");
     }
 
     /**
