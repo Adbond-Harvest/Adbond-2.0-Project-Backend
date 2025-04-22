@@ -10,28 +10,34 @@ use app\Http\Controllers\Controller;
 use app\Http\Requests\User\CreatePost;
 use app\Http\Requests\User\UpdatePost;
 use app\Http\Requests\User\TogglePostActivate;
+use app\Http\Requests\React;
 
 use app\Http\Resources\PostResource;
 
 use app\Services\PostService;
 use app\Services\FileService;
+use app\Services\ReactionService;
 
 use app\Models\User;
+use app\Models\Post;
 
 use app\Utilities;
 
 use app\Enums\PostType;
 use app\Enums\FilePurpose;
+use app\Enums\ProjectFilter;
 
 class PostController extends Controller
 {
     private $postService;
     private $fileService;
+    private $reactionService;
 
     public function __construct()
     {
         $this->postService = new PostService;
         $this->fileService = new FileService;
+        $this->reactionService = new ReactionService;
     }
 
     public function save(CreatePost $request)
@@ -124,7 +130,7 @@ class PostController extends Controller
 
     public function post($postId)
     {
-        $post = $this->postService->post($postId);
+        $post = $this->postService->post($postId, ['comments']);
         if(!$post) return Utilities::error402("Post not found");
 
         return Utilities::ok(new PostResource($post));
@@ -149,5 +155,28 @@ class PostController extends Controller
         // $data['photoId'] = $res['file']->id;
         // $fileMeta = ["belongsId"=>$projectType->id, "belongsType"=>"app\Models\ProjectType"];
         // $this->fileService->updateFileObj($fileMeta, $res['file']);
+    }
+
+    public function react(React $request)
+    {
+        try{
+            $data = $request->validated();
+            if(!isset($data['postId'])) return Utilities::error402("PostId is required");
+
+            $data['entityType'] = Post::$type;
+            $data['entityId'] = $data['postId'];
+            $data['userType'] = User::$userType;
+            $data['userId'] = Auth::user()->id;
+            $data['reaction'] = ($data['reaction'] == 'like') ? true : false;
+
+            $reaction = $this->reactionService->userReaction($data['userId'], $data['userType'], $data['entityId'], $data['entityType']);
+
+            $reaction = $this->reactionService->save($data, $reaction);
+
+            return Utilities::okay("Successful");
+
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
     }
 }

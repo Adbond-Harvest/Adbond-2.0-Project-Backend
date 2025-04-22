@@ -1,10 +1,10 @@
 <?php
 
-namespace app\Http\Controllers\User;
+namespace app\Http\Controllers\Client;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use app\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 use app\Http\Requests\SaveComment;
 use app\Http\Requests\React;
@@ -12,7 +12,7 @@ use app\Http\Requests\React;
 use app\Http\Resources\CommentResource;
 
 use app\Models\Comment;
-use app\Models\User;
+use app\Models\Client;
 
 use app\Services\CommentService;
 use app\Services\ReactionService;
@@ -35,8 +35,8 @@ class CommentController extends Controller
         try{
             $data = $request->validated();
 
-            $data['commenterId'] = Auth::user()->id;
-            $data['commenterType'] = User::$userType;
+            $data['commenterId'] = Auth::guard("client")->user()->id;
+            $data['commenterType'] = Client::$userType;
 
             $comment = $this->commentService->save($data);
 
@@ -54,9 +54,9 @@ class CommentController extends Controller
 
             $data['entityType'] = Comment::$type;
             $data['entityId'] = $data['commentId'];
-            $data['userType'] = User::$userType;
-            $data['userId'] = Auth::user()->id;
-            $data['reaction'] = ($data['reaction'] == 'like') ? 1 : 0;
+            $data['userType'] = Client::$userType;
+            $data['userId'] = Auth::guard("client")->user()->id;
+            $data['reaction'] = ($data['reaction'] == 'like') ? true : false;
 
             $reaction = $this->reactionService->userReaction($data['userId'], $data['userType'], $data['entityId'], $data['entityType']);
 

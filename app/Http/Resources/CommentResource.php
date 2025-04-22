@@ -18,7 +18,9 @@ class CommentResource extends JsonResource
             "id" => $this->id,
             "message" => $this->message,
             "commenter" => $this->commenter->name,
-            "addedAt" => $this->created_at->format('F j, Y')
+            "addedAt" => $this->created_at->format('F j, Y'),
+            "likesCount" => $this->likes->count(),
+            "dislikesCount" => $this->dislikes->count()
         ];
     }
 }
