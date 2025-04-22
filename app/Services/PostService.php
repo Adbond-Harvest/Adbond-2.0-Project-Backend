@@ -8,6 +8,7 @@ use PDF;
 use app\Models\Post;
 
 use app\Enums\PostType;
+use app\Enums\ProjectFilter;
 
 class PostService
 {
@@ -69,6 +70,11 @@ class PostService
     public function post($id, $with=[])
     {
         return Post::with($with)->where("id", $id)->first();
+    }
+
+    public function getBySlug($slug, $with=[])
+    {
+        return Post::with($with)->where("slug", $slug)->first();
     }
 
     public function getByTopic($topic, $with=[])

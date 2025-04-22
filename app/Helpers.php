@@ -817,6 +817,12 @@ Class Helpers
         return $res;
     }
 
+    public static function createSlug($title)
+    {
+        $titleArr = explode(" ", $title);
+        return implode("-", $titleArr);
+    }
+
     public static function curl($url, $options=[], $posts=[])
     {
 

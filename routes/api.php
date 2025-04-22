@@ -48,6 +48,8 @@ use app\Http\Controllers\Client\OfferBidController;
 use app\Http\Controllers\Client\ClientController;
 use app\Http\Controllers\Client\SiteTourController;
 use app\Http\Controllers\Client\OfferPaymentController;
+use app\Http\Controllers\Client\PostController;
+use app\Http\Controllers\Client\CommentController;
 
 //Public Controllers
 use app\Http\Controllers\ProjectController;
@@ -193,14 +195,16 @@ Route::group(['prefix' => '/v2',], function () {
 
         Route::group(['prefix' => '/posts'], function () {
             Route::post('', [UserPostController::class, "save"]);
-            Route::post('/{postId}', [UserPostController::class, "update"]);
+            Route::post('/react', [UserPostController::class, "react"]);
             Route::post('/toggle_activate', [UserPostController::class, "toggleActivate"]);
+            Route::post('/{postId}', [UserPostController::class, "update"]);
             Route::get('', [UserPostController::class, "posts"]);
             Route::get('/{postId}', [UserPostController::class, "post"]);
         });
 
         Route::group(['prefix' => '/comments'], function () {
             Route::post('', [UserCommentController::class, "save"]);
+            Route::post('/react', [UserCommentController::class, "react"]);
         });
 
         // Client
@@ -395,6 +399,17 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('/schedules', [SiteTourController::class, 'schedules']);
             Route::get('/filter_schedules', [SiteTourController::class, 'filterSchedules']);
             Route::get('', [SiteTourController::class, 'siteTours']);
+        });
+
+        Route::group(['prefix' => '/posts'], function () {
+            Route::post('/react', [PostController::class, "react"]);
+            Route::get('', [PostController::class, "posts"]);
+            Route::get('/{postId}', [PostController::class, "post"]);
+        });
+
+        Route::group(['prefix' => '/comments'], function () {
+            Route::post('', [CommentController::class, "save"]);
+            Route::post('/react', [CommentController::class, "react"]);
         });
 
 

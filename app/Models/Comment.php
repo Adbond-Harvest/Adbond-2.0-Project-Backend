@@ -24,4 +24,14 @@ class Comment extends Model
     {
         return $this->belongsTo(Post::class);
     }
+
+    public function likes()
+    {
+        return $this->morphMany(Reaction::class, 'entity')->where('reaction', 1);
+    }
+
+    public function dislikes()
+    {
+        return $this->morphMany(Reaction::class, 'entity')->where('reaction', 0);
+    }
 }

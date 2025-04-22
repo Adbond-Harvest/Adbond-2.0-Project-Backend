@@ -17,15 +17,22 @@ class PostResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+        $resource = [
             "id" => $this->id,
+            "slug" => $this->slug,
             "topic" => $this->topic,
             "type" => $this->post_type,
-            "file" => new FileResource($this->file),
+            "coverPhoto" => new FileResource($this->file),
             "content" => $this->content,
             "active" => ($this->active == 1) ? true : false,
             "created" => $this->created_at->format('F j, Y'),
-            "comments" => CommentResource::collection($this->comments)
+            "comments" => CommentResource::collection($this->whenLoaded('comments'))
         ];
+
+        $resource["commentsCount"] = $this->comments->count();
+        $resource["likesCount"] = $this->likes->count();
+        $resource["dislikesCount"] = $this->dislikes->count();
+
+        return $resource;
     }
 }
