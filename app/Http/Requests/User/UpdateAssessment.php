@@ -28,7 +28,16 @@ class UpdateAssessment extends BaseRequest
             "instructions" => "nullable|string",
             "duration" => "nullable|integer",
             "cutOffMark" => "nullable|numeric",
-            "active" => "nullable|boolean"
+            "active" => "nullable|boolean",
+            "questions" => "nullable|array",
+            "questions.*" => "array",
+            "questions.*.questionId" => "nullable|integer",
+            "questions.*.question" => "required|string",
+            "questions.*.options" => "required|array",
+            "questions.*.options.*" => "array",
+            "questions.*.options.*.optionId" => "nullable|integer",
+            "questions.*.options.*.value" => "required",
+            "questions.*.options.*.answer" => "required|boolean"
         ];
     }
 }
