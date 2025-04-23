@@ -71,12 +71,89 @@ class AssessmentController extends Controller
             if(!$assessment) return Utilities::error402("Assessment not found");
 
             $data = $request->validated();
+
+            $currentQuestions = $assessment->questions;
+            $updatedQuestionsIds = [];
+
+            if(isset($data['questions'])) {
+                foreach($data['questions'] as $question) {
+                    if(isset($question['questionId'])) {
+                        $questionObj = $this->questionService->question($question['questionId']);
+                        if(!$questionObj) return Utilities::error402("QuestionId ".$question['questionId']." is invalid");
+
+                        if(isset($question['options']) && count($question['options']) > 0) {
+                            $currentOptions = $questionObj->options;
+                            $updatedOptionsIds = [];
+                            foreach($question['options'] as $option) {
+                                if(isset($option['optionId'])) {
+                                    $optionObj = $this->optionService->option($option['optionId']);
+                                    if(!$optionObj) return Utilities::error402("OptionId ".$option['optionId']." is invalid");
+                                    $this->optionService->update($option, $optionObj);
+                                    $updatedOptionsIds[] = $option['optionId'];
+                                }else{
+                                    $option['questionId'] = $questionObj->id;
+                                    $this->optionService->save($option);
+                                }
+                            }
+                            //delete options that are not in the updated options
+
+                            $this->removeDeletedObjects($currentOptions, $updatedOptionsIds);
+                        }
+                        $this->questionService->update($question, $questionObj);
+                        $updatedQuestionsIds[] = $questionObj->id;
+                    }else{
+                        $question['assessmentId'] = $assessment->id;
+                        $questionObj = $this->questionService->save($question);
+                        if(isset($question['options']) && count($question['options']) > 0) {
+                            foreach($question['options'] as $option) {
+                                $option['questionId'] = $questionObj->id;
+                                $this->optionService->save($option);
+                            }
+                        }
+                    }
+                }
+                //delete questions that are not in the updated questions
+                $this->removeDeletedObjects($currentQuestions, $updatedQuestionsIds);
+            }
+
             $assessment = $this->assessmentService->update($data, $assessment);
+            $assessment = $this->assessmentService->assessment($assessment->id);
 
             return Utilities::ok(new AssessmentResource($assessment));
         }catch(\Exception $e){
             return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }
+    }
+
+    private function removeDeletedObjects($objects, $arrIds) 
+    {
+        if($objects->count() > 0) {
+            foreach($objects as $object) {
+                if(!in_array($object->id, $arrIds)) $object->delete();
+            }
+        }
+    }
+
+    private function handleOptionsUpdate($options, $question)
+    {
+        $currentOptions = $question->options;
+        $updatedOptionsIds = [];
+        foreach($options as $option) {
+            dd($option);
+            if(isset($option['optionId'])) {
+                $optionObj = $this->optionService->option($option['optionId']);
+                if(!$optionObj) return Utilities::error402("OptionId ".$option['optionId']." is invalid");
+                $this->optionService->update($option, $optionObj);
+                $updatedOptionsIds[] = $option['optionId'];
+            }else{
+                $option['questionId'] = $questionObj->id;
+                dd($option);
+                $this->optionService->save($option);
+            }
+        }
+        //delete options that are not in the updated options
+
+        $this->removeDeletedObjects($currentOptions, $updatedOptionsIds);
     }
 
     public function assessments()
