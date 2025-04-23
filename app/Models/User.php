@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -117,5 +118,74 @@ class User extends Authenticatable implements JWTSubject
     public function commissionTransactions()
     {
         return $this->hasMany(StaffCommissionTransaction::class);
+    }
+
+    public function reactions(): MorphMany
+    {
+        return $this->morphMany(Reaction::class, 'user');
+    }
+
+    // Posts liked by the user
+    public function likedPosts()
+    {
+        return $this->morphedByMany(Post::class, 'entity', 'reactions')
+                    ->where('reaction', true);
+    }
+
+    public function likedPostIds()
+    {
+        $ids = [];
+        if($this->likedPosts()->count() > 0) {
+            foreach($this->likedPosts() as $post) $ids[] = $post->id;
+        }
+        return $ids;
+    }
+
+    // Comments liked by the user
+    public function likedComments()
+    {
+        return $this->morphedByMany(Comment::class, 'entity', 'reactions')
+                    ->where('reaction', true);
+    }
+
+    public function likedCommentIds()
+    {
+        $ids = [];
+        if($this->likedComments()->count() > 0) {
+            foreach($this->likedComments() as $comment) $ids[] = $comment->id;
+        }
+        return $ids;
+    }
+
+    // Posts disliked by the user
+    public function dislikedPosts()
+    {
+        return $this->morphedByMany(Post::class, 'entity', 'reactions')
+                    ->where('reaction', false);
+    }
+
+    public function dislikedPostIds()
+    {
+        $ids = [];
+        if($this->likedPosts()->count() > 0) {
+            foreach($this->dislikedPosts() as $post) $ids[] = $post->id;
+        }
+        return $ids;
+    }
+
+    // Comments disliked by the user
+    public function dislikedComments()
+    {
+        return $this->morphedByMany(Comment::class, 'entity', 'reactions')
+                    ->where('reaction', false);
+    }
+
+    public function dislikedCommentIds()
+    {
+        $ids = [];
+        if($this->dislikedComments()->count() > 0) {
+            foreach($this->dislikedComments() as $comment) $ids[] = $comment->id;
+        }
+        return $ids;
     }
 }

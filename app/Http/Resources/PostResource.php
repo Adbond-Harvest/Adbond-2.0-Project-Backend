@@ -4,6 +4,7 @@ namespace app\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 use app\Http\Resources\FileResource;
 use app\Http\Resources\CommentResource;
@@ -26,6 +27,8 @@ class PostResource extends JsonResource
             "content" => $this->content,
             "active" => ($this->active == 1) ? true : false,
             "created" => $this->created_at->format('F j, Y'),
+            "liked" => $this->liked(),
+            "disliked" => $this->disliked(),
             "comments" => CommentResource::collection($this->whenLoaded('comments'))
         ];
 
@@ -34,5 +37,27 @@ class PostResource extends JsonResource
         $resource["dislikesCount"] = $this->dislikes->count();
 
         return $resource;
+    }
+
+    private function liked()
+    {
+        $liked = false;
+        $user = Auth::user() ?? Auth::guard("client")->user();
+        if($user) {
+            $likedPostIds = $user->likedPostIds();
+            $liked = (in_array($this->id, $likedPostIds));
+        }
+        return $liked;
+    }
+
+    private function disliked()
+    {
+        $disliked = false;
+        $user = Auth::user() ?? Auth::guard("client")->user();
+        if($user) {
+            $likedPostIds = $user->dislikedPostIds();
+            $disliked = (in_array($this->id, $likedPostIds));
+        }
+        return $disliked;
     }
 }
