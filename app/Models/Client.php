@@ -10,6 +10,10 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+
+use app\Models\Post;
+use app\Models\Comment;
 
 use app\Enums\RefererCodePrefix;
 
@@ -97,5 +101,111 @@ class Client extends Authenticatable implements JWTSubject
     public function siteTourSchedules()
     {
         return $this->hasManyThrough(SiteTourSchedule::class, SiteTourBooking::class, "client_id", "id", "id", "site_tour_schedule_id");
+    }
+
+    public function reactions(): MorphMany
+    {
+        return $this->morphMany(Reaction::class, 'user');
+    }
+
+    // Posts liked by the user
+    // public function likedPosts()
+    // {
+    //     return $this->morphedByMany(Post::class, 'entity', 'reactions')
+    //                 ->where('reaction', true);
+    // }
+    public function likedPosts()
+    {
+        return Post::whereHas('reactions', function ($query) {
+            $query->where('user_id', $this->id)
+                ->where('user_type', self::$userType)
+                ->where('reaction', true)
+                ->where('entity_type', Post::class);
+        });
+    }
+
+    public function likedPostIds()
+    {
+        $ids = [];
+        if($this->likedPosts()->count() > 0) {
+            foreach($this->likedPosts() as $post) $ids[] = $post->id;
+        }
+        return $ids;
+    }
+
+    // Comments liked by the user
+    // public function likedComments()
+    // {
+    //     return $this->morphedByMany(Comment::class, 'entity', 'reactions')
+    //                 ->where('reaction', true);
+    // }
+    public function likedComments()
+    {
+        return Comment::whereHas('reactions', function ($query) {
+            $query->where('user_id', $this->id)
+                ->where('user_type', self::$userType)
+                ->where('reaction', true)
+                ->where('entity_type', Comment::class);
+        });
+    }
+
+    public function likedCommentIds()
+    {
+        $ids = [];
+        if($this->likedComments()->count() > 0) {
+            foreach($this->likedComments() as $comment) $ids[] = $comment->id;
+        }
+        return $ids;
+    }
+
+    // Posts disliked by the user
+    // public function dislikedPosts()
+    // {
+    //     return $this->morphedByMany(Post::class, 'entity', 'reactions')
+    //                 ->where('reaction', false);
+    // }
+    public function dislikedPosts()
+    {
+        return Post::whereHas('reactions', function ($query) {
+            $query->where('user_id', $this->id)
+                ->where('user_type', self::$userType)
+                ->where('reaction', 0)
+                ->where('entity_type', Post::$type);
+        });
+    }
+
+    public function dislikedPostIds()
+    {
+        $ids = [];
+        if($this->dislikedPosts()->count() > 0) {
+            foreach($this->dislikedPosts() as $post) $ids[] = $post->id;
+        }
+        return $ids;
+    }
+    
+    // Comments disliked by the user
+    // public function dislikedComments()
+    // {
+    //     return $this->morphedByMany(Comment::class, 'entity', 'reactions')
+    //                 ->where('reaction', false);
+    // }
+
+    public function dislikedComments()
+    {
+        return Comment::whereHas('reactions', function ($query) {
+            $query->where('user_id', $this->id)
+                ->where('user_type', self::$userType)
+                ->where('reaction', false)
+                ->where('entity_type', Comment::class);
+        });
+    }
+
+    public function dislikedCommentIds()
+    {
+        $ids = [];
+        if($this->dislikedComments()->count() > 0) {
+            foreach($this->dislikedComments() as $comment) $ids[] = $comment->id;
+        }
+        return $ids;
     }
 }
