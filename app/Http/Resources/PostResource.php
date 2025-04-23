@@ -22,7 +22,7 @@ class PostResource extends JsonResource
             "slug" => $this->slug,
             "topic" => $this->topic,
             "type" => $this->post_type,
-            "coverPhoto" => new FileResource($this->file),
+            "coverPhoto" => new FileResource($this->coverPhoto),
             "content" => $this->content,
             "active" => ($this->active == 1) ? true : false,
             "created" => $this->created_at->format('F j, Y'),
