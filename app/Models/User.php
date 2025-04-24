@@ -128,8 +128,12 @@ class User extends Authenticatable implements JWTSubject
     // Posts liked by the user
     public function likedPosts()
     {
-        return $this->morphedByMany(Post::class, 'entity', 'reactions')
-                    ->where('reaction', true);
+        return Post::whereHas('reactions', function ($query) {
+            $query->where('user_id', $this->id)
+                ->where('user_type', self::$userType)
+                ->where('reaction', true)
+                ->where('entity_type', Post::class);
+        });
     }
 
     public function likedPostIds()
@@ -144,8 +148,12 @@ class User extends Authenticatable implements JWTSubject
     // Comments liked by the user
     public function likedComments()
     {
-        return $this->morphedByMany(Comment::class, 'entity', 'reactions')
-                    ->where('reaction', true);
+        return Comment::whereHas('reactions', function ($query) {
+            $query->where('user_id', $this->id)
+                ->where('user_type', self::$userType)
+                ->where('reaction', true)
+                ->where('entity_type', Comment::class);
+        });
     }
 
     public function likedCommentIds()
@@ -160,8 +168,12 @@ class User extends Authenticatable implements JWTSubject
     // Posts disliked by the user
     public function dislikedPosts()
     {
-        return $this->morphedByMany(Post::class, 'entity', 'reactions')
-                    ->where('reaction', false);
+        return Post::whereHas('reactions', function ($query) {
+            $query->where('user_id', $this->id)
+                ->where('user_type', self::$userType)
+                ->where('reaction', 0)
+                ->where('entity_type', Post::$type);
+        });
     }
 
     public function dislikedPostIds()
@@ -176,8 +188,12 @@ class User extends Authenticatable implements JWTSubject
     // Comments disliked by the user
     public function dislikedComments()
     {
-        return $this->morphedByMany(Comment::class, 'entity', 'reactions')
-                    ->where('reaction', false);
+        return Comment::whereHas('reactions', function ($query) {
+            $query->where('user_id', $this->id)
+                ->where('user_type', self::$userType)
+                ->where('reaction', false)
+                ->where('entity_type', Comment::class);
+        });
     }
 
     public function dislikedCommentIds()
