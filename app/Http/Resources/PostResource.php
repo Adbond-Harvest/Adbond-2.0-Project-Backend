@@ -44,7 +44,7 @@ class PostResource extends JsonResource
         $liked = false;
         $user = Auth::user() ?? Auth::guard("client")->user();
         if($user) {
-            $likedPostIds = $user->likedPostIds();
+            $likedPostIds = $user->likedPosts()->pluck("posts.id")->toArray();
             $liked = (in_array($this->id, $likedPostIds));
         }
         return $liked;
@@ -55,7 +55,7 @@ class PostResource extends JsonResource
         $disliked = false;
         $user = Auth::user() ?? Auth::guard("client")->user();
         if($user) {
-            $likedPostIds = $user->dislikedPostIds();
+            $likedPostIds = $user->dislikedPosts()->pluck("posts.id")->toArray();
             $disliked = (in_array($this->id, $likedPostIds));
         }
         return $disliked;

@@ -139,6 +139,7 @@ class User extends Authenticatable implements JWTSubject
     public function likedPostIds()
     {
         $ids = [];
+        // dd($this->likedPosts()->pluck("posts.id")->toArray());
         if($this->likedPosts()->count() > 0) {
             foreach($this->likedPosts() as $post) $ids[] = $post->id;
         }
@@ -179,7 +180,7 @@ class User extends Authenticatable implements JWTSubject
     public function dislikedPostIds()
     {
         $ids = [];
-        if($this->likedPosts()->count() > 0) {
+        if($this->dislikedPosts()->count() > 0) {
             foreach($this->dislikedPosts() as $post) $ids[] = $post->id;
         }
         return $ids;

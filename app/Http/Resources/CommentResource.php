@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 
+use app\Http\Resources\UserClientResource;
+
 class CommentResource extends JsonResource
 {
     /**
@@ -18,12 +20,13 @@ class CommentResource extends JsonResource
         return [
             "id" => $this->id,
             "message" => $this->message,
-            "commenter" => $this->commenter->name,
+            "commenter" => new UserClientResource($this->commenter),
             "liked" => $this->liked(),
             "disliked" => $this->disliked(),
             "addedAt" => $this->created_at->format('F j, Y'),
             "likesCount" => $this->likes->count(),
-            "dislikesCount" => $this->dislikes->count()
+            "dislikesCount" => $this->dislikes->count(),
+            "commentedAt" => $this->created_at->timestamp
         ];
     }
 
