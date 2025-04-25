@@ -49,6 +49,20 @@ class AssessmentService
         return Assessment::with($with)->orderBy("created_at", "DESC")->get();
     }
 
+    public function activate($assessment)
+    {
+        $assessment->active = 1;
+        $assessment->update();
+        return $assessment;
+    }
+
+    public function deactivate($assessment)
+    {
+        $assessment->active = 0;
+        $assessment->update();
+        return $assessment;
+    }
+
     public function delete($assessment)
     {
         $assessment->delete();

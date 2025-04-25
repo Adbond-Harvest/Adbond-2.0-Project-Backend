@@ -248,8 +248,10 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('', [UserAssessmentController::class, "assessments"]);
             Route::get('/attempts/{assessmentId}', [UserAssessmentController::class, "attempts"]);
             Route::get('/attempt/{attemptId}', [AssessmentAttemptController::class, "attempt"]);
+            Route::post('/toggle_activate', [UserAssessmentController::class, "toggleActivate"]);
             Route::post('/{assessmentId}', [UserAssessmentController::class, "update"]);
             Route::get('/{assessmentId}', [UserAssessmentController::class, "assessment"]);
+            Route::delete('/{assessmentId}', [UserAssessmentController::class, "assessment"]);
         });
         
 
