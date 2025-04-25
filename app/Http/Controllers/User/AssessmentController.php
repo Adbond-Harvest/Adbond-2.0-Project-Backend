@@ -8,6 +8,7 @@ use app\Http\Controllers\Controller;
 
 use app\Http\Requests\User\CreateAssessment;
 use app\Http\Requests\User\UpdateAssessment;
+use app\Http\Requests\User\ToggleAssessmentActivate;
 
 use app\Http\Resources\AssessmentResource;
 use app\Http\Resources\AssessmentAttemptResource;
@@ -180,5 +181,27 @@ class AssessmentController extends Controller
         $attempts = $this->assessmentAttemptService->assessmentAttempts($assessmentId);
 
         return Utilities::okay(AssessmentAttemptResource::collection($attempts));
+    }
+
+    public function toggleActivate(ToggleAssessmentActivate $request)
+    {
+        $assessment = $this->assessmentService->assessment($request->validated("assessmentId"));
+        if(!$assessment) return Utilities::error402("Assessment not found");
+
+        $assessment = ($assessment->active==0) ? $this->assessmentService->activate($assessment) : $this->assessmentService->deactivate($assessment);
+
+        return Utilities::ok(new AssessmentResource($assessment));
+    }
+
+    public function delete($assessmentId)
+    {
+        if (!is_numeric($assessmentId) || !ctype_digit($assessmentId)) return Utilities::error402("Invalid parameter assessmentID");
+
+        $assessment = $this->assessmentService->assessment($assessmentId);
+        if(!$assessment) return Utilities::error402("Assessment not found");
+
+        $this->assessmentService->delete($assessment);
+
+        return Utilities::okay("Assessment Deleted Successfully");
     }
 }
