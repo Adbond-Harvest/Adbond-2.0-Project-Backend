@@ -46,6 +46,17 @@ class CommentController extends Controller
         }
     }
 
+    public function delete($commentId)
+    {
+        if (!is_numeric($commentId) || !ctype_digit($commentId)) return Utilities::error402("Invalid parameter commentID");
+        $comment = $this->commentService->comment($commentId, ['comments']);
+        if(!$comment) return Utilities::error402("Comment not found");
+
+        $this->commentService->delete($comment);
+
+        return Utilities::okay("Comment Deleted");
+    }
+
     public function react(React $request)
     {
         try{

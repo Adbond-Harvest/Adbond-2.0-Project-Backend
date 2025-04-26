@@ -3,6 +3,7 @@
 namespace app\Services;
 
 use app\Models\ClientPurchasesSummaryView;
+use app\Models\ClientPackage;
 
 use app\Enums\PurchaseSummaryDuration;
 
@@ -36,7 +37,13 @@ class PurchaseService
         // if($start) $start = explode(' ', $start)[0];
         // if($end) $end = explode(' ', $end)[0];
         // dd($start.' - '.$end);
-
+        if($this->summaryDuration == PurchaseSummaryDuration::TODAY->value) {
+            // return ClientPackage::select()
+            return ClientPackage::select('amount as total_amount', 'purchase_completed_at as purchase_date')
+                ->where('origin', 'order')
+                ->whereDate('purchase_date', now())
+                ->get();
+        }
         $query = ClientPurchasesSummaryView::query();
         if($start && $end) {
             $query = $query->whereBetween('purchase_date', [$start, $end]);

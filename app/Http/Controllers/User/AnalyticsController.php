@@ -1,0 +1,55 @@
+<?php
+
+namespace app\Http\Controllers\User;
+
+use Illuminate\Http\Request;
+use app\Http\Controllers\Controller;
+
+use app\Services\PurchaseService;
+use app\Services\ProjectService;
+
+use app\Enums\PurchaseSummaryDuration;
+
+use app\Utilities;
+
+class AnalyticsController extends Controller
+{
+    private $purchaseService;
+    private $projectService;
+
+    public function __construct()
+    {
+        $this->purchaseService = new PurchaseService;
+        $this->projectService = new ProjectService;
+    }
+
+
+    public function salesOverview(Request $request)
+    {
+        $duration = ($request->query('duration'));
+        $validDurations = [PurchaseSummaryDuration::TODAY, PurchaseSummaryDuration::WEEK->value, PurchaseSummaryDuration::MONTH->value, 
+                            PurchaseSummaryDuration::YEAR->value, PurchaseSummaryDuration::ALL->value];
+        if(!$duration || !in_array($duration, $validDurations)) $duration = PurchaseSummaryDuration::MONTH->value;
+
+        $this->purchaseService->summaryDuration = $duration;
+
+        $purchaseChart = $this->purchaseService->clientPurchaseSummary();
+        $purchaseTotal = 0;
+        if($purchaseChart->count() > 0) {
+            foreach($purchaseChart as $purchase) {
+                $purchaseTotal += $purchase->total_amount;
+            }
+        }
+
+        return Utilities::ok([
+            "purchaseTotal" => $purchaseTotal,
+            "purchaseChart" => $purchaseChart,
+        ]);
+    }
+
+    public function projectTypes()
+    {
+        $projectTypesSummary = $this->projectService->projectTypesSummary();
+        return Utilities::ok($projectTypesSummary);
+    }
+}
