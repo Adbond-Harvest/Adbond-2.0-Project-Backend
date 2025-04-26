@@ -30,6 +30,7 @@ use app\Http\Controllers\User\AssessmentController as UserAssessmentController;
 use app\Http\Controllers\User\AssessmentQuestionController;
 use app\Http\Controllers\User\AssessmentQuestionOptionController;
 use app\Http\Controllers\User\AssessmentAttemptController;
+use app\Http\Controllers\User\AnalyticsController;
 
 
 // Client Controllers
@@ -200,10 +201,12 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/{postId}', [UserPostController::class, "update"]);
             Route::get('', [UserPostController::class, "posts"]);
             Route::get('/{postId}', [UserPostController::class, "post"]);
+            Route::delete('/{postId}', [UserPostController::class, "delete"]);
         });
 
         Route::group(['prefix' => '/comments'], function () {
             Route::post('', [UserCommentController::class, "save"]);
+            Route::delete('/{commentId}', [UserCommentController::class, "delete"]);
             Route::post('/react', [UserCommentController::class, "react"]);
         });
 
@@ -251,7 +254,13 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/toggle_activate', [UserAssessmentController::class, "toggleActivate"]);
             Route::post('/{assessmentId}', [UserAssessmentController::class, "update"]);
             Route::get('/{assessmentId}', [UserAssessmentController::class, "assessment"]);
-            Route::delete('/{assessmentId}', [UserAssessmentController::class, "assessment"]);
+            Route::delete('/{assessmentId}', [UserAssessmentController::class, "delete"]);
+        });
+
+        // analytics
+        Route::group(['prefix' => '/analytics'], function () {
+            Route::get('/sales_overview', [AnalyticsController::class, "salesOverview"]);
+            Route::get('/project_types', [AnalyticsController::class, "projectTypes"]);
         });
         
 

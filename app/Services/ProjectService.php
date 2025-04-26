@@ -100,6 +100,11 @@ class ProjectService
         ->get();
     }
 
+    public function projectTypesSummary()
+    {
+        return ProjectPackageSummaryView::select("project_type as projectType", DB::raw('SUM(total_packages) as total'))->groupBy("project_type")->get();
+    }
+
     public function activeProjects($with=[], $offset=0, $perPage=null)
     {
         $query = Project::with($with)->where("active", true);

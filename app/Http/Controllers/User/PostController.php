@@ -136,6 +136,17 @@ class PostController extends Controller
         return Utilities::ok(new PostResource($post));
     }
 
+    public function delete($postId)
+    {
+        if (!is_numeric($postId) || !ctype_digit($postId)) return Utilities::error402("Invalid parameter postID");
+        $post = $this->postService->post($postId, ['comments']);
+        if(!$post) return Utilities::error402("Post not found");
+
+        $this->postService->delete($post);
+
+        return Utilities::okay("Post Deleted");
+    }
+
 
     private function saveFile($file, $postId=null)
     {

@@ -171,6 +171,7 @@ class EnumClass
             PurchaseSummaryDuration::CUSTOM->value,
             PurchaseSummaryDuration::MONTH->value,
             PurchaseSummaryDuration::WEEK->value,
+            PurchaseSummaryDuration::TODAY->value,
             PurchaseSummaryDuration::YEAR->value
         ];
     }
