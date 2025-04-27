@@ -63,11 +63,11 @@ class Post extends Model
                 }
             }
 
-            if($post->postTags->count() > 0) {
-                foreach($post->postTags as $postTag) {
-                    $postTag->delete();
-                }
-            }
+            // if($post->postTags->count() > 0) {
+            //     foreach($post->postTags as $postTag) {
+            //         $postTag->delete();
+            //     }
+            // }
         });
     }
 }
