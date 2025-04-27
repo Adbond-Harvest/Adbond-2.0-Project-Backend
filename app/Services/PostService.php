@@ -10,6 +10,8 @@ use app\Models\Post;
 use app\Enums\PostType;
 use app\Enums\ProjectFilter;
 
+use app\Helpers;
+
 class PostService
 {
     public $count = false;
@@ -18,6 +20,7 @@ class PostService
     {
             $post = new Post;
             $post->topic = $data['topic'];
+            $post->slug = Helpers::createSlug($data['topic']);
             $post->post_type = $data['type'];
             $post->user_id = $data['userId'];
             $post->file_id = $data['fileId'];
@@ -29,7 +32,10 @@ class PostService
 
     public function update($data, $post)
     {
-        if(isset($data['topic'])) $post->topic = $data['topic'];
+        if(isset($data['topic'])) {
+            $post->topic = $data['topic'];
+            $post->slug = Helpers::createSlug($data['topic']);
+        }
         if(isset( $data['type'])) $post->post_type = $data['type'];
         if(isset( $data['fileId'])) $post->file_id = $data['fileId'];
         if(isset( $data['content'])) $post->content = $data['content'];

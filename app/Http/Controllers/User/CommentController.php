@@ -49,7 +49,7 @@ class CommentController extends Controller
     public function delete($commentId)
     {
         if (!is_numeric($commentId) || !ctype_digit($commentId)) return Utilities::error402("Invalid parameter commentID");
-        $comment = $this->commentService->comment($commentId, ['comments']);
+        $comment = $this->commentService->comment($commentId);
         if(!$comment) return Utilities::error402("Comment not found");
 
         $this->commentService->delete($comment);
