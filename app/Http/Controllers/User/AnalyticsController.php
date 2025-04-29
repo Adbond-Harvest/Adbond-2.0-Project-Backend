@@ -28,7 +28,7 @@ class AnalyticsController extends Controller
     {
         $duration = ($request->query('duration'));
         $validDurations = [PurchaseSummaryDuration::TODAY, PurchaseSummaryDuration::WEEK->value, PurchaseSummaryDuration::MONTH->value, 
-                            PurchaseSummaryDuration::YEAR->value, PurchaseSummaryDuration::ALL->value];
+                            PurchaseSummaryDuration::YEAR->value, PurchaseSummaryDuration::ALL->value, PurchaseSummaryDuration::CUSTOM->value];
         if(!$duration || !in_array($duration, $validDurations)) $duration = PurchaseSummaryDuration::MONTH->value;
 
         if($duration == PurchaseSummaryDuration::CUSTOM->value) {
