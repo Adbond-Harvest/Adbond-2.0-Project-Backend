@@ -31,6 +31,16 @@ class AnalyticsController extends Controller
                             PurchaseSummaryDuration::YEAR->value, PurchaseSummaryDuration::ALL->value];
         if(!$duration || !in_array($duration, $validDurations)) $duration = PurchaseSummaryDuration::MONTH->value;
 
+        if($duration == PurchaseSummaryDuration::CUSTOM->value) {
+            $start = $request->query('start');
+            $end = $request->query('end');
+
+            if(!$start) return Utilities::error402("Custom Start Date is required");
+
+            $this->purchaseService->start = $start;
+            if($end) $this->purchaseService->end = $end;
+        }
+
         $this->purchaseService->summaryDuration = $duration;
 
         $purchaseChart = $this->purchaseService->clientPurchaseSummary();
