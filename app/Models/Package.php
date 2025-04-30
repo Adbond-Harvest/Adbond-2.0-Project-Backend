@@ -9,6 +9,8 @@ class Package extends Model
 {
     use HasFactory;
 
+    public static $type = "app\Models\Package";
+
     /**
      * The attributes that should be cast.
      *

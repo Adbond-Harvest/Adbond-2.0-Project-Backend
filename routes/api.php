@@ -27,6 +27,8 @@ use app\Http\Controllers\User\OfferPaymentController as UserOfferPaymentControll
 use app\Http\Controllers\User\UtilityController as UserUtilityController;
 use app\Http\Controllers\User\AssetSwitchController as UserAssetSwitchController;
 use app\Http\Controllers\User\AssessmentController as UserAssessmentController;
+use app\Http\Controllers\User\PromoController as UserPromoController;
+use app\Http\Controllers\User\PromoCodeController as UserPromoCodeController;
 use app\Http\Controllers\User\AssessmentQuestionController;
 use app\Http\Controllers\User\AssessmentQuestionOptionController;
 use app\Http\Controllers\User\AssessmentAttemptController;
@@ -208,6 +210,23 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('', [UserCommentController::class, "save"]);
             Route::delete('/{commentId}', [UserCommentController::class, "delete"]);
             Route::post('/react', [UserCommentController::class, "react"]);
+        });
+
+        Route::group(['prefix' => '/promos'], function () {
+            Route::group(['prefix' => '/promo_codes'], function () {
+                Route::post('', [UserPromoCodeController::class, "createPromoCode"]);
+                Route::post('/toggle_activate', [UserPromoCodeController::class, "toggleActivate"]);
+                Route::post('/{promoCodeId}', [UserPromoCodeController::class, "update"]);
+                Route::delete('/{promoCodeId}', [UserPromoCodeController::class, "delete"]);
+                Route::get('', [UserPromoCodeController::class, "promoCodes"]);
+            });
+
+            Route::post('', [UserPromoController::class, "create"]);
+            Route::post('/toggle_activate', [UserPromoController::class, "toggleActivate"]);
+            Route::post('/{PromoId}', [UserPromoController::class, "update"]);
+            Route::delete('/{PromoId}', [UserPromoController::class, "delete"]);
+            Route::get('', [UserPromoController::class, "promos"]);
+            Route::get('/{PromoId}', [UserPromoController::class, "promo"]);
         });
 
         // Client
