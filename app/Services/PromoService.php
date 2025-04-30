@@ -58,6 +58,16 @@ class PromoService
         }
     }
 
+    public function getPromoProductByDetail($promoId, $type, $id)
+    {
+        return PromoProduct::where("promo_id", $promoId)->where("product_type", $type)->where("product_id", $id)->first();
+    }
+
+    public function removePromoProduct($product)
+    {
+        $product->delete();
+    }
+
     public function toggleActivate($promo)
     {
         $promo->active = 1 - $promo->active;
