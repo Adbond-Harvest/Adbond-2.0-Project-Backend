@@ -37,4 +37,23 @@ class Promo extends Model
     {
         return $this->hasMany(PromoCode::class);
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        self::deleting(function (Promo $promo) {
+            if($promo->promoCodes->count() > 0) {
+                foreach($promo->promoCodes as $promoCode) {
+                    $promoCode->delete();
+                }
+            }
+
+            if($promo->promoProducts->count() > 0) {
+                foreach($promo->promoProducts as $promoProduct) {
+                    $promoProduct->delete();
+                }
+            }
+        });
+    }
 }
