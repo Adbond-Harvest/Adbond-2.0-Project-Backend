@@ -13,6 +13,40 @@ use app\Helpers;
 
 class PromoCodeService
 {
+    public function save($data)
+    {
+        $promoCode = new PromoCode;
+        $promoCode->promo_id = $data['promoId'];
+        $promoCode->code = $data['code'];
+        if(isset($data['expiry'])) $promoCode->expiry = $data['expiry'];
+        if(isset($data['maxUsage'])) $promoCode->max_usage = $data['maxUsage'];
+        if(isset($data['packageLimited'])) $promoCode->package_limited = 1;
+
+        $promoCode->save();
+
+        return $promoCode;
+    }
+
+    public function update($data, $promoCode)
+    {
+        if(isset($data['code'])) $promoCode->code = $data['code'];
+        if(isset($data['expiry'])) $promoCode->expiry = $data['expiry'];
+        if(isset($data['maxUsage'])) $promoCode->max_usage = $data['maxUsage'];
+        if(isset($data['packageLimited'])) $promoCode->package_limited = 1;
+
+        $promoCode->update();
+
+        return $promoCode;
+    }
+
+    public function toggleActivate($promoCode)
+    {
+        $promoCode->active = 1 - $promoCode->active;
+        $promoCode->save();
+
+        return $promoCode;
+    }
+
     public function validatePromoCode($code, $package)
     {
         $promoCode = PromoCode::whereCode($code)->first();
@@ -61,6 +95,11 @@ class PromoCodeService
         return false;
     }
 
+    public function promoCodes($with=[])
+    {
+        return PromoCode::with($with)->orderBy("created_at", "DESC")->get();
+    }
+
     public function promoCode($code)
     {
         return PromoCode::whereCode($code)->first();
@@ -69,6 +108,11 @@ class PromoCodeService
     public function promoCodeById($id)
     {
         return PromoCode::find($id);
+    }
+
+    public function delete($promoCode)
+    {
+        $promoCode->delete();
     }
 
 }

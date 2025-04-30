@@ -32,4 +32,9 @@ class Promo extends Model
     {
         return $this->hasMany(PromoProduct::class);
     }
+
+    public function promoCodes()
+    {
+        return $this->hasMany(PromoCode::class);
+    }
 }

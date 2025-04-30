@@ -9,6 +9,8 @@ class Project extends Model
 {
     use HasFactory;
 
+    public static $type = "app\Models\Project";
+
     // public function getCreatedAtAttribute($value)
     // {
     //     return \Carbon\Carbon::parse($value)->diffForHumans();

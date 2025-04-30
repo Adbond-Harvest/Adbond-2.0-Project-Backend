@@ -20,6 +20,7 @@ use app\Enums\OfferApprovalStatus;
 use app\Enums\PurchaseSummaryDuration;
 use app\Enums\AssetSwitchType;
 use app\Enums\Weekday;
+use app\Enums\PromoProductType;
 
 class EnumClass
 {
@@ -195,6 +196,14 @@ class EnumClass
             Weekday::SATURDAY->value,
             Weekday::SUNDAY->value,
             Weekday::ALL->value
+        ];
+    }
+
+    public static function promoProductTypes()
+    {
+        return [
+            PromoProductType::PROJECT->value,
+            PromoProductType::PACKAGE->value
         ];
     }
 }
