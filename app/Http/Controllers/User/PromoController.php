@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use app\Http\Requests\User\CreatePromo;
 use app\Http\Requests\User\UpdatePromo;
 use app\Http\Requests\User\Toggle;
+use app\Http\Requests\User\AddPromoProduct;
+use app\Http\Requests\User\DeletePromoProduct;
 
 use app\Http\Resources\PromoResource;
 
@@ -119,6 +121,52 @@ class PromoController extends Controller
         $action = ($promo->active) ? "Activated" : "Deactivated";
 
         return Utilities::okay("Promo has been ".$action);
+    }
+
+    public function addProducts(AddPromoProduct $request)
+    {
+        try{
+            $data = $request->validated();
+
+            $promo = $this->promoService->getPromo($data['promoId']);
+            if(!$promo) return Utilities::error402("Promo not found");
+
+            $products = [];
+            foreach($data['products'] as $product) {
+                $existingProduct = $this->promoService->getPromoProductByDetail($data['promoId'], $product['type'], $product['id']);
+                if(!$existingProduct) {
+                    $product['promoId'] = $data['promoId'];
+                    $product['type'] = ($product['type'] == PromoProductType::PACKAGE->value) ? Package::$type : Project::$type;
+                    $products[] = $product;
+                }
+            }
+
+            $this->promoService->savePromoProducts($products);
+            $promo = $this->promoService->getPromo($data['promoId'], ['packages', 'projects']);
+
+            return Utilities::ok(new PromoResource($promo));
+
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
+    }
+
+    public function removeProduct(DeletePromoProduct $request)
+    {
+        try{
+            $data = $request->validated();
+            $data['type'] = ($data['type'] == PromoProductType::PACKAGE->value) ? Package::$type : Project::$type;
+            $product = $this->promoService->getPromoProductByDetail($data['promoId'], $data['type'], $data['id']);
+            if(!$product) return Utilities::error402("Promo Product not found");
+
+            $this->promoService->removePromoProduct($product);
+
+            $promo = $this->promoService->getPromo($data['promoId'], ['packages', 'projects']);
+
+            return Utilities::ok(new PromoResource($promo));
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
     }
 
     public function promo($promoId)

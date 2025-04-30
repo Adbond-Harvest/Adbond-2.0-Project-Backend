@@ -223,6 +223,8 @@ Route::group(['prefix' => '/v2',], function () {
 
             Route::post('', [UserPromoController::class, "create"]);
             Route::post('/toggle_activate', [UserPromoController::class, "toggleActivate"]);
+            Route::post('/add_products', [UserPromoController::class, "addProducts"]);
+            Route::post('/remove_product', [UserPromoController::class, "removeProduct"]);
             Route::post('/{PromoId}', [UserPromoController::class, "update"]);
             Route::delete('/{PromoId}', [UserPromoController::class, "delete"]);
             Route::get('', [UserPromoController::class, "promos"]);
