@@ -71,11 +71,23 @@ class Package extends Model
         return $this->hasMany(ClientPackage::class, "package_id", "id");
     }
 
+    public function promoProducts()
+    {
+        return $this->morphMany(PromoProduct::class, 'product');
+    }
+
     /**
      * Get all promos for this package
      */
     public function promos()
     {
-        return $this->morphMany(PromoProduct::class, 'product');
+        return $this->hasManyThrough(
+            Promo::class,
+            PromoProduct::class,
+            'product_id',   // Foreign key on promo_products table...
+            'id',           // Foreign key on promos table...
+            'id',           // Local key on packages table...
+            'promo_id'      // Local key on promo_products table...
+        )->where('promo_products.product_type', '=', self::$type);
     }
 }

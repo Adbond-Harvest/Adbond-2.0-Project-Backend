@@ -42,7 +42,7 @@ class PostController extends Controller
 
     public function save(CreatePost $request)
     {
-        // try{
+        try{
             DB::beginTransaction();
             $data = $request->validated();
             $res = $this->saveFile($request->file('file'));
@@ -58,10 +58,10 @@ class PostController extends Controller
             DB::commit();
             // dd($post);
             return Utilities::ok(new PostResource($post));
-        // }catch(\Exception $e){
-        //     DB::rollBack();
-        //     return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
-        // }
+        }catch(\Exception $e){
+            DB::rollBack();
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
     }
 
     public function update(UpdatePost $request, $postId)
