@@ -14,7 +14,7 @@ class Comment extends Model
     public static $type = "app\Models\Comment";
 
     /**
-     * Get the parent purchase model (Order or Offer).
+     * Get the parent comment model (User or Client).
      */
     public function commenter(): MorphTo
     {

@@ -18,13 +18,16 @@ use app\Http\Requests\SaveMedia;
 use app\Http\Requests\SaveMultipleMedia;
 
 use app\Models\User;
+use app\Models\Package;
 
 use app\Services\PackageService;
 use app\Services\FileService;
 use app\Services\ProjectService;
+use app\Services\PromoService;
 
 use app\Enums\FilePurpose;
 use app\Enums\ProjectFilter;
+
 use app\Utilities;
 
 
@@ -33,12 +36,14 @@ class PackageController extends Controller
     private $packageService;
     private $projectService;
     private $fileService;
+    private $promoService;
 
     public function __construct()
     {
         $this->packageService = new PackageService;
         $this->projectService = new ProjectService;
         $this->fileService = new FileService;
+        $this->promoService = new PromoService;
     }
 
     public function packages(Request $request, $projectId)
@@ -363,6 +368,46 @@ class PackageController extends Controller
             $this->packageService->delete($package);
 
         } catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
+    }
+
+    public function addPromo(AddProductPromo $request)
+    {
+        try{
+            $data = $request->validated();
+
+            $package = $this->packageService->package($data['productId']);
+            if(!$package) return Utilities::error402("Package not found");
+
+            $product['type'] = Package::$type;
+            $product['id'] = $data['productId'];
+            $product['promoId'] = $data['promoId'];
+
+            $promoProduct = $this->promoService->savePromoProduct($product);
+
+            return Utilities::okay("Promo has been Added to the Package Successfully");
+
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
+    }
+
+    public function removePromo(RemoveProductPromo $request)
+    {
+        try{
+            $data = $request->validated();
+            $package = $this->packageService->package($data['productId']);
+            if(!$package) return Utilities::error402("Package not found");
+
+            $promoProduct = $this->promoService->getPromoProductByDetail($data["promoId"], Package::$type, $data['productId']);
+            if(!$promoProduct) return Utilities::error402("Promo Product not found");
+
+            $this->promoService->removePromoProduct($promoProduct);
+
+            return Utilities::okay("Promo has been Removed to the Package Successfully");
+
+        }catch(\Exception $e){
             return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }
     }

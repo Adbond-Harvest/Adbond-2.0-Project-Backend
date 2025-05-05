@@ -11,6 +11,8 @@ use app\Http\Requests\User\UpdateProject;
 use app\Http\Requests\User\AddProjectLocation;
 use app\Http\Requests\User\ToggleProjectActivate;
 use app\Http\Requests\User\FilterProject;
+use app\Http\Requests\User\AddProductPromo;
+use app\Http\Requests\User\RemoveProductPromo;
 
 use app\Http\Resources\ProjectResource;
 use app\Http\Resources\Min\ProjectTypeResource;
@@ -19,9 +21,12 @@ use app\Services\ProjectService;
 use app\Services\FileService;
 use app\Services\ProjectTypeService;
 use app\Services\MetricService;
+use app\Services\PromoService;
 
 use app\Enums\ProjectFilter;
 use app\Enums\MetricType;
+
+use app\Models\Project;
 
 use app\Utilities;
 
@@ -31,6 +36,7 @@ class ProjectController extends Controller
     private $projectTypeService;
     private $fileService;
     private $metricService;
+    private $promoService;
 
     public function __construct()
     {
@@ -38,6 +44,7 @@ class ProjectController extends Controller
         $this->projectTypeService = new ProjectTypeService;
         $this->fileService = new FileService;
         $this->metricService = new MetricService;
+        $this->promoService = new PromoService;
     }
 
     public function save(SaveProject $request)
@@ -70,6 +77,46 @@ class ProjectController extends Controller
             }
             $project = $this->projectService->update($data, $project);
             return Utilities::okay("Project Updated Successfully", new ProjectResource($project));
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
+    }
+
+    public function addPromo(AddProductPromo $request)
+    {
+        try{
+            $data = $request->validated();
+
+            $project = $this->projectService->project($data['productId']);
+            if(!$project) return Utilities::error402("Project not found");
+
+            $product['type'] = Project::$type;
+            $product['id'] = $data['productId'];
+            $product['promoId'] = $data['promoId'];
+
+            $promoProduct = $this->promoService->savePromoProduct($product);
+
+            return Utilities::okay("Promo has been Added to the Project Successfully");
+
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
+    }
+
+    public function removePromo(RemoveProductPromo $request)
+    {
+        try{
+            $data = $request->validated();
+            $project = $this->projectService->project($data['productId']);
+            if(!$project) return Utilities::error402("Project not found");
+
+            $promoProduct = $this->promoService->getPromoProductByDetail($data["promoId"], Project::$type, $data['productId']);
+            if(!$promoProduct) return Utilities::error402("Promo Product not found");
+
+            $this->promoService->removePromoProduct($promoProduct);
+
+            return Utilities::okay("Promo has been Removed to the Project Successfully");
+
         }catch(\Exception $e){
             return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }

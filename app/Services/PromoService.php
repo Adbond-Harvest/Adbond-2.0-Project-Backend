@@ -46,15 +46,22 @@ class PromoService
         return $promo;
     }
 
-
-    public function savePromoProducts($products)
+    public function savePromoProduct($product)
     {
-        foreach($products as $product) {
             $promoProduct = new PromoProduct;
             $promoProduct->product_type = $product['type'];
             $promoProduct->product_id = $product['id'];
             $promoProduct->promo_id = $product['promoId'];
             $promoProduct->save();
+
+            return $promoProduct;
+    }
+
+
+    public function savePromoProducts($products)
+    {
+        foreach($products as $product) {
+            $this->savePromoProduct($product);
         }
     }
 

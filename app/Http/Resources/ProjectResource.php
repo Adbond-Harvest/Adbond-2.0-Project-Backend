@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 use app\Http\Resources\ProjectTypeResource;
 use app\Http\Resources\PackageResource;
+use app\Http\Resources\PromoResource;
 
 class ProjectResource extends JsonResource
 {
@@ -25,7 +26,8 @@ class ProjectResource extends JsonResource
             "status" => ($this->active) ? "Active" : "Inactive",
             "created" => $this->created_at->format("F j, Y"),
             "projectType" => new ProjectTypeResource($this->whenLoaded("projectType")),
-            "packages" => PackageResource::collection($this->whenLoaded("packages"))
+            "packages" => PackageResource::collection($this->whenLoaded("packages")),
+            "promos" => PromoResource::collection($this->promos)
             // "locations" => ProjectLocationResource::collection($this->whenLoaded("locations"))
         ];
         $resource['packageCount'] = $this->packages->count();

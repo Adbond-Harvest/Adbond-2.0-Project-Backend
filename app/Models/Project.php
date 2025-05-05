@@ -48,10 +48,20 @@ class Project extends Model
     /**
      * Get all promos for this project
      */
-    public function promos()
+    public function promoProducts()
     {
         return $this->morphMany(PromoProduct::class, 'product');
     }
 
-
+    public function promos()
+    {
+        return $this->hasManyThrough(
+            Promo::class,
+            PromoProduct::class,
+            'product_id',   // Foreign key on promo_products table...
+            'id',           // Foreign key on promos table...
+            'id',           // Local key on projects table...
+            'promo_id'      // Local key on promo_products table...
+        )->where('promo_products.product_type', '=', self::$type);
+    }
 }

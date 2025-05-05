@@ -128,6 +128,8 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/activate', [UserProjectController::class, "activate"]);
             Route::post('/deactivate', [UserProjectController::class, "deactivate"]);
             Route::post('/delete', [UserProjectController::class, "delete"]);
+            Route::post('/add_promo', [UserProjectController::class, "addPromo"]);
+            Route::post('/remove_promo', [UserProjectController::class, "removePromo"]);
             // Route::post('/filter/{projectTypeId}', [UserProjectController::class, "filter"]);
             Route::get('/types', [UserProjectController::class, "types"]);
             // Route::get('/summary/{projectTypeId}', [UserProjectController::class, "summary"]);
@@ -148,6 +150,8 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/deactivate', [UserPackageController::class, "deactivate"]);
             Route::post('/delete', [UserPackageController::class, "delete"]);
             Route::post('/filter/{projectId}', [UserPackageController::class, "filter"]);
+            Route::post('/add_promo', [UserPackageController::class, "addPromo"]);
+            Route::post('/remove_promo', [UserPackageController::class, "removePromo"]);
             Route::get('/all/{projectId}', [UserPackageController::class, "packages"]);
             Route::get('/search/{projectId}', [UserPackageController::class, "search"]);
             Route::get('/export/{projectId}', [UserPackageController::class, "export"]);
