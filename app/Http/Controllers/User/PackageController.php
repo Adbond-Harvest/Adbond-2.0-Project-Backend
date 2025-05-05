@@ -16,6 +16,8 @@ use app\Http\Requests\User\TogglePackageActivate;
 use app\Http\Requests\User\FilterPackage;
 use app\Http\Requests\SaveMedia;
 use app\Http\Requests\SaveMultipleMedia;
+use app\Http\Requests\User\AddProductPromo;
+use app\Http\Requests\User\RemoveProductPromo;
 
 use app\Models\User;
 use app\Models\Package;
