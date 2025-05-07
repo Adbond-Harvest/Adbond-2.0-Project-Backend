@@ -65,9 +65,11 @@ class PromoController extends Controller
             $promo = $this->promoService->save($data);
 
             if(isset($data['promoCode'])) {
-                $promoCodeData = $data['promoCode'];
-                $promoCodeData['promoId'] = $promo->id;
-                $promoCode = $this->promoCodeService->save($promoCodeData);
+                foreach($data['promoCode'] as $promoCode) {
+                    $promoCodeData = $promoCode;
+                    $promoCodeData['promoId'] = $promo->id;
+                    $promoCode = $this->promoCodeService->save($promoCodeData);
+                }
             }
 
             if(isset($data['products'])) {
