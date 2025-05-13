@@ -36,9 +36,10 @@ class CreatePromo extends BaseRequest
             "products.*.type" => ["string", Rule::in(EnumClass::promoProductTypes())],
             "products.*.id" => "integer",
             "promoCode" => "nullable|array",
-            "promoCode.*code" => "string|unique:promo_codes,code",
-            "promoCode.*expiry" => "nullable|date|date_format:Y-m-d",
-            "promoCode.*maxUsage" => "nullable|integer"
+            "promoCode.*" => "nullable|array",
+            "promoCode.*.code" => "string|unique:promo_codes,code",
+            "promoCode.*.expiry" => "nullable|date|date_format:Y-m-d",
+            "promoCode.*.maxUsage" => "nullable|integer"
         ];
     }
 }

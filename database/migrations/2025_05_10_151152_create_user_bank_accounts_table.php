@@ -4,8 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-use app\Enums\RedemptionStatus;
-
 return new class extends Migration
 {
     /**
@@ -13,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('staff_commission_redemptions', function (Blueprint $table) {
+        Schema::create('user_bank_accounts', function (Blueprint $table) {
             $table->id();
             $table->foreignId("user_id");
-            $table->double("amount");
-            $table->foreignId("bank_account_id");
-            $table->string("status")->default(RedemptionStatus::PENDING->value);
+            $table->string("number", 10);
+            $table->string("name");
+            $table->foreignId("bank_id");
             $table->timestamps();
         });
     }
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('staff_commission_redemptions');
+        Schema::dropIfExists('user_bank_accounts');
     }
 };

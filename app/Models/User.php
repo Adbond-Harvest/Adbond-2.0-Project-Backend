@@ -96,6 +96,16 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo("app\Models\User", "registered_by", "id");
     }
 
+    public function staffReferrals()
+    {
+        return $this->hasMany(User::class, "registered_by", "id");
+    }
+
+    public function clientReferrals(): MorphMany
+    {
+        return $this->morphMany(Client::class, 'referer');
+    }
+
     /**
      * Get all commission earnings for the user
      */

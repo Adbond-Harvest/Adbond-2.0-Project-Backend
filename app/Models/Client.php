@@ -81,6 +81,11 @@ class Client extends Authenticatable implements JWTSubject
         return $this->morphTo();
     }
 
+    public function referrals(): MorphMany
+    {
+        return $this->morphMany(Client::class, 'referer');
+    }
+
     public function nextOfKins()
     {
         return  $this->hasOne(ClientNextOfKin::class, "client_id", "id");
