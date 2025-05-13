@@ -10,13 +10,17 @@ use app\Exceptions\UserNotFoundException;
 use app\Models\Payment;
 use app\Models\Payment_mode;
 use app\Models\StaffCommissionEarning;
+use app\Models\StaffCommissionRedemption;
 use app\Models\DeductibleFee;
 use app\Models\CommissionRate;
 use app\Models\ClientCommissionEarning;
 use app\Models\ClientCommissionRate;
+use app\Models\StaffTotalEarningView;
+use app\Models\StaffTotalRedemptionView;
 
 use app\Enums\StaffTypes;
 use app\Enums\StaffCommissionType;
+use app\Enums\RedemptionStatus;
 
 use app\Helpers;
 use app\Utilities;
@@ -111,6 +115,52 @@ class CommissionService
         $commission = $this->addDirectCommission($user, $order);
         if(isset($staff) && $staff != null) $this->addIndirectCommission($staff, $order);
         return true;
+    }
+
+    public function getStaffEarnings($userId)
+    {
+        return StaffCommissionEarning::where("user_id", $userId)->orderBy("created_at", "DESC")->get();
+    }
+
+    public function getTotalStaffsEarnings()
+    {
+        return StaffTotalEarningView::get();
+    }
+
+    public function getTotalStaffEarnings($userId)
+    {
+        $totalEarning = StaffTotalEarningView::where("user_id", $userId)->first();
+        return ($totalEarning) ? $totalEarning->total_earnings : 0;
+    }
+
+    public function getTotalStaffRedemptions($userId)
+    {
+        $totalRedemption = StaffTotalRedemptionView::where("user_id", $userId)->first();
+        return ($totalRedemption) ? $totalRedemption->total_redemptions : 0;
+    }
+
+    public function pendingRedemption($userId)
+    {
+        return StaffCommissionRedemption::where("user_id", $userId)->where("status", RedemptionStatus::PENDING->value)->first();
+    }
+
+    public function commissionRedemptions($with=[], $userId=null)
+    {
+        $query = StaffCommissionRedemption::with($with); 
+        if($userId) $query = $query->where("user_id", $userId); 
+        return $query->orderBy("created_at", "DESC")->get();
+    }
+
+    public function redeemCommission($data)
+    {
+        $redemption = new StaffCommissionRedemption;
+        $redemption->amount = $data['amount'];
+        $redemption->bank_account_id = $data['bankAccountId'];
+        $redemption->user_id = $data['userId'];
+
+        $redemption->save();
+
+        return $redemption;
     }
 
     // public function completeCommissionPayment($user, $commission)

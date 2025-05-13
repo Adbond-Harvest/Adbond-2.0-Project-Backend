@@ -223,6 +223,14 @@ class UserService
         return $user;
     }
 
+    public function reset($user)
+    {
+        $user->password = '12345';
+        $user->update();
+
+        return $user;
+    }
+
     /*
     *   Upgrade candidates that passed the e-staff assessments to become an e-staff
     */

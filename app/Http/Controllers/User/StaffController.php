@@ -66,6 +66,18 @@ class StaffController extends Controller
         }
     }
 
+    public function reset($userId)
+    {
+        if (!is_numeric($userId) || !ctype_digit($userId)) return Utilities::error402("Invalid parameter userId");
+
+        $user = $this->userService->getUser($userId);
+        if(!$user) return Utilities::error402("User not found");
+
+        $this->userService->reset($user);
+
+        return Utilities::okay("Staff Password has been reset");
+    }
+
     public function users()
     {
         $users = $this->userService->getUsers(Auth::user());

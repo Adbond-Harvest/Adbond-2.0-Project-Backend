@@ -32,6 +32,11 @@ class ProfileController extends Controller
         $this->fileService = new FileService;
     }
 
+    public function index()
+    {
+        return Utilities::ok(new UserBriefResource(Auth::user()));
+    }
+
     public function setPassword(UserSetPassword $request)
     {
         try{

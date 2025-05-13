@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use app\Http\Middleware\ClientAuth;
 use app\Http\Middleware\UserAuth;
+use app\Http\Middleware\HRAuth;
+use app\Http\Middleware\SuperAdminAuth;
 
 //User Controllers
 use app\Http\Controllers\User\ProjectTypeController as UserProjectTypeController;
@@ -33,6 +35,8 @@ use app\Http\Controllers\User\AssessmentQuestionController;
 use app\Http\Controllers\User\AssessmentQuestionOptionController;
 use app\Http\Controllers\User\AssessmentAttemptController;
 use app\Http\Controllers\User\AnalyticsController;
+use app\Http\Controllers\User\ReferralController;
+use app\Http\Controllers\User\UserBankAccountController;
 
 
 // Client Controllers
@@ -102,12 +106,17 @@ Route::group(['prefix' => '/v2',], function () {
         });
 
         Route::group(['prefix' => '/profile'], function () {
+            Route::get('', 'ProfileController@index');
             Route::post('/set_password', 'ProfileController@setPassword');
             Route::post('/update', 'ProfileController@update');
         });
         Route::post('/upload_photo', 'FileController@savePhoto');
 
         //Staff Routes
+        Route::group(['middleware' => SuperAdminAuth::class, 'prefix' => '/staffs'], function () {
+            Route::get('/reset/{userId}', [StaffController::class, "reset"]);
+        });
+
         Route::group(['prefix' => '/staffs'], function () {
             Route::post('', [StaffController::class, "save"]);
             Route::get('', [StaffController::class, "users"]);
@@ -234,6 +243,30 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('', [UserPromoController::class, "promos"]);
             Route::get('/{PromoId}', [UserPromoController::class, "promo"]);
         });
+
+        Route::group(['prefix' => '/staff_bank_accounts'], function () {
+            Route::get('', [UserBankAccountController::class, "bankAccounts"]);
+            Route::post('', [UserBankAccountController::class, "addAccount"]);
+        });
+
+        Route::group(['middleware' => HRAuth::class, 'prefix' => '/staff_bank_accounts'], function () {
+            Route::get('/{staffId}', [UserBankAccountController::class, "bankAccounts"]);
+        });
+
+        Route::group(['prefix' => '/referrals'], function () {
+            Route::get('/earnings', [ReferralController::class, "referralEarnings"]);
+            Route::post('/redeem_commission', [ReferralController::class, "redeem"]);
+            Route::get('/redemptions', [ReferralController::class, "staffRedemptions"]);
+        });
+
+        Route::group(['middleware' => HRAuth::class, 'prefix' => '/admin_referrals'], function () {
+            Route::get('', [ReferralController::class, "referralCommissions"]);
+            Route::get('/earnings/{staffId}', [ReferralController::class, "referralEarnings"]);
+            Route::get('/redemptions/{staffId}', [ReferralController::class, "staffRedemptions"]);
+            Route::get('/redemptions', [ReferralController::class, "commissionRedemptions"]);
+        });
+
+
 
         // Client
         Route::group(['prefix' => '/clients'], function () {
