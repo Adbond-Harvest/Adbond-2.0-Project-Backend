@@ -3,6 +3,7 @@
 namespace app\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use app\Http\Requests\BaseRequest;
 
 class UpdatePromo extends BaseRequest
@@ -23,7 +24,12 @@ class UpdatePromo extends BaseRequest
     public function rules(): array
     {
         return [
-            "title" => "nullable|string|unique:promos,title",
+            // "title" => "nullable|string|unique:promos,title",
+            "title" => [
+                "nullable",
+                "string",
+                Rule::unique("promos", "title")->ignore($this->route("promoId"))
+            ],
             "discount" => "nullable|numeric",
             "start" => "nullable|date|date_format:Y-m-d",
             "end" => "nullable|date|date_format:Y-m-d",

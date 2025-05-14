@@ -60,6 +60,7 @@ class PromoController extends Controller
                 }
                 $data["packageLimited"] = true;
             }
+
             DB::beginTransaction();
             $data['userId'] = Auth::user()->id;
             $promo = $this->promoService->save($data);
@@ -135,10 +136,29 @@ class PromoController extends Controller
 
             $products = [];
             foreach($data['products'] as $product) {
-                $existingProduct = $this->promoService->getPromoProductByDetail($data['promoId'], $product['type'], $product['id']);
+                if($product['type'] == PromoProductType::PACKAGE->value) {
+                    $package = $this->packageService->package($product['id']);
+                    if(!$package) return Utilities::error402("This Package Id ".$product['id']." is not valid");
+
+                    $type = Project::$type;
+                    $projectId = $package->project_id;
+                    $existingProduct = $this->promoService->getPromoProductByDetail($data['promoId'], $type, $projectId);
+
+                    if(!$existingProduct) {
+                        $type = Package::$type;
+                        $existingProduct = $this->promoService->getPromoProductByDetail($data['promoId'], $type, $product['id']);
+                    }
+                }else{
+                    $project = $this->projectService->project($product['id']);
+                    if(!$project) return Utilities::error402("This Project Id ".$product['id']." is not valid");
+
+                    $type = Project::$type;
+                    $existingProduct = $this->promoService->getPromoProductByDetail($data['promoId'], $type, $product['id']);
+                }
+
                 if(!$existingProduct) {
                     $product['promoId'] = $data['promoId'];
-                    $product['type'] = ($product['type'] == PromoProductType::PACKAGE->value) ? Package::$type : Project::$type;
+                    $product['type'] = $type;
                     $products[] = $product;
                 }
             }
