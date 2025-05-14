@@ -238,10 +238,10 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/toggle_activate', [UserPromoController::class, "toggleActivate"]);
             Route::post('/add_products', [UserPromoController::class, "addProducts"]);
             Route::post('/remove_product', [UserPromoController::class, "removeProduct"]);
-            Route::post('/{PromoId}', [UserPromoController::class, "update"]);
-            Route::delete('/{PromoId}', [UserPromoController::class, "delete"]);
+            Route::post('/{promoId}', [UserPromoController::class, "update"]);
+            Route::delete('/{promoId}', [UserPromoController::class, "delete"]);
             Route::get('', [UserPromoController::class, "promos"]);
-            Route::get('/{PromoId}', [UserPromoController::class, "promo"]);
+            Route::get('/{promoId}', [UserPromoController::class, "promo"]);
         });
 
         Route::group(['prefix' => '/staff_bank_accounts'], function () {
