@@ -30,7 +30,8 @@ class CreatePost extends BaseRequest
             "topic" => "required|string",
             "type" => ["required", "string", Rule::in(EnumClass::postTypes())],
             "file" => ["required","file","mimes:jpg,jpeg,png,gif,webp,mp4,mpeg,mov,avi,wmv,webm,flv,3gp,m4v","max:50000", new VideoDuration(60)],
-            "content" => "required|string"
+            "content" => "required|string",
+            "projectTypeId" => "required|integer|exists:project_types,id"
         ];
     }
 }
