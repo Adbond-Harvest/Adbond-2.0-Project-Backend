@@ -24,6 +24,7 @@ class PostService
             $post->post_type = $data['type'];
             $post->user_id = $data['userId'];
             $post->file_id = $data['fileId'];
+            $post->project_type_id = $data['projectTypeId'];
             $post->content = $data['content'];
             
             $post->save();
@@ -38,6 +39,7 @@ class PostService
         }
         if(isset( $data['type'])) $post->post_type = $data['type'];
         if(isset( $data['fileId'])) $post->file_id = $data['fileId'];
+        if(isset( $data['projectTypeId'])) $post->project_type_id = $data['projectTypeId'];
         if(isset( $data['content'])) $post->content = $data['content'];
 
         $post->update();

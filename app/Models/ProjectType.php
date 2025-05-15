@@ -13,17 +13,17 @@ class ProjectType extends Model
 
     public static function land()
     {
-        return self::where("name", ProjectTypeEnum::LAND->value);
+        return self::where("name", ProjectTypeEnum::LAND->value)->first();
     }
 
     public static function agro()
     {
-        return self::where("name", ProjectTypeEnum::AGRO->value);
+        return self::where("name", ProjectTypeEnum::AGRO->value)->first();
     }
 
     public static function homes()
     {
-        return self::where("name", ProjectTypeEnum::HOMES->value);
+        return self::where("name", ProjectTypeEnum::HOMES->value)->first();
     }
 
     public function photo()

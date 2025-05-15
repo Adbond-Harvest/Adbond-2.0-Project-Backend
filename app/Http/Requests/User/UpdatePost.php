@@ -28,7 +28,8 @@ class UpdatePost extends BaseRequest
             "topic" => "nullable|string",
             "type" => "nullable|string",
             "file" => ["nullable","file","mimes:jpg,jpeg,png,gif,webp,mp4,mpeg,mov,avi,wmv,webm,flv,3gp,m4v","max:50000", new VideoDuration(60)],
-            "content" => "nullable|string"
+            "content" => "nullable|string",
+             "projectTypeId" => "nullable|integer|exists:project_types,id"
         ];
     }
 }
