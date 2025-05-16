@@ -341,6 +341,7 @@ Route::group(['prefix' => '/v2',], function () {
 
     Route::group(['prefix' => '/packages'], function () {
         // Package Routes
+        Route::get('/project_type/{projectTypeId}', [PackageController::class, 'getProjectTypePackages']);
         Route::get('{projectId}', [PackageController::class, 'getPackages']);
         // Route::get('/types', [ProjectController::class, 'getTypes']);
         Route::get('/view/{packageId}', [PackageController::class, 'getPackage']);
@@ -349,6 +350,11 @@ Route::group(['prefix' => '/v2',], function () {
     Route::group(['prefix' => '/site_tours',], function () {
         Route::post('/book', [PublicSiteTourController::class, 'book']);
         Route::get('/filter_schedules', [PublicSiteTourController::class, 'filterSchedules']);
+    });
+
+    Route::group(['prefix' => '/posts'], function () {
+        Route::get('', [PostController::class, "posts"]);
+        Route::get('/{slug}', [PostController::class, "post"]);
     });
 
     //Utitlity Routes
@@ -473,7 +479,7 @@ Route::group(['prefix' => '/v2',], function () {
         Route::group(['prefix' => '/posts'], function () {
             Route::post('/react', [PostController::class, "react"]);
             Route::get('', [PostController::class, "posts"]);
-            Route::get('/{postId}', [PostController::class, "post"]);
+            Route::get('/{slug}', [PostController::class, "post"]);
         });
 
         Route::group(['prefix' => '/comments'], function () {
