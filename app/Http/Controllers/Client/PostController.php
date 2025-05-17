@@ -55,7 +55,7 @@ class PostController extends Controller
 
     public function post($slug)
     {
-        $post = $this->postService->getBySlug($slug);
+        $post = $this->postService->getBySlug($slug, ['comments']);
         if(!$post) return Utilities::error402("Post not found");
 
         return Utilities::ok(new PostResource($post));
