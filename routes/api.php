@@ -57,6 +57,7 @@ use app\Http\Controllers\Client\SiteTourController;
 use app\Http\Controllers\Client\OfferPaymentController;
 use app\Http\Controllers\Client\PostController;
 use app\Http\Controllers\Client\CommentController;
+use app\Http\Controllers\Client\ReferralController as ClientReferralController;
 
 //Public Controllers
 use app\Http\Controllers\ProjectController;
@@ -256,12 +257,13 @@ Route::group(['prefix' => '/v2',], function () {
         Route::group(['prefix' => '/referrals'], function () {
             Route::get('/earnings', [ReferralController::class, "referralEarnings"]);
             Route::post('/redeem_commission', [ReferralController::class, "redeem"]);
-            Route::get('/redemptions', [ReferralController::class, "staffRedemptions"]);
+            Route::get('/redemptions', [ReferralController::class, "staffRedemptions"]); 
         });
 
         Route::group(['middleware' => HRAuth::class, 'prefix' => '/admin_referrals'], function () {
             Route::get('', [ReferralController::class, "referralCommissions"]);
             Route::get('/earnings/{staffId}', [ReferralController::class, "referralEarnings"]);
+            Route::post('/redemptions/complete_payment', [ReferralController::class, "completePayment"]);
             Route::get('/redemptions/{staffId}', [ReferralController::class, "staffRedemptions"]);
             Route::get('/redemptions', [ReferralController::class, "commissionRedemptions"]);
         });
@@ -485,6 +487,10 @@ Route::group(['prefix' => '/v2',], function () {
         Route::group(['prefix' => '/comments'], function () {
             Route::post('', [CommentController::class, "save"]);
             Route::post('/react', [CommentController::class, "react"]);
+        });
+
+        Route::group(['prefix' => '/referrals'], function () {
+            Route::get('', [ClientReferralController::class, "referrals"]);
         });
 
 
