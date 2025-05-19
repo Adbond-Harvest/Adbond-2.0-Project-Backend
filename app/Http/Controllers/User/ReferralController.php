@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use app\Http\Controllers\Controller;
 
 use app\Http\Requests\User\RedeemCommission;
+use app\Http\Requests\User\CompleteReferralCommissionPayment;
 
 use app\Http\Resources\StaffCommissionEarningResource;
 use app\Http\Resources\TotalStaffCommissionEarningsResource;
@@ -86,6 +87,20 @@ class ReferralController extends Controller
 
             return Utilities::okay("Redemption Request Successful");
             
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
+    }
+
+    public function completePayment(CompleteReferralCommissionPayment $request)
+    {
+        try{
+            $redemption = $this->commissionService->commissionRedemption($request->validated('redemptionId'));
+
+            $this->commissionService->completeRedemption($redemption);
+
+            return Utilities::okay("Referral Earning Redemption Completed");
+
         }catch(\Exception $e){
             return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
         }
