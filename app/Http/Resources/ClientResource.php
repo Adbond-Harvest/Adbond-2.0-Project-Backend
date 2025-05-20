@@ -35,6 +35,7 @@ class ClientResource extends JsonResource
             'employmentStatus' => $this->employment_status,
             'occupation' => $this->occupation,
             'kycStatus' => $this->kyc_status,
+            'refererCode' => $this->referer_code,
             'joinedAt' => $this->created_at->format('F j, Y'),
             // 'kyc_completed' => Helpers::kycCompleted($this),
             'active' => ($this->activated && $this->activated == 1) ? true : false,
