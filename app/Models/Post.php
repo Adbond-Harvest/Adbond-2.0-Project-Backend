@@ -17,6 +17,11 @@ class Post extends Model
         return $this->belongsTo(File::class, "file_id", "id");
     }
 
+    public function projectType()
+    {
+        return $this->belongsTo(ProjectType::class);
+    }
+
     public function comments()
     {
         return $this->hasMany(Comment::class)->orderBy("created_at", "DESC");
