@@ -167,6 +167,16 @@ class PackageService
         return $query->offset($offset)->limit($perPage)->orderBy("created_at", "DESC")->get();
     }
 
+    public function activePackages($with=[], $offset=0, $perPage=null)
+    {
+        $query = Package::with($with);
+        if($this->projectId) $query = $query->where("project_id", $this->projectId);
+        if($this->count) return $query->count();
+
+        if($perPage==null) $perPage=env('PAGINATION_PER_PAGE');
+        return $query->offset($offset)->limit($perPage)->orderBy("created_at", "DESC")->get();
+    }
+
     public function package($id, $with=[])
     {
         return Package::with($with)->where("id", $id)->first();

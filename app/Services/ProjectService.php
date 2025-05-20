@@ -139,6 +139,7 @@ class ProjectService
     {
         $query = Project::with($with);
         if($this->typeId) $query = $query->where("project_type_id", $this->typeId);
+
         if(isset($filter['text'])) {
             $query = $query->where(function($q) use($filter) { 
                 $q->where("identifier", "LIKE", "%".$filter['text']."%")->orWhere("name", "LIKE", "%".$filter['text']."%");
@@ -216,6 +217,12 @@ class ProjectService
     {
         $project->active = true;
         $project->update();
+        if($project->packages->count() > 0) {
+            foreach($project->packages as $package) {
+                $package->active = true;
+                $package->update();
+            }
+        }
         return $project;
     }
 
