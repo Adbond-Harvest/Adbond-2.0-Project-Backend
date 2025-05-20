@@ -35,6 +35,7 @@ class ClientBriefResource extends JsonResource
             'employmentStatus' => $this->employment_status,
             'occupation' => $this->occupation,
             'kycStatus' => $this->kyc_status,
+            'refererCode' => $this->referer_code,
             'identification' => new ClientIdentificationResource($this->clientIdentification)
             // 'passwordSet' => ($this->password_set)
             // 'kyc_completed' => Helpers::kycCompleted($this),
