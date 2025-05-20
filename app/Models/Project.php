@@ -64,4 +64,21 @@ class Project extends Model
             'promo_id'      // Local key on promo_products table...
         )->where('promo_products.product_type', '=', self::$type);
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        self::updating(function (Project $project) {
+            if($project->active == 0) {
+                if($project->packages->count() > 0) {
+                    foreach($project->packages as $package) {
+                        $package->active = 0;
+                        $package->update();
+                    }
+                }
+            }
+        
+        });
+    }
 }

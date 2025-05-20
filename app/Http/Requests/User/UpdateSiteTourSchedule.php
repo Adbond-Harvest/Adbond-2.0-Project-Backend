@@ -6,6 +6,8 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use app\Http\Requests\BaseRequest;
 
+use app\EnumClass;
+
 class UpdateSiteTourSchedule extends BaseRequest
 {
     /**
