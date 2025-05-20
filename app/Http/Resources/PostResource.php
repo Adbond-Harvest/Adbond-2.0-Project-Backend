@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 use app\Http\Resources\FileResource;
 use app\Http\Resources\CommentResource;
+use app\Http\Resources\ProjectTypeResource;
 
 class PostResource extends JsonResource
 {
@@ -26,6 +27,7 @@ class PostResource extends JsonResource
             "coverPhoto" => new FileResource($this->coverPhoto),
             "content" => $this->content,
             "active" => ($this->active == 1) ? true : false,
+            "projectType" => new ProjectTypeResource($this->projectType),
             "created" => $this->created_at->format('F j, Y'),
             "liked" => $this->liked(),
             "disliked" => $this->disliked(),
