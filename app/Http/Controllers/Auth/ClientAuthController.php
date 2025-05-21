@@ -27,6 +27,8 @@ use app\Services\UserService;
 use app\Services\WalletService;
 use app\Services\MetricService;
 
+use app\Enums\RefererCodePrefix;
+
 use app\Helpers;
 use app\Utilities;
 
@@ -98,14 +100,16 @@ class ClientAuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function register(Register $request) {
+    public function register(Request $request) {
         try{
+            dd($request->all());
             DB::beginTransaction();
 
             $post = $request->all();
             if(isset($post['referalCode'])) {
-                $user = $this->userService->getUserByRefererCode($post['referalCode']);
-                if(!$user) return Utilities::error402("Invalid Referer Code");
+                // $codePrefix = explode("-", $post['referalCode'])[0]; 
+                // $user = (RefererCodePrefix::USER->value == $codePrefix) ? $this->userService->getUserByRefererCode($post['referalCode']);
+                // if(!$user) return Utilities::error402("Invalid Referer Code");
 
                 $userData = Utilities::getByRefererCode($post['referalCode']);
                 if($userData['user']) {
