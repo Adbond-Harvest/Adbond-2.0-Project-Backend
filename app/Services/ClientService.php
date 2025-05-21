@@ -38,6 +38,11 @@ class ClientService
         return Client::with($with)->where('email', $email)->first();
     }
 
+    public function getClientByReferralCode($code)
+    {
+        return Client::where("referer_code", $code)->first();
+    }
+
     public function getClientByProvider($provider_name, $provider_id)
     {
         return Client::where('provider_name', $provider_name)->where('provider_id', $provider_id)->first();
