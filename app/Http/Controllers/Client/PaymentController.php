@@ -344,7 +344,6 @@ class PaymentController extends Controller
                 // If its full payment or its the first installment or its the last installment
                 // if the client was referred to by a staff, add commission to the staff
                 if(($order->is_installment==0 || ($order->installments_payed < 2 || $order->payment_status_id==PaymentStatus::complete()->id)) && Auth::guard('client')->user()->referer) {
-                    dd("referer earnings");
                     // calculate the bonus/commission for the referer and save it
                     if($order->payment_status_id==PaymentStatus::complete()->id && Auth::guard("client")->user()->referer_type == UserType::CLIENT->value) {
                         $this->commissionService->saveClientEarning(Auth::guard("client")->user()->referer, $order);
