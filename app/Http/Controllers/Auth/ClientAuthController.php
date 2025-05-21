@@ -102,7 +102,6 @@ class ClientAuthController extends Controller
      */
     public function register(Request $request) {
         try{
-            dd($request->all());
             DB::beginTransaction();
 
             $post = $request->all();
