@@ -113,6 +113,7 @@ class PostController extends Controller
         $filter = [];
         if($request->query('text')) $filter["text"] = $request->query('text');
         if($request->query('type')) $filter["type"] = $request->query('type');
+        if($request->query('projectTypeId')) $filter["projectTypeId"] = $request->query('projectTypeId');
         if($request->query('date')) $filter["date"] = $request->query('date');
         if($request->query('status')) {
             $validStatus = ["active" => ProjectFilter::ACTIVE->value, "inactive" => ProjectFilter::INACTIVE->value];

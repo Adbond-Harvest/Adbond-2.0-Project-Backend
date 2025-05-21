@@ -92,11 +92,17 @@ class PostService
         return $query->first();
     }
 
+    public function getByprojectType($projectTypeId, $with=[])
+    {
+        return Post::with($with)->where("project_type_id", $projectTypeId)->get();
+    }
+
     public function filter($filter, $with=[], $offset=0, $perPage=null)
     {
         $query = Post::with($with);
         if(isset($filter['text'])) $query->where("topic", "LIKE", "%".$filter['text']."%");
         if(isset($filter['type'])) $query->where("post_type", "LIKE", "%".$filter['type']."%");
+        if(isset($filter['projectTypeId'])) $query->where("project_type_id", $filter['projectTypeId']);
         if(isset($filter['date'])) $query = $query->whereDate("created_at", $filter['date']);
         if(isset($filter['status'])) $query = ($filter['status'] == ProjectFilter::ACTIVE->value) ? $query->where("active", true) : $query->where("active", false);
         if($this->count) return $query->count();
