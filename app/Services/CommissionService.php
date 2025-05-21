@@ -44,7 +44,7 @@ class CommissionService
     public function saveClientEarning($client, $order)
     {
         $fee = DeductibleFee::where("name", "commission tax")->first();
-        $commissionTax = $fee ? $fee->commission_tax : 0;
+        $commissionTax = $fee ? $fee->percentage : 0;
         $clientCommissionRate = ClientCommissionRate::first();
 
         if($clientCommissionRate) {
