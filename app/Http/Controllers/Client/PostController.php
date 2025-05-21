@@ -43,6 +43,7 @@ class PostController extends Controller
         $filter["status"] = ProjectFilter::ACTIVE->value;
         if($request->query('text')) $filter["text"] = $request->query('text');
         if($request->query('type')) $filter["type"] = $request->query('type');
+        if($request->query('projectTypeId')) $filter["projectTypeId"] = $request->query('projectTypeId');
         if($request->query('date')) $filter["date"] = $request->query('date');
 
         $posts = $this->postService->filter($filter, [], $offset, $perPage);
