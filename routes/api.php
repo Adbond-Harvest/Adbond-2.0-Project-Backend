@@ -64,6 +64,7 @@ use app\Http\Controllers\ProjectController;
 use app\Http\Controllers\PackageController;
 use app\Http\Controllers\SiteTourController as PublicSiteTourController;
 use app\Http\Controllers\UtilityController;
+use app\Http\Controllers\VirtualTeamApplicationController;
 
 use app\Http\Controllers\TestController;
 use app\Utilities;
@@ -322,6 +323,11 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('/sales_overview', [AnalyticsController::class, "salesOverview"]);
             Route::get('/project_types', [AnalyticsController::class, "projectTypes"]);
         });
+
+        Route::group(['prefix' => '/virtual_teams'], function () {
+            Route::get('/applications', [VirtualTeamApplicationController::class, "applications"]);
+            Route::get('/application/{applicationId}', [VirtualTeamApplicationController::class, "application"]);
+        });
         
 
         Route::get('/roles', [UserUtilityController::class, "roles"]);
@@ -357,6 +363,10 @@ Route::group(['prefix' => '/v2',], function () {
     Route::group(['prefix' => '/posts'], function () {
         Route::get('', [PostController::class, "posts"]);
         Route::get('/{slug}', [PostController::class, "post"]);
+    });
+
+    Route::group(['prefix' => '/virtual_teams'], function () {
+        Route::post('/apply', [VirtualTeamApplicationController::class, "apply"]);
     });
 
     //Utitlity Routes
