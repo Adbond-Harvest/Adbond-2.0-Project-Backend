@@ -94,20 +94,24 @@ class MetricService
     {
         switch($type) {
             case MetricType::ACTIVE->value : 
-                $metric->previous_active_total = $latestActive->active_total;
-                $metric->active_total = ($increaseActive) ? $latestActive->active_total++ : $latestActive->active_total--;
+                $activeTotal = $latestActive?->active_total ?? 0;
+                $metric->previous_active_total = $activeTotal;
+                $metric->active_total = ($increaseActive) ? $activeTotal++ : $activeTotal--;
                 $metric->save();
                 break;
             case MetricType::TOTAL->value :
-                $metric->previous_total = $latestTotal->total;
-                $metric->total = ($increaseTotal) ? $latestTotal->total++ : $latestTotal->total--;
+                $total = $latestTotal?->total ?? 0;
+                $metric->previous_total = $total;
+                $metric->total = ($increaseTotal) ? $total++ : $total--;
                 $metric->save();
                 break;
             case MetricType::BOTH->value :
-                $metric->previous_total = $latestTotal->total;
-                $metric->previous_active_total = $latestActive->active_total;
-                $metric->total = ($increaseTotal) ? $latestTotal->total++ : $latestTotal->total--;
-                $metric->active_total = ($increaseActive) ? $latestActive->active_total++ : $latestActive->active_total--;
+                $total = $latestTotal?->total ?? 0;
+                $activeTotal = $latestActive?->active_total ?? 0;
+                $metric->previous_total = $total;
+                $metric->previous_active_total = $activeTotal;
+                $metric->total = ($increaseTotal) ? $total++ : $total--;
+                $metric->active_total = ($increaseActive) ? $activeTotal++ : $activeTotal--;
                 $metric->save();
                 break;
         }
