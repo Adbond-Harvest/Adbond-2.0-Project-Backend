@@ -96,13 +96,13 @@ class MetricService
             case MetricType::ACTIVE->value : 
                 $activeTotal = $latestActive?->active_total ?? 0;
                 $metric->previous_active_total = $activeTotal;
-                $metric->active_total = ($increaseActive) ? $activeTotal++ : $activeTotal--;
+                $metric->active_total = ($increaseActive) ? ++$activeTotal : --$activeTotal;
                 $metric->save();
                 break;
             case MetricType::TOTAL->value :
                 $total = $latestTotal?->total ?? 0;
                 $metric->previous_total = $total;
-                $metric->total = ($increaseTotal) ? $total++ : $total--;
+                $metric->total = ($increaseTotal) ? ++$total : --$total;
                 $metric->save();
                 break;
             case MetricType::BOTH->value :
@@ -110,8 +110,8 @@ class MetricService
                 $activeTotal = $latestActive?->active_total ?? 0;
                 $metric->previous_total = $total;
                 $metric->previous_active_total = $activeTotal;
-                $metric->total = ($increaseTotal) ? $total++ : $total--;
-                $metric->active_total = ($increaseActive) ? $activeTotal++ : $activeTotal--;
+                $metric->total = ($increaseTotal) ? ++$total : --$total;
+                $metric->active_total = ($increaseActive) ? ++$activeTotal : --$activeTotal;
                 $metric->save();
                 break;
         }
