@@ -36,7 +36,7 @@ class PackageController extends Controller
         if (!is_numeric($projectId) || !ctype_digit($projectId)) return Utilities::error402("Invalid parameter projectID");
         $this->packageService->projectId = $projectId;
 
-        $packages = $this->packageService->packages(['state', 'packagePhotos']);
+        $packages = $this->packageService->packages(['state', 'packagePhotos', 'media']);
 
         return Utilities::ok(PackageResource::collection($packages));
     }
