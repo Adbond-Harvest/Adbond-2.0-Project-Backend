@@ -51,11 +51,11 @@ class DatabaseSeeder extends Seeder
             new Roles,
             new StaffTypes,
             new States,
-            new Users,
-            new Projects,
-            new Packages,
-            new Promos,
-            new PromoCodes,
+            // new Users,
+            // new Projects,
+            // new Packages,
+            // new Promos,
+            // new PromoCodes,
             new Discounts,
             new PaymentModes,
             new PaymentPeriodStatuses,
@@ -64,9 +64,9 @@ class DatabaseSeeder extends Seeder
             new CommissionRateSeeder,
             new DeductibleFees,
             new Benefits,
-            new WalletSeeder,
+            // new WalletSeeder,
             new BankAccounts,
-            new AddRefererUserCode
+            // new AddRefererUserCode
         ];
 
         foreach($seeders as $seeder) $seeder->run();
