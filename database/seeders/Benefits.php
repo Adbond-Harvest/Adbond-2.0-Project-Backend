@@ -22,6 +22,10 @@ class Benefits extends Seeder
             ["name" => "Good Road Network", "icon" => env('APP_URL') . Storage::url('public/benefits/Good Road Network.svg')],
             ["name" => "Perimeter Fencing", "icon" => env('APP_URL') . Storage::url('public/benefits/Perimeter Fencing.svg')],
             ["name" => "Power Supply", "icon" => env('APP_URL') . Storage::url('public/benefits/Power Supply.svg')],
+            ["name" => "Instant allocation", "icon" => env('APP_URL') . Storage::url('public/benefits/Survey Plan.svg')],
+            ["name" => "Deed of Assignment", "icon" => env('APP_URL') . Storage::url('public/benefits/Survey Plan.svg')],
+            ["name" => "Security", "icon" => env('APP_URL') . Storage::url('public/benefits/Survey Plan.svg')],
+            ["name" => "Layout", "icon" => env('APP_URL') . Storage::url('public/benefits/Survey Plan.svg')],
         ];
 
         foreach($benefits as $benefit) {
