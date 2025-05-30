@@ -24,7 +24,7 @@ class PackageController extends Controller
     public function getPackage($packageId)
     {
         if (!is_numeric($packageId) || !ctype_digit($packageId)) return Utilities::error402("Invalid parameter packageID");
-        $package = $this->packageService->package($packageId, ['photos', 'state']);
+        $package = $this->packageService->package($packageId, ['photos', 'state', 'media']);
 
         if(!$package) return Utilities::error402("Package not found");
 
@@ -51,7 +51,7 @@ class PackageController extends Controller
         $perPage = ($request->query('perPage'));
         if(!is_int((int) $perPage) || $perPage==null) $perPage = 4;
 
-        $packages = $projectType->packages()->with(['state', 'packagePhotos'])->orderBy("created_at", "DESC")->limit($perPage)->get();
+        $packages = $projectType->packages()->with(['state', 'packagePhotos', 'media'])->orderBy("created_at", "DESC")->limit($perPage)->get();
 
         return Utilities::ok(PackageResource::collection($packages));
     }
