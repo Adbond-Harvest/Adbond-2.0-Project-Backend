@@ -31,6 +31,7 @@ class Benefits extends Seeder
         foreach($benefits as $benefit) {
             $benefitObj = Benefit::where("name", $benefit['name']);
             if(!$benefitObj) {
+                $benefitObj = new Benefit;
                 $benefitObj->name = $benefit['name'];
                 $benefitObj->icon = $benefit['icon'];
                 $benefitObj->save();
