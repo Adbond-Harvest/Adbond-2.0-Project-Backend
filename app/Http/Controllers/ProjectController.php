@@ -46,10 +46,10 @@ class ProjectController extends Controller
         if(!is_int((int) $perPage) || $perPage==null) $perPage = 10;
         $offset = $perPage * ($page-1);
 
-        $projects = $this->projectService->projects(['projectType'], $offset, $perPage);
+        $projects = $this->projectService->projects(['projectType', 'packages.media'], $offset, $perPage);
         $projects->each(function ($project) {
             // $project->load('packages');
-            $project->setRelation('packages', $project->packages(10)->get());
+            $project->setRelation('packages.media', $project->packages(10)->get());
         });
         $this->projectService->count = true;
         $projectsCount = $this->projectService->projects();
