@@ -25,7 +25,7 @@ class SaveMedia extends BaseRequest
     public function rules(): array
     {
         return [
-            'media' => ["required","file","mimes:jpg,jpeg,png,gif,webp,mp4,mpeg,mov,avi,wmv,webm,flv,3gp,m4v","max:50000", new VideoDuration(60)]
+            'media' => ["required","file","mimes:jpg,jpeg,png,gif,webp,mp4,mpeg,mov,avi,wmv,webm,flv,3gp,m4v","max:50000", new VideoDuration(90)]
             // "media" => "mimes:jpg,jpeg,png,gif,webp,mp4,mpeg,mov,avi,wmv,webm,flv,3gp,m4v"
             // "media" => "required"
         ];
