@@ -109,8 +109,12 @@ class ProjectService
     {
         $query = Project::with($with)->where("active", true);
         if($this->typeId) $query = $query->where("project_type_id", $this->typeId);
+        if($this->status && $this->status == ProjectFilter::ACTIVE->value) $query = $query->where("active", true);
+        if($this->status && $this->status == ProjectFilter::INACTIVE->value) $query = $query->where("active", false);
+
         if($this->count) return $query->count();
         if($perPage==null) $perPage=env('PAGINATION_PER_PAGE', 15);
+        if($this->all) return $query->orderBy("created_at", "DESC")->get();
         return $query->orderBy("created_at", "DESC")->limit($perPage)->offset($offset)->get();
         // dd($projects);
     }

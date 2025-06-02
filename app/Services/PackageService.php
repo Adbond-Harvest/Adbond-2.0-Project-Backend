@@ -169,7 +169,7 @@ class PackageService
 
     public function activePackages($with=[], $offset=0, $perPage=null)
     {
-        $query = Package::with($with);
+        $query = Package::with($with)->where("active", 1);
         if($this->projectId) $query = $query->where("project_id", $this->projectId);
         if($this->count) return $query->count();
 
