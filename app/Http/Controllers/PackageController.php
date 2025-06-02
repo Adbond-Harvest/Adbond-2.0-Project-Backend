@@ -36,7 +36,7 @@ class PackageController extends Controller
         if (!is_numeric($projectId) || !ctype_digit($projectId)) return Utilities::error402("Invalid parameter projectID");
         $this->packageService->projectId = $projectId;
 
-        $packages = $this->packageService->packages(['state', 'packagePhotos', 'media']);
+        $packages = $this->packageService->activePackages(['state', 'packagePhotos', 'media']);
 
         return Utilities::ok(PackageResource::collection($packages));
     }
@@ -51,7 +51,7 @@ class PackageController extends Controller
         $perPage = ($request->query('perPage'));
         if(!is_int((int) $perPage) || $perPage==null) $perPage = 4;
 
-        $packages = $projectType->packages()->with(['state', 'packagePhotos', 'media'])->orderBy("created_at", "DESC")->limit($perPage)->get();
+        $packages = $projectType->packages()->with(['state', 'packagePhotos', 'media'])->where("active", 1)->orderBy("created_at", "DESC")->limit($perPage)->get();
 
         return Utilities::ok(PackageResource::collection($packages));
     }
