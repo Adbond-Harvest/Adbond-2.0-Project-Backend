@@ -65,6 +65,7 @@ class TransactionService
     public function filter($filter, $with=[], $offset=0, $perPage=null)
     {
         $query = Payment::with($with);
+        if($this->clientId) $query->where("client_id", $this->clientId);
         if(isset($filter['text'])) $query->where("receipt_no", "LIKE", "%".$filter['text']."%")->orWhereHas('purchase', function($query2) use($filter) {
             $query2->whereHas('package', function($query3) use($filter) {
                 $query3->where("name", "LIKE", "%".$filter['text']."%")->orWhereHas('project', function($query4) use($filter) {
