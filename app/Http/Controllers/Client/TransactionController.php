@@ -60,7 +60,7 @@ class TransactionController extends Controller
             if(!in_array($request->query('projectType'), $validTypes)) return Utilities::error402("Valid Project Types are: ".$validTypesString);
             $filter["projectType"] = $request->query('projectType');
         }
-
+        $this->transactionService->clientId = Auth::guard("client")->user()->id;
 
         $transactions = $this->transactionService->filter($filter, [], $offset, $perPage);
 
@@ -88,6 +88,8 @@ class TransactionController extends Controller
 
         if(!$transaction) return Utilities::error402("Transaction nor found");
 
+        if($transaction->client_id != Auth::guard("client")->user()->id) return Utilities::error402("You cannot view this transaction");
+
         return Utilities::ok(new TransactionResource($transaction));
     }
 
@@ -98,6 +100,8 @@ class TransactionController extends Controller
             $transaction = $this->transactionService->transaction($transactionId);
 
             if(!$transaction) return Utilities::error402("Transaction nor found");
+
+            if($transaction->client_id != Auth::guard("client")->user()->id) return Utilities::error402("You cannot export this transaction");
 
             $transactions = [$transaction];
             $transactions = collect($transactions);

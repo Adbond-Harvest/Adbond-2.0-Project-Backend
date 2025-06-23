@@ -126,6 +126,7 @@ class OfferService
     public function approve($offer)
     {
         $offer->approved = true;
+        $offer->payment_status_id = PaymentStatus::pending()->id;
         $offer->update();
 
         return $offer;
