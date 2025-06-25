@@ -85,8 +85,13 @@ class Offer extends Model
             if($offer->accepted_bid_id && !$offer->payment_status_id) {
                 $offer->payment_status_id = PaymentStatus::awaiting_payment()->id;
             }
-            $offer->acceptedBid->payment_status_id = $offer->payment_status_id;
-            $offer->acceptedBid->update();
+            $acceptedBid = $offer->acceptedBid;
+            if ($acceptedBid) {
+                $acceptedBid->payment_status_id = $offer->payment_status_id;
+                $acceptedBid->save();
+            }
+            // $offer->acceptedBid->payment_status_id = $offer->payment_status_id;
+            // $offer->acceptedBid->update();
         });
     }
 
