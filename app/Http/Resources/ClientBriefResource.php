@@ -7,6 +7,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 use app\Http\Resources\ClientIdentificationResource;
 
+use app\Enums\KYCStatus;
+
 use app\Helpers;
 
 class ClientBriefResource extends JsonResource
@@ -34,11 +36,28 @@ class ClientBriefResource extends JsonResource
             'maritalStatus' => $this->marital_status,
             'employmentStatus' => $this->employment_status,
             'occupation' => $this->occupation,
-            'kycStatus' => $this->kyc_status,
+            'kycStatus' => $this->verifyKYC($this),
             'refererCode' => $this->referer_code,
             'identification' => new ClientIdentificationResource($this->clientIdentification)
             // 'passwordSet' => ($this->password_set)
             // 'kyc_completed' => Helpers::kycCompleted($this),
         ];
+    }
+
+    private function verifyKYC($client)
+    {
+        $status = KYCStatus::NOTSTARTED->value;
+        $started = Helpers::kycStarted($client);
+        if($started) {
+            $completed = Helpers::kycCompleted($client);
+            $status = ($completed) ? KYCStatus::COMPLETED->value : KYCStatus::STARTED->value;
+        }else{
+            $status = KYCStatus::NOTSTARTED->value;
+        }
+        if($client->kyc_status != $status) {
+            $client->kyc_status = $status;
+            $client->update();
+        }
+        return $status;
     }
 }
