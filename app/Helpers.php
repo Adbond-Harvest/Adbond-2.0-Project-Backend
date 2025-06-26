@@ -196,7 +196,7 @@ Class Helpers
             $client->gender == '' || $client->gender == null ||
             $client->marital_status == '' || $client->marital_status == null ||
             $client->employment_status == '' || $client->employment_status == null ||
-            $client->occupation == '' || $client->occupation == null ||
+            // $client->occupation == '' || $client->occupation == null ||
             $client->postal_code == '' || $client->postal_code == null ||
             $client->phone_number == '' || $client->phone_number == null ||
             $client->address == '' || $client->address == null ||
@@ -218,7 +218,7 @@ Class Helpers
             ($client->gender != '' && $client->gender != null) ||
             ($client->marital_status != '' || $client->marital_status != null) ||
             ($client->employment_status != '' || $client->employment_status != null) ||
-            ($client->occupation != '' || $client->occupation != null) ||
+            // ($client->occupation != '' || $client->occupation != null) ||
             ($client->postal_code != '' || $client->postal_code != null) ||
             ($client->phone_number != '' || $client->phone_number != null) ||
             ($client->address != '' || $client->address != null) ||

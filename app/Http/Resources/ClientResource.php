@@ -9,6 +9,10 @@ use app\Http\Resources\AssetResource;
 use app\Http\Resources\WalletResource;
 use app\Http\Resources\ClientNextOfKinResource;
 
+use app\Enums\KYCStatus;
+
+use app\Helpers;
+
 class ClientResource extends JsonResource
 {
     /**
@@ -34,7 +38,7 @@ class ClientResource extends JsonResource
             'maritalStatus' => $this->marital_status,
             'employmentStatus' => $this->employment_status,
             'occupation' => $this->occupation,
-            'kycStatus' => $this->kyc_status,
+            'kycStatus' => $this->verifyKYC($this),
             'refererCode' => $this->referer_code,
             'joinedAt' => $this->created_at->format('F j, Y'),
             // 'kyc_completed' => Helpers::kycCompleted($this),
@@ -44,5 +48,22 @@ class ClientResource extends JsonResource
             'nextOfKin' => new ClientNextOfKinResource($this->whenLoaded("nextOfKins"))
             // 'passwordSet' => ($this->password_set)
         ];
+    }
+
+    private function verifyKYC($client)
+    {
+        $status = KYCStatus::NOTSTARTED->value;
+        $started = Helpers::kycStarted($client);
+        if($started) {
+            $completed = Helpers::kycCompleted($client);
+            $status = ($completed) ? KYCStatus::COMPLETED->value : KYCStatus::STARTED->value;
+        }else{
+            $status = KYCStatus::NOTSTARTED->value;
+        }
+        if($client->kyc_status != $status) {
+            $client->kyc_status = $status;
+            $client->update();
+        }
+        return $status;
     }
 }
