@@ -200,7 +200,7 @@ Class Helpers
             $client->postal_code == '' || $client->postal_code == null ||
             $client->phone_number == '' || $client->phone_number == null ||
             $client->address == '' || $client->address == null ||
-            $client->age_group_id == '' || $client->age_group_id == null ||
+            $client->dob == '' || $client->dob == null ||
             // $client->country_id == '' || $client->country_id == null ||
             // $client->state_id == '' || $client->state_id == null ||
             !$client->nextOfKins
@@ -222,7 +222,7 @@ Class Helpers
             ($client->postal_code != '' || $client->postal_code != null) ||
             ($client->phone_number != '' || $client->phone_number != null) ||
             ($client->address != '' || $client->address != null) ||
-            ($client->age_group_id != '' || $client->age_group_id != null) ||
+            ($client->dob != '' || $client->dob != null) ||
             // $client->country_id == '' || $client->country_id == null ||
             // $client->state_id == '' || $client->state_id == null ||
             ($client->nextOfKins)
