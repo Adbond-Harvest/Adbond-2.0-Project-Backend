@@ -156,6 +156,7 @@ class ClientService
         if(isset($data['postalCode'])) $client->postal_code = $data['postalCode'];
         if(isset($data['ageGroupId'])) $client->age_group_id = $data['ageGroupId'];
         if(isset($data['refererCode'])) $client->referer_code = $data['refererCode'];
+        if(isset($data['kycStatus'])) $client->kyc_status = $data['kycStatus'];
         if(isset($data['dob'])) {
             $ageGroupService = new AgeGroupService;
             $ageGroup = $ageGroupService->getGroupFromDob($data['dob']);

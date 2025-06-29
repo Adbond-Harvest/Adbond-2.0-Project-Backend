@@ -18,6 +18,7 @@ use app\Services\HybridStaffDrawService;
 use app\Services\UserService;
 usE app\Services\LoyaltyService;
 use app\Services\FileService;
+use app\Services\ClientService;
 
 use app\Http\Resources\MonthlyWeekDaysResource; 
 use app\Http\Resources\InspectionDayMinResource;
@@ -230,6 +231,15 @@ Class Helpers
             $started = true;
         }
         return $started;
+    }
+
+    public static function updateKYC($clientId, $status)
+    {
+        $clientService = new ClientService;
+
+        $client = $clientService->getClient($clientId);
+        if($client) $client = $clientService->update(["kycStatus" => $status], $client);
+        return $client;
     }
 
     public static function clientPackageUnits($clientPackage)

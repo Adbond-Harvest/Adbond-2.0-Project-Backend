@@ -55,8 +55,7 @@ class ClientBriefResource extends JsonResource
             $status = KYCStatus::NOTSTARTED->value;
         }
         if($client->kyc_status != $status) {
-            $client->kyc_status = $status;
-            $client->update();
+            Helpers::updateKYC($client->id, $status);
         }
         return $status;
     }
