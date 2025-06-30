@@ -146,16 +146,86 @@
                                     Without prejudice to the Purchase Price agreed by the Parties in Clause 2 above, the Vendor agrees to make all information available for the purchaser to perfect his/her title free at no 
                                     additional cost including the provisional survey plan provided by the Vendor.
                                 </li>
+                                @if($installment)
                                 <li>
                                     First payment (initial deposit payment) paid for Land Package subscribed on installments payment plan of 12-months cannot be refunded. However; the Initial deposit payment can only be 
                                     transferred for another purchase/package or resale in not more than 24-months of payment.
                                 </li>
+                                @endif
                                 <li>
-                                    Land package subscribed by current Subscriber who intends to reduce number of plots under his/her subscription will pay a legal fee of 10% as deduction fees on each plot relinquished.
+                                    Land purchased by current client and intending to reduce number of plots bought; client will pay a legal fee of 10% deduction fees on each plot transferred.
                                 </li>
+                                <li>
+                                    Infrastructural Fees is Optional: If you decide to build; is mandatory to pay (fees are subject to review as at when ready to build) OR If you decide to sell; 
+                                    the new owner will pay the infrastructural fees before building.
+                                </li>
+                                <li>48sqm out of 648sqm will be allotted for road and set-backs before building</li>
                             </ol>
                         </li>
                         <li class="list-heading">
+                            <b>TERMS & CONDITIONS</b>
+                            <ul>
+                                <li>
+                                    Note that 12% will be charged as transaction fee while the seller pays another 10% as change of 
+                                    documentation legal charges and VAT of 7.5% making a total of 29.5% Fee.
+                                </li>
+                                <li>
+                                    If Villa Owner is selling to another Villa Owner by Self the Charges will only be total of 17.5% to 
+                                    the company
+                                </li>
+                                <li>
+                                    Your Instruction will be followed and the Order will be in queue until sales is achievable in less 
+                                    than 12-18months.
+                                </li>
+                                <li>
+                                    Kindly Note that Allocation for Implementation is done only twice in a Year; March and 
+                                    September of the Year.
+                                    <ul>
+                                        <li>
+                                            March Batch Deadline for sign up is February 25th of Every Year and Allocation is 2nd & 4th 
+                                            Thursdays in March.
+                                        </li>
+                                        <li>
+                                            September Batch Deadline for sign up is August 25th of Every Year and Allocation is 2nd & 4th 
+                                            Thursdays in September.
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>Allocation of Land to Villa Owners will kick off from the 12th to 36th Month of Property launch, 
+                                    and will be ready for Physical Allocation. Villa Owners with instant request for Allocation have 
+                                    100% advantage to upgrade to already developing location based on choice or place land for resales 
+                                    order that will happen in between 12-18months of signing up for resale.
+                                </li>
+                                <li>
+                                    Also Note: That After 36months of Readiness for Allocation and customers did not show up for 
+                                    theirs, a Management Fee of N29 Per Square meter for Motherland, N39 Per Square meter for 
+                                    Heritage, N49 Per Square meter for Legacy Green, N99 Per Square meter for My Country Home 
+                                    annually that will be paid for Assets management fee before allocation can take place.
+                                </li>
+                                <li>
+                                    Also make your Infrastructural Fee payment receipt paid in full forwarded to our correspondence 
+                                    via support@adbondharvestandhomes.com or inquiry@adbondharvestandhomes.com or can also 
+                                    be forwarded on WhatsApp 09063890175/07061569205 (Request for Your Development Fee since 
+                                    its different in all Locations).
+                                </li>
+                                <li>
+                                    Also; If you get allocation during Agricultural Development Stage with the payment of Agro 
+                                    Development Land Fee and also note that in future there will be Additional Sum for Home 
+                                    Development Fee to be paid per square meter.
+                                </li>
+                                <li>
+                                    NOTE; FREE CASSSAVA CULTIVATION FOR THE FIRST ONE HUNDRED (100) VILLA 
+                                    OWNERS THAT COMPLETE PAYMENT WITHIN THE YEAR 2025 OF SUBSCRIPTION.<br><br>
+                                    Notice! Notice!! Notice!!!
+                                </li>
+                                <li>
+                                    At ADBOND, Allocation is 100% Free
+                                    Allocation at ADBOND means Instant Development either at the Agricultural Development or 
+                                    Home Development Implementation in Less than 21days.
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- <li class="list-heading">
                             <b>DEVELOPMENT TERMS</b>
                             <ol type="I">
                                 <li>
@@ -173,56 +243,8 @@
                                     Purchasers are not permitted to bury their dead ones in the community. However, the Vendor undertakes to make provision for a burial vault/burial site to cater for the community. 
                                 </li>
                             </ol>
-                        </li>
+                        </li> -->
                     </ol>
-                </li>
-                <li class="list-heading">
-                    <b>GENERAL TERMS & CONDITIONS</b>
-                    <ol type="I"> 
-                        <li>
-                            Note that in the case of resale; the Purchaser which is now refer to as “Villa Owner” will be charged 12% as transaction fee, 10% charge as documentation fee and VAT of 7.5% making a total of 
-                            29.5% Fee.
-                        </li>
-
-                        <li>
-                            In the event where an existing Villa Owner who wishes to relinquish the totality of his/her interest finds a prospective buyer, the charges will only be a total of 17.5% to the Vendor (ADBOND).
-                        </li>
-
-                        <li>
-                            A Villa Owner’s instruction to resell will be in queue till sale is achievable after 6-months but within 18-months of instruction to resell. 
-                        </li>
-                        <li>
-                            Kindly Note that Implementation of Allocation is done twice a Year only; March and September of the Year after all required payments have been made by the Purchaser.
-                            <br/><br/>
-                            * March Batch Deadline for sign up is February 25th of Every Year and Allocation is 2nd & 4th Thursdays in March.
-                            <br/>
-                            * September Batch Deadline for sign up is August 25th of Every Year and Allocation is 2nd & 4th Thursdays in September. 
-                        <li>
-                            ADBOND boasts of varying products such as Motherland, Legacy Green, My Country Home, Heritage Homesteads in different locations. In the event of any request for allocation by a Subscriber/Villa Owner the said allocation shall be granted under the product name purchased in any available location.
-                        </li>
-                        <li>
-                            Allocation of Land to Villa Owners will kick off from the 12th to 36th Month of Property launch, and will then be ready for Physical Allocation. Villa Owners with instant request for Allocation have 100% advantage to upgrade to already developing location based on choice or place their portion of land on resales order that will happen in between 12-18months of signing up for resale subject to Clause 3(iii).
-                        </li>
-                        <li>
-                            Note: That After 36-months of notification of the Vendor’s Readiness to allocate and the Villa Owner fails to fulfil his/her obligation as regards allocation, this failure shall attract a Management Fee per square meter of #29 for Motherland, #39 for Heritage, #49 for Legacy Green, #99 for My Country Home Per Square meter annually that will be paid as Assets Management Fee before allocation can take place.
-                        </li>
-                        <li>
-                            Infrastructural Development Fees shall be payable Outrightly or in 6-Installments within the period of 6-months. Receipt(s) of payment should be forwarded to our representative or via our Email: info@adbondharvestandhomes.com (Infrastructural Fees varies from one location to the other at prevalent rate). 
-                        </li>
-                        <li>
-                            If a Subscriber/Villa Owner who has being allocated his/her portion during Agricultural Development Stage with the payment of Agro Development Land Fee will be required to make an additional payment for Infrastructural Development at prevalent rate.
-                        </li>
-                        <li>
-                            At ADBOND, Allocation is 100% Free. However, request for allocation of land will only be granted if Subscriber/Villa Owner shows clear financial readiness of instant development either at the Agricultural Development or Home Development in Less than 21days (NOTE: Allocation is Revokable).
-                        </li>
-                        <li>
-                            At ADBOND, in the event where a Subscriber/Villa Owner neglects, fails or refuses to continue with his/her development after allocation of land; ADBOND reserves the right to withdraw/revoke the allocation of the said land after a 90-days period of abandonment. 
-                        </li>
-                        <li>
-                            Deed of Assignment, Land of Agreement and every other alienation document shall be received by the Purchaser within 90-days of completion of payments.
-                        </li>
-                    </ol>
-                    <br/><br/>
                 </li>
 
                 <li class="list-heading">

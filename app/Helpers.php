@@ -619,6 +619,24 @@ Class Helpers
         // dd('done');
     }
 
+    public static function generateHomesLetterOfHappiness($payment, $isPayment=true)
+    {
+        $addressArr = [];
+        $addressArr = self::formatAddress($payment?->client?->address);
+        $pdfData = [
+            'image' => 'logo.jpg',
+            'name' => $payment?->client?->full_name,
+            'addressArr' => $addressArr,
+            'date' => date('jS F, Y'),
+        ];
+        // dd($pdfData);
+        $pdf = PDF::loadView('pdf/letter_of_happiness_homes', $pdfData);
+        // return $pdf->stream('letter_of_happiness.pdf');
+        // $pdf->setPaper('A4', 'portrait');
+        $pdf->save("files/letter_of_happiness_{$payment->purchase->id}.pdf");
+        // dd('done');
+    }
+
     public static function generateMemorandumAgreement($order)
     {
         $data = self::prepareContract($order);

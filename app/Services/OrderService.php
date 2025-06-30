@@ -5,6 +5,7 @@ namespace app\Services;
 use app\Models\Order;
 use app\Models\Discount;
 use app\Models\OrderDiscount;
+use app\Models\ProjectType;
 
 use app\Enums\OrderDiscountType;
 use app\Enums\FilePurpose;
@@ -166,7 +167,8 @@ class OrderService
         // generate and save letter of happiness
         try{
             // generate and save contract
-            Helpers::generateLetterOfHappiness($payment);
+            
+            ($order->package->project->project_type_id == ProjectType::land()->id) ? Helpers::generateLetterOfHappiness($payment) : Helpers::generateHomesLetterOfHappiness($payment);
             // dd('generate receipt');
             $uploadedLetter = "files/letter_of_happiness_{$order->id}.pdf";
             
@@ -266,7 +268,8 @@ class OrderService
         // generate and save letter of happiness
         try{
             // generate and save contract
-            Helpers::generateLetterOfHappiness($clientPackage, false);
+            ($order->package->project->project_type_id == ProjectType::land()->id) ? 
+                Helpers::generateLetterOfHappiness($clientPackage, false) : Helpers::generateHomesLetterOfHappiness($clientPackage);
             // dd('generate receipt');
             $uploadedLetter = "files/letter_of_happiness_{$order->id}.pdf";
             
