@@ -149,6 +149,7 @@ class OfferController extends Controller
 
     public function activeOffers(Request $request)
     {
+        //Return only active offers that does not belong to the logged in client
         $page = ($request->query('page')) ?? 1;
         $perPage = ($request->query('perPage'));
         if(!is_int((int) $page) || $page <= 0) $page = 1;
@@ -163,6 +164,8 @@ class OfferController extends Controller
         $this->offerService->filter = $filter;
 
         $this->offerService->sales = false;
+        $this->offerService->clientId = Auth::guard("client")->user()->id;
+        $this->offerService->mine = false;
 
         $offers = $this->offerService->offers(['bids'], $offset, $perPage);
 
