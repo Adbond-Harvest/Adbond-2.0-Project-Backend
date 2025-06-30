@@ -35,10 +35,13 @@ class AssetSwitchController extends Controller
         $this->clientPackageService = new ClientPackageService;
     }
 
-    public function downgradePackages($packageId)
+    public function downgradePackages($assetId)
     {
-        if ($packageId && (!is_numeric($packageId) || !ctype_digit($packageId))) return Utilities::error402("Invalid parameter packageID");
-        $package = $this->packageService->package($packageId);
+        if ($assetId && (!is_numeric($assetId) || !ctype_digit($assetId))) return Utilities::error402("Invalid parameter assetID");
+        $asset = $this->clientPackageService->clientPackage($assetId);
+        if(!$asset) return Utilities::error402("This asset does not exist");
+
+        $package = $asset->package;
         if(!$package) return Utilities::error402("Package not found");
 
         if(!$package?->project) return Utilities::error402("Package Project not found");
@@ -50,10 +53,13 @@ class AssetSwitchController extends Controller
         return Utilities::ok(PackageResource::collection($packages));
     }
 
-    public function upgradePackages($packageId)
+    public function upgradePackages($assetId)
     {
-        if ($packageId && (!is_numeric($packageId) || !ctype_digit($packageId))) return Utilities::error402("Invalid parameter packageID");
-        $package = $this->packageService->package($packageId);
+        if ($assetId && (!is_numeric($assetId) || !ctype_digit($assetId))) return Utilities::error402("Invalid parameter assetID");
+        $asset = $this->clientPackageService->clientPackage($assetId);
+        if(!$asset) return Utilities::error402("This asset does not exist");
+
+        $package = $asset->package;
         if(!$package) return Utilities::error402("Package not found");
 
         if(!$package?->project) return Utilities::error402("Package Project not found");
