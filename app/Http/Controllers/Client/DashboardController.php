@@ -33,6 +33,7 @@ class DashboardController extends Controller
     public function index()
     {
         try{
+            $this->transactionService->clientId = Auth::guard('client')->user()->id;
             $assetSummary = $this->assetService->clientAssetSummary(Auth::guard('client')->user()->id);
             $assets = $this->assetService->clientAssets(Auth::guard('client')->user()->id);
             $projects = $this->projectService->activeProjects(['projectType'], 0, 10);
