@@ -68,7 +68,9 @@ class OfferService
     public function offers($with=[], $offset=0, $perPage=null)
     {
         $query = Offer::with($with);
-        if($this->clientId) $query->where("client_id", $this->clientId);
+        if($this->clientId) {
+            ($this->mine) ? $query->where("client_id", $this->clientId) : $query->where("client_id", "!=", $this->clientId);
+        }
         if($this->sales == false) $query->whereNull("resell_order_id")->whereNull("accepted_bid_id");
         if($this->sales == true) $query->whereNotNull("resell_order_id")->OrWhereNotNull("accepted_bid_id");
         if($this->filter && is_array($this->filter)) {

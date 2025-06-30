@@ -273,7 +273,7 @@ class PaymentController extends Controller
         $data['unitPrice'] = $package->amount;
         // $data['balance'] = ($data['isInstallment']) ? ($data['amountPayable'] - $data['amountPayed']) : 0;
         $data['orderDate'] = (isset($data['orderDate'])) ? $data['orderDate'] : now();
-        if($data['isInstallment'] && $package->installment_duration) $data['paymentDueDate'] = now()->addMonths($package->installment_duration);
+        if($data['isInstallment'] && $package->installment_duration) $data['paymentDueDate'] = now()->addMonths((int)$package->installment_duration);
 
         $order = $this->orderService->save($data);
         $order->order_number = $order->id.$data['processingId'];
