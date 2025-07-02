@@ -43,7 +43,7 @@ class UpdateClient extends BaseRequest
             "identificationId" => "required_with:identificationPhoto|integer|exists:identifications,id",
             "identificationPhoto" => "required_with:identificationId|image|max:10000|mimes:jpeg,png,jpg,webp",
             "postalCode" => "string|nullable",
-            "dob" => "date|date_format:Y-m-d|before_or_equal:" . now()->subYears(18)->format('Y-m-d')",
+            "dob" => "date|date_format:Y-m-d|before_or_equal:" . now()->subYears(18)->format('Y-m-d'),
         ];
     }
 }
