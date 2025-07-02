@@ -9,11 +9,11 @@
     
     @section('content')
         
-        <div class="content">
+        <div style="padding: 20px;">
             
             <p>Use the code below to verify your account</p>
             
-            <div class="code">
+            <div style="margin-top: 20px; margin-bottom: 20px; font-weight: bold;">
                 {{$code}}
             </div>
             
@@ -21,3 +21,4 @@
         </div>
         
     @endsection
+
