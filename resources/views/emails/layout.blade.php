@@ -27,6 +27,7 @@
             padding: 20px;
         }
         .header img {
+            width: 30%;
             max-width: 150px;
             margin-bottom: 10px;
         }
@@ -54,6 +55,11 @@
             text-decoration: none;
             border-radius: 5px;
             margin-top: 15px;
+        }
+        .code {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            font-weight: bold;
         }
     </style>
 </head>
