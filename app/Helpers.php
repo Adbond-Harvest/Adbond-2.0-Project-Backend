@@ -587,8 +587,10 @@ Class Helpers
         ];
         $pdf = PDF::loadView('pdf/contract', $pdfData);
         // return $pdf->stream('contract.pdf');
-        $path = public_path("files/contract_{$order->id}.pdf");
+        $file = "files/contract_{$order->id}.pdf";
+        $path = public_path($file);
         $pdf->save($path);
+        return $file;
     }
 
     public static function generateLetterOfHappiness($payment, $isPayment=true)
@@ -614,8 +616,11 @@ Class Helpers
         ];
         // dd($pdfData);
         $pdf = PDF::loadView('pdf/letter_of_happiness', $pdfData);
+
+        $file = "files/letter_of_happiness_{$payment->purchase->id}.pdf";
         // return $pdf->stream('letter_of_happiness.pdf');
-        $pdf->save("files/letter_of_happiness_{$payment->purchase->id}.pdf");
+        $pdf->save($file);
+        return $file;
         // dd('done');
     }
 
@@ -667,7 +672,9 @@ Class Helpers
         ];
         $pdf = PDF::loadView('pdf/memorandum_agreement', $pdfData);
         // return $pdf->stream('memorandum_agreement.pdf');
-        $pdf->save("files/memorandum_agreement_{$order->id}.pdf");
+        $file = "files/memorandum_agreement_{$order->id}.pdf";
+        $pdf->save($file);
+        return $file;
     }
 
     public static function generateReceipt($payment)
@@ -716,6 +723,7 @@ Class Helpers
         $pdf->setOptions(array('isRemoteEnabled' => true));
         // return $pdf->stream('receipt.pdf');
         $pdf->save('files/receipt'.$payment->receipt_no.'.pdf');
+        return 'files/receipt'.$payment->receipt_no.'.pdf';
         // dd('done');
     }
 

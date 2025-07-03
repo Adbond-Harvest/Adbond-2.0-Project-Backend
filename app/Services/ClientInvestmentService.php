@@ -6,7 +6,12 @@ use DateTime;
 
 use app\Models\ClientInvestment;
 
+use app\Mail\MOU;
+
+use app\Enums\FilePurpose;
+
 use app\Utilities;
+use app\Helpers;
 
 class ClientInvestmentService
 {
@@ -87,6 +92,34 @@ class ClientInvestmentService
         $clientInvestment->memorandum_agreement_file_id = $memorandumAgreementFileId;
         $clientInvestment->update();
         return $clientInvestment;
+    }
+
+    public function uploadMOU($order, $investment)
+    {
+        // generate MOU
+        try{
+            $fileService = new FileService;
+            $uploadedFile = Helpers::generateMemorandumAgreement($order);
+            // dd('generate MOU');
+            $response = Helpers::moveUploadedFileToCloud($uploadedFile, FileTypes::PDF->value, $order->client->id, 
+                                FilePurpose::MEMORANDUM_OF_AGREEMENT->value, UserType::CLIENT->value, "client-MOUs");
+            if($response['success']) {
+                $fileMeta = ["belongsId"=>$investment->id, "belongsType"=>ClientInvestment::$type];
+                $fileService->updateFileObj($fileMeta, $response['upload']['file']);
+
+                $this->addMemorandumAgreement($response['upload']['file']->id, $investment);
+                // dd("got here");
+                try{
+                    // Send MOU Mail
+                    Mail::to($order->client->email)->send(new MOU($order->client, $uploadedFile));
+                    unlink($response['path']);
+                }catch(\Exception $e) {
+                    Utilities::logStuff("Error Occurred while attempting to send MOU Email..".$e);
+                }
+            }
+        }catch(\Exception $e) {
+            Utilities::logStuff("Error Occurred while attempting to generate and upload MOU..".$e);
+        }
     }
 
     public function getProfit($clientInvestment)

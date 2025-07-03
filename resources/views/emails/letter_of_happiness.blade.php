@@ -1,25 +1,26 @@
 @extends('emails.layout')
     @section('title')
-        New Payment
+        New Purchase Happiness Letter
     @endsection
 
     @section('heading')
-        New Payment
+        New Purchase Happiness Letter
     @endsection
     
     @section('content')
         
         <div style="padding: 20px;">
-            <h2>Dear {{ $payment->client->full_name }}</h2>
+            <h2>Dear {{ $client->full_name }} your letter of happiness is here!</h2>
             
-            <p>We have received a new Payment from you!</p>
+            <p>Thank you for purchasing a property.</p>
             
             <div style="background-color: #f8f9fa;
             border-radius: 5px;
             padding: 15px;
             margin-bottom: 20px;">
-                You can find your payment receipt attached to this mail
+                We’ve attached your letter of happiness to this email. Kindly download to view.
             </div>
         </div>
         
     @endsection
+
