@@ -12,11 +12,15 @@ use app\Models\Offer;
 use app\Models\ClientInvestment;
 use app\Models\ClientAssetsView;
 
+use app\Mail\LetterOfHappiness;
+use app\Mail\Contract;
+
 use app\Services\ClientInvestmentService;
 
 use app\Enums\ProjectFilter;
 use app\Enums\ClientPackageOrigin;
 use app\Enums\PackageType;
+use app\Enums\FilePurpose;
 use app\Enums\InvestmentRedemptionOption;
 
 use app\Exports\PackageExport;
@@ -24,6 +28,8 @@ use app\Exports\PackageExport;
 use app\Services\MetricService;
 
 use app\Enums\MetricType;
+
+use app\Helpers;
 
 class ClientPackageService
 {
@@ -144,6 +150,63 @@ class ClientPackageService
     {
         $clientPackage->sold = true;
         $clientPackage->update();
+    }
+
+    public function uploadLetterOfHappiness($payment, $asset)
+    {
+        // generate letter of happiness if the card payment was successful
+        try{
+            $fileService = new FileService;
+            $uploadedFile = ($payment->purchase->package->project->project_type_id == ProjectType::land()->id) ?
+                    Helpers::generateLetterOfHappiness($payment->load('paymentMode')) : Helpers::generateHomesLetterOfHappiness($payment->load('paymentMode'));
+            // dd('generate letter of happiness');
+            $response = Helpers::moveUploadedFileToCloud($uploadedFile, FileTypes::PDF->value, $asset->client->id, 
+                                FilePurpose::LETTER_OF_HAPPINESS->value, UserType::CLIENT->value, "client-letter-of-happiness");
+            if($response['success']) {
+                $fileMeta = ["belongsId"=>$asset->id, "belongsType"=>ClientPackage::$type];
+                $fileService->updateFileObj($fileMeta, $response['upload']['file']);
+
+                $this->update(['happinessLetterFileId' => $response['upload']['file']->id], $asset);
+                // dd("got here");
+                try{
+                    // Send Letter of Happiness Mail
+                    Mail::to($payment->client->email)->send(new LetterOfHappiness($asset->client, $uploadedFile));
+                    unlink($response['path']);
+                }catch(\Exception $e) {
+                    Utilities::logStuff("Error Occurred while attempting to send Letter of Happiness Email..".$e);
+                }
+            }
+        }catch(\Exception $e) {
+            Utilities::logStuff("Error Occurred while attempting to generate and upload letter of Happiness..".$e);
+        }
+    }
+
+    public function uploadContract($order, $asset)
+    {
+        // generate Contract
+        try{
+            $fileService = new FileService;
+            $uploadedFile = Helpers::generateContract($order);
+            // dd('generate Contract');
+            $response = Helpers::moveUploadedFileToCloud($uploadedFile, FileTypes::PDF->value, $asset->client->id, 
+                                FilePurpose::CONTRACT->value, UserType::CLIENT->value, "client-contracts");
+            if($response['success']) {
+                $fileMeta = ["belongsId"=>$asset->id, "belongsType"=>ClientPackage::$type];
+                $fileService->updateFileObj($fileMeta, $response['upload']['file']);
+
+                $this->update(['contractFileId' => $response['upload']['file']->id], $asset);
+                // dd("got here");
+                try{
+                    // Send Contract Mail
+                    Mail::to($asset->client->email)->send(new Contract($asset->client, $uploadedFile));
+                    unlink($response['path']);
+                }catch(\Exception $e) {
+                    Utilities::logStuff("Error Occurred while attempting to send Contract Email..".$e);
+                }
+            }
+        }catch(\Exception $e) {
+            Utilities::logStuff("Error Occurred while attempting to generate and upload Contract..".$e);
+        }
     }
 
     public function clientPackage($id, $with=[])

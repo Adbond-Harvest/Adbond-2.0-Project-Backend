@@ -131,6 +131,7 @@ class PaymentController extends Controller
             if(!$processedData) return Utilities::error402("processing Id has expired.. Go back and prepare the order again");
             $package = $this->packageService->package($processedData['packageId']);
             $order = null;
+            $res = null;
             if($data['cardPayment']) { // if it is a card payment
                 // verify card payment
                 $res = $this->paymentService->paystackVerify($data['reference'], $processedData['amountPayable']);
@@ -153,6 +154,7 @@ class PaymentController extends Controller
 
                 // Save the payment
                 $payment = $this->savePayment($order, $data, $processedData, $res);
+
                 // dd('success false');
                 // Send email to client about the receipt
 
@@ -177,6 +179,8 @@ class PaymentController extends Controller
                 }
             }
 
+            $this->postPaymentActions($data, $processedData, $order, $payment, $res);
+
             DB::commit();
             $order->load("package")->load("discounts")->load("paymentStatus");
 
@@ -191,6 +195,44 @@ class PaymentController extends Controller
         //     return Utilities::error($e, 'An error occurred while trying to perform this operation, Please try again later or contact support');
         // }
 
+    }
+
+    private function postPaymentActions($data, $processedData, $order, $payment, $gatewayRes=null)
+    {
+        // if the payment gateway marked the payment as a success, deduct the units
+        if($order?->package && (!$data['cardPayment'] || ($data['cardPayment'] && !$gatewayRes['paymentError']))) {
+            // deduct units only if it full payment or the first payment of an installment
+            if($order->is_installment == 0 || $order->installments_payed < 2) $this->packageService->deductUnits($order->units, $order?->package);
+            if($order->package->type==PackageType::INVESTMENT->value) $clientInvestment = $this->clientInvestmentService->saveInvestment($order, $processedData);
+
+            if($data['cardPayment']) {
+                // dd('got here');
+                $asset = null;
+                
+                // If its full payment or its the first installment or its the last installment
+                // if the client was referred to by a staff, add commission to the staff
+                if(($order->is_installment==0 || ($order->installments_payed < 2 || $order->payment_status_id==PaymentStatus::complete()->id)) && Auth::guard('client')->user()->referer) {
+                    // calculate the bonus/commission for the referer and save it
+                    if($order->payment_status_id==PaymentStatus::complete()->id && Auth::guard("client")->user()->referer_type == UserType::CLIENT->value) {
+                        $this->commissionService->saveClientEarning(Auth::guard("client")->user()->referer, $order);
+                    }
+                    if(Auth::guard("client")->user()->referer_type == UserType::USER->value) {
+                        $this->commissionService->save(Auth::guard("client")->user()->referer, $order);
+                    }
+                }
+
+                $this->paymentService->uploadReceipt($payment, Auth::guard('client')->user());  
+                $clientInvestment = (isset($clientInvestment)) ? $clientInvestment : null;
+                if ($order->is_installment == 0 || $order->installments_payed == $order->installment_count) {
+                    $this->orderService->completeOrder($order, $payment, $clientInvestment);
+                }else{
+                    $asset = (($order->package->type==PackageType::INVESTMENT->value) ? $this->clientPackageService->saveClientPackageInvestment($clientInvestment) : $this->clientPackageService->saveClientPackageOrder($order));
+                }
+            }else{
+                (($order->package->type==PackageType::INVESTMENT->value) ? $this->clientPackageService->saveClientPackageInvestment($clientInvestment) : $this->clientPackageService->saveClientPackageOrder($order));
+            }
+            // dd('skipped'.$data);
+        }
     }
 
     public function saveAdditionalPayment(SaveAdditionalPayment $request)
@@ -247,6 +289,9 @@ class PaymentController extends Controller
                 $data['paymentStatusId'] = PaymentStatus::pending()->id;
                 $payment = $this->savePayment($order, $data, $processedData);
             }
+
+            $this->postPaymentActions($data, $processedData, $order, $payment, $res);
+
             DB::commit();
             Cache::forget('order_processing_' . $data['processingId']); // Delete from cache
 
@@ -332,38 +377,7 @@ class PaymentController extends Controller
         $paymentData['paymentGatewayId'] = ($data['cardPayment']) ? PaymentMode::cardPayment()->id : PaymentMode::bankTransfer()->id;
         $payment = $this->paymentService->save($paymentData);
 
-        // if the payment gateway marked the payment as a success, deduct the units
-        if($order?->package && (!$data['cardPayment'] || ($data['cardPayment'] && !$gatewayRes['paymentError']))) {
-            // deduct units only if it full payment or the first payment of an installment
-            if($order->is_installment == 0 || $order->installments_payed < 2) $this->packageService->deductUnits($order->units, $order?->package);
-            if($order->package->type==PackageType::INVESTMENT->value) $clientInvestment = $this->clientInvestmentService->saveInvestment($order, $processedData);
-
-            if($data['cardPayment']) {
-                // dd('got here');
-                
-                // If its full payment or its the first installment or its the last installment
-                // if the client was referred to by a staff, add commission to the staff
-                if(($order->is_installment==0 || ($order->installments_payed < 2 || $order->payment_status_id==PaymentStatus::complete()->id)) && Auth::guard('client')->user()->referer) {
-                    // calculate the bonus/commission for the referer and save it
-                    if($order->payment_status_id==PaymentStatus::complete()->id && Auth::guard("client")->user()->referer_type == UserType::CLIENT->value) {
-                        $this->commissionService->saveClientEarning(Auth::guard("client")->user()->referer, $order);
-                    }
-                    if(Auth::guard("client")->user()->referer_type == UserType::USER->value) {
-                        $this->commissionService->save(Auth::guard("client")->user()->referer, $order);
-                    }
-                }
-
-                $this->paymentService->uploadReceipt($payment, Auth::guard('client')->user());  
-                $clientInvestment = (isset($clientInvestment)) ? $clientInvestment : null;
-                ($order->is_installment == 0 || $order->installments_payed == $order->installment_count) ? 
-                    $this->orderService->completeOrder($order, $payment, $clientInvestment) 
-                    : 
-                    (($order->package->type==PackageType::INVESTMENT->value) ? $this->clientPackageService->saveClientPackageInvestment($clientInvestment) : $this->clientPackageService->saveClientPackageOrder($order));
-            }else{
-                (($order->package->type==PackageType::INVESTMENT->value) ? $this->clientPackageService->saveClientPackageInvestment($clientInvestment) : $this->clientPackageService->saveClientPackageOrder($order));
-            }
-            // dd('skipped'.$data);
-        }
+        
         // dd($gatewayRes['paymentError']);
 
         return $payment;
