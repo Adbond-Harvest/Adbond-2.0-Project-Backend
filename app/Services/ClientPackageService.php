@@ -12,6 +12,7 @@ use app\Models\Order;
 use app\Models\Offer;
 use app\Models\ClientInvestment;
 use app\Models\ClientAssetsView;
+use app\Models\ProjectType;
 
 use app\Mail\LetterOfHappiness;
 use app\Mail\Contract;
