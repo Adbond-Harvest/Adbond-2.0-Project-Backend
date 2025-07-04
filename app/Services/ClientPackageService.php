@@ -4,6 +4,7 @@ namespace app\Services;
 
 use Maatwebsite\Excel\Facades\Excel;
 use PDF;
+use Illuminate\Support\Facades\Mail;
 
 use app\Models\Package;
 use app\Models\ClientPackage;
