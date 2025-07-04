@@ -70,6 +70,8 @@ use app\Http\Controllers\VirtualTeamApplicationController;
 use app\Http\Controllers\TestController;
 use app\Utilities;
 
+
+
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -511,7 +513,5 @@ Route::group(['prefix' => '/v2',], function () {
 
     // Route::get('test/benefit', [TestController::class, 'benefit']);
 
-    // Route::get('/orders-mail', function() {
-    //     return view('emails/new_order');
-    // });
+    // Route::get('/contract-mail', [TestController::class, "sendContract"]);
 });
