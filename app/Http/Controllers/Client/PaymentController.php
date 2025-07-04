@@ -124,7 +124,7 @@ class PaymentController extends Controller
 
     public function save(SavePayment $request)
     {
-        // try{
+        try{
             DB::beginTransaction();
             $data = $request->validated();
             $processedData = Cache::get('order_processing_' . $data['processingId']);
@@ -190,10 +190,10 @@ class PaymentController extends Controller
                 "paymentSummary" => new PaymentResource($payment),
                 "order" => new OrderResource($order)
             ]);
-        // }catch(\Exception $e){
-        //     DB::rollBack();
-        //     return Utilities::error($e, 'An error occurred while trying to perform this operation, Please try again later or contact support');
-        // }
+        }catch(\Exception $e){
+            DB::rollBack();
+            return Utilities::error($e, 'An error occurred while trying to perform this operation, Please try again later or contact support');
+        }
 
     }
 
