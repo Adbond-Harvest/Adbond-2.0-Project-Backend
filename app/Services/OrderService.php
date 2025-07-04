@@ -2,6 +2,8 @@
 
 namespace app\Services;
 
+use Illuminate\Support\Facades\Mail;
+
 use app\Models\Order;
 use app\Models\Discount;
 use app\Models\OrderDiscount;

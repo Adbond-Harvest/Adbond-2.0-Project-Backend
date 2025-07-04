@@ -3,6 +3,7 @@
 namespace app\Services;
 
 use DateTime;
+use Illuminate\Support\Facades\Mail;
 
 use app\Models\ClientInvestment;
 
