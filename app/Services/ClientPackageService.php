@@ -22,6 +22,7 @@ use app\Enums\ClientPackageOrigin;
 use app\Enums\PackageType;
 use app\Enums\FilePurpose;
 use app\Enums\InvestmentRedemptionOption;
+use app\Enums\FileTypes;
 
 use app\Exports\PackageExport;
 
