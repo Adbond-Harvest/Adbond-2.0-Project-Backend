@@ -219,6 +219,7 @@ class AssetSwitchService
             $assetUpgrade->update();
 
             $asset->upgrade_id = $assetUpgrade->id;
+            $asset->upgraded = 1;
             $asset->update();
 
             $newAsset = new ClientPackage;

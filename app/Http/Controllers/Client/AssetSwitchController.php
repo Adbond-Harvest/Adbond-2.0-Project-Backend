@@ -83,6 +83,10 @@ class AssetSwitchController extends Controller
 
             if($data['type'] == AssetSwitchType::DOWNGRADE->value && $asset->purchase_complete == 1) return Utilities::error402("You cannot downgrade this asset");
 
+            if($asset->requestedSwitch()) return Utilities::error402("There's a pending asset upgrade/downgrade request on this asset");
+
+            if($asset->upgraded == 1) return Utilities::error402("You cannot upgrade or downgrade this asset");
+
             $validSwitchPackages = ($data['type'] == AssetSwitchType::DOWNGRADE->value) ? 
                                         $this->assetSwitchService->getDownGradePackages($asset->package, true)
                                         :
