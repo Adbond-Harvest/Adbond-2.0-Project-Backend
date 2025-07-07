@@ -42,6 +42,7 @@ class AssetResource extends JsonResource
             "makePayment" => $this->makePaymentFlag(),
             "paymentPlan" => $this->paymentPlan(),
             "installmentCount" => $this->installmentCount(),
+            "requestedSwitch" => $this->requestedSwitch(),
             "valuation" => ($this->package) ? $this->package->amount * $this->units : null,
             "nextPaymentDate" => $this->payment_due_date,
             "appreciation" => $this->appreciation(),

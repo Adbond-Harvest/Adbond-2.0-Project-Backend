@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+use app\Enums\AssetSwitchType;
+
 use app\Services\FileService;
 
 class ClientPackage extends Model
@@ -44,6 +46,26 @@ class ClientPackage extends Model
     public function package()
     {
         return $this->belongsTo(Package::class);
+    }
+
+    public function assetSwitchRequests()
+    {
+        return $this->hasMany(DowngradeUpgradeRequest::class, "client_package_id", "id");
+    }
+
+    public function upgradeRequests()
+    {
+        return $this->assetSwitchRequests()->where("type", AssetSwitchType::UPGRADE->value)->whereNull("approved")->get();
+    }
+
+    public function downgradeRequests()
+    {
+        return $this->assetSwitchRequests()->where("type", AssetSwitchType::DOWNGRADE->value)->whereNull("approved")->get();
+    }
+
+    public function requestedSwitch()
+    {
+        return ($this->upgradeRequests()->count() > 0 || $this->downgradeRequests()->count());
     }
 
     protected static function boot()
