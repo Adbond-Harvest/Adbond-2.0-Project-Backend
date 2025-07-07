@@ -33,10 +33,11 @@ class AssetSwitchService
     {
         $projectType = $package->project->projectType;
         $query = Package::where("amount", "<", $package->amount)->where("type", PackageType::NON_INVESTMENT->value)
-            ->whereHas("project", function($projectQuery) use($projectType) {
-            $projectQuery->whereHas("projectType", function($projectTypeQuery) use($projectType) {
-                $projectTypeQuery->where("id", $projectType->id);
-            });
+            ->whereHas("project", function($projectQuery) use($package) {
+                $projectQuery->where("id", $package?->project?->id);
+            // $projectQuery->whereHas("projectType", function($projectTypeQuery) use($projectType) {
+            //     $projectTypeQuery->where("id", $projectType->id);
+            // });
         });
         return ($ids===false) ? $query->get() : $query->pluck("id")->toArray();
     }
@@ -46,10 +47,11 @@ class AssetSwitchService
         // dd($package->amount);
         $projectType = $package->project->projectType;
         $query = Package::where("amount", ">", $package->amount)->where("type", PackageType::NON_INVESTMENT->value)
-            ->whereHas("project", function($projectQuery) use($projectType) {
-            $projectQuery->whereHas("projectType", function($projectTypeQuery) use($projectType) {
-                $projectTypeQuery->where("id", $projectType->id);
-            });
+            ->whereHas("project", function($projectQuery) use($package) {
+                $projectQuery->where("id", $package?->project?->id);
+            // $projectQuery->whereHas("projectType", function($projectTypeQuery) use($projectType) {
+            //     $projectTypeQuery->where("id", $projectType->id);
+            // });
         });
         return ($ids===false) ? $query->get() : $query->pluck("id")->toArray();
     }
