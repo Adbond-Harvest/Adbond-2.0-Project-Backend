@@ -242,11 +242,13 @@ class PackageController extends Controller
         }
     }
 
-    public function search(Request $request, $projectId)
+    public function search(Request $request, $projectId=null)
     {
         try{
-            if (!is_numeric($projectId) || !ctype_digit($projectId)) return Utilities::error402("Invalid parameter projectID");
-            $this->packageService->projectId = $projectId;
+            if($projectId != null) {
+                if (!is_numeric($projectId) || !ctype_digit($projectId)) return Utilities::error402("Invalid parameter projectID");
+                $this->packageService->projectId = $projectId;
+            }
 
             $page = ($request->query('page')) ?? 1;
             $perPage = ($request->query('perPage'));
