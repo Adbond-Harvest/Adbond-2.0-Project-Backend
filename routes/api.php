@@ -167,8 +167,8 @@ Route::group(['prefix' => '/v2',], function () {
             Route::post('/add_promo', [UserPackageController::class, "addPromo"]);
             Route::post('/remove_promo', [UserPackageController::class, "removePromo"]);
             Route::get('/all/{projectId}', [UserPackageController::class, "packages"]);
-            Route::get('/search/{projectId}', [UserPackageController::class, "search"]);
             Route::get('/search', [UserPackageController::class, "search"]);
+            Route::get('/search/{projectId}', [UserPackageController::class, "search"]);
             Route::get('/export/{projectId}', [UserPackageController::class, "export"]);
             Route::get('/{id}', [UserPackageController::class, "package"]);
         });
