@@ -52,8 +52,8 @@ class PackageService
             if(isset($data['type']) && $data['type'] == PackageType::INVESTMENT->value) {
                 $package->interest_return_duration = $data['interestReturnDuration'];
                 $package->interest_return_timeline = $data['interestReturnTimeline'];
-                $package->interest_return_percentage = $data['interestReturnPercentage'];
-                $package->interest_return_amount = $data['interestReturnAmount'];
+                if(isset($data['interestReturnPercentage'])) $package->interest_return_percentage = $data['interestReturnPercentage'];
+                if(isset($data['interestReturnAmount'])) $package->interest_return_amount = $data['interestReturnAmount'];
                 $package->redemption_options = json_encode($data['redemptionOptions']);
                 $package->redemption_package_id = $data['redemptionPackageId'];
             }
