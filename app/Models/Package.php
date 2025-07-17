@@ -23,7 +23,8 @@ class Package extends Model
         'amount' => 'double',
         'discount' => 'double',
         'min_price' => 'double',
-        'infrastructure_fee' => 'double'
+        'infrastructure_fee' => 'double',
+        'redemption_options' => 'array',
     ];
 
     public function project()
@@ -39,6 +40,11 @@ class Package extends Model
     public function brochure()
     {
         return $this->belongsTo(File::class);
+    }
+
+    public function redemptionPackage()
+    {
+        return $this->hasOne(Package::class, "redemption_package_id", "id");
     }
 
     // public function sizes()
