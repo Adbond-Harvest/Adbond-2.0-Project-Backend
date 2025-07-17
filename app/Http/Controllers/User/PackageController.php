@@ -87,6 +87,8 @@ class PackageController extends Controller
 
         $package = $this->packageService->package($id, ['media']);
 
+        if(!$package) return Utilities::error402("Package not found");
+
         return Utilities::ok(new PackageResource($package));
     }
 
