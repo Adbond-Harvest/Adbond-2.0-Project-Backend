@@ -44,7 +44,7 @@ class Package extends Model
 
     public function redemptionPackage()
     {
-        return $this->hasOne(Package::class, "redemption_package_id", "id");
+        return $this->belongsTo(Package::class, "redemption_package_id", "id");
     }
 
     // public function sizes()
