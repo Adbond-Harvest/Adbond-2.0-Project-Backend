@@ -41,6 +41,11 @@ class Package extends Model
         return $this->belongsTo(File::class);
     }
 
+    public function redemptionPackage()
+    {
+        return $this->hasOne(Package::class, "redemption_package_id", "id");
+    }
+
     // public function sizes()
     // {
     //     return $this->hasMany(PackageSize::class);

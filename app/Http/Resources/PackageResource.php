@@ -23,6 +23,7 @@ class PackageResource extends JsonResource
         return [
             "id" => $this->id,
             "name" => $this->name,
+            "type" => $this->type,
             "project" => new ProjectResource($this->whenLoaded("project")),
             "size" => $this->size,
             "amount" => $this->amount,
@@ -40,6 +41,7 @@ class PackageResource extends JsonResource
             "interestReturnPercentage" => $this->interest_return_percentage."%",
             "interestReturnAmount" => $this->interest_return_amount,
             "redemptionOptions" => $this->redemption_options,
+            "redemptionPackage" => $this->redemptionPackage(),
             "vrUrl" => $this->vr_url,
             "active" => ($this->active) ? true : false,
             "status" => ($this->units==0 || $this->sold_out) ? "Sold Out" : (($this->active) ? "Active" : "Inactive"),
@@ -52,5 +54,25 @@ class PackageResource extends JsonResource
             "promos" => PromoResource::collection($this->promos),
             "createdAt" => $this->created_at->format('F j, Y'), 
         ];
+    }
+
+    private function redemptionPackage()
+    {
+        return $this->redemptionPackage ?
+        [
+            'id' => $this->redemptionPackage->id,
+            'name' => $this->redemptionPackage->name,
+            "project" => $this->redemptionPackage->project->name,
+            "state" => $this->redemptionPackage->state,
+            "address" => $this->redemptionPackage->address,
+            "location" => $this->redemptionPackage->address." ".$this->redemptionPackage->state,
+            "size" => $this->redemptionPackage->size,
+            "amount" => $this->redemptionPackage->amount,
+            "minPrice" => $this->redemptionPackage->min_price,
+            "infrastructureFee" => $this->redemptionPackage->infrastructure_fee,
+            "description" => $this->redemptionPackage->description,
+            "benefits" => BenefitResource::collection($this->redemptionPackage->benefits)
+        ]
+        : null;
     }
 }
