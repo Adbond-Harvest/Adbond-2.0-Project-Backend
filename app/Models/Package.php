@@ -23,7 +23,8 @@ class Package extends Model
         'amount' => 'double',
         'discount' => 'double',
         'min_price' => 'double',
-        'infrastructure_fee' => 'double'
+        'infrastructure_fee' => 'double',
+        'redemption_options' => 'array',
     ];
 
     public function project()
