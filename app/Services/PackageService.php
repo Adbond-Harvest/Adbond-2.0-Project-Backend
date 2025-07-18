@@ -98,6 +98,15 @@ class PackageService
         if(isset($data['brochureFileId'])) $package->brochure_file_id = $data['brochureFileId'];
         if(isset($data['installmentOption'])) $package->installment_option = $data['installmentOption'];
         if(isset($data['vrUrl'])) $package->vr_url = $data['vrUrl'];  
+
+        if(isset($data['type'])) $package->type = $data['type'];
+        if(isset($data['interestReturnDuration'])) $package->interest_return_duration = $data['interestReturnDuration'];
+        if(isset($data['interestReturnTimeline'])) $package->interest_return_timeline = $data['interestReturnTimeline'];
+        if(isset($data['interestReturnPercentage'])) $package->interest_return_percentage = $data['interestReturnPercentage'];
+        if(isset($data['interestReturnAmount'])) $package->interest_return_amount = $data['interestReturnAmount'];
+        if(isset($data['redemptionOptions'])) $package->redemption_options = json_encode($data['redemptionOptions']);
+        if(isset($data['redemptionPackageId'])) $package->redemption_package_id = $data['redemptionPackageId'];
+
         $package->update();
 
         if(isset($data['benefits'])) $package->benefits()->sync($data['benefits']);

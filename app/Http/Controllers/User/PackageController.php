@@ -28,7 +28,9 @@ use app\Services\ProjectService;
 use app\Services\PromoService;
 
 use app\Enums\FilePurpose;
+use app\Enums\PackageType;
 use app\Enums\ProjectFilter;
+use app\Enums\InvestmentRedemptionOption;
 
 use app\Utilities;
 
@@ -185,6 +187,28 @@ class PackageController extends Controller
             // Get The package being updated
             $package = $this->packageService->package($packageId);
             if(!$package) return Utilities::error402("package not found");
+
+            if($package->type == PackageType::NON_INVESTMENT->value || (isset($data['type']) && $data['type'] == PackageType::NON_INVESTMENT->value)){
+                if(isset($data["interestReturnDuration"]) && $data["interestReturnDuration"]) return Utilities::error402("Package is not an investment package, hence cannot have Interest Return");
+                if(isset($data["interestReturnTimeline"]) && $data["interestReturnTimeline"]) return Utilities::error402("Package is not an investment package, hence cannot have Interest Return");
+                if(isset($data["interestReturnPercentage"]) && $data["interestReturnPercentage"]) return Utilities::error402("Package is not an investment package, hence cannot have Interest Return");
+                if(isset($data["interestReturnAmount"]) && $data["interestReturnAmount"]) return Utilities::error402("Package is not an investment package, hence cannot have Interest Return");
+                if(isset($data["redemptionOptions"]) && $data["redemptionOptions"]) return Utilities::error402("Package is not an investment package, hence cannot have Redemption Options");
+                if(isset($data["redemptionPackageId"]) && $data["redemptionPackageId"]) return Utilities::error402("Package is not an investment package, hence cannot have Redemption Package");
+            }
+
+            if($package->type == PackageType::INVESTMENT->value || (isset($data['type']) && $data['type'] == PackageType::INVESTMENT->value)){
+                if(!$package->interest_duration && !isset($data["interestReturnDuration"])) return Utilities::error402("Interest Return Duration is required");
+                if(!$package->interest_return_timeline && !isset($data["interestReturnTimeline"])) return Utilities::error402("Interest Return Timeline is Required");
+                if((!$package->interest_return_percentage && !isset($data["interestReturnAmount"])) && !isset($data["interestReturnPercentage"])) return Utilities::error402("Interest Return Percentage is Required");
+                if((!$package->interest_return_amount && !isset($data["interestReturnPercentage"])) && !isset($data["interestReturnAmount"])) return Utilities::error402("Interest Return Amount is required when the Percentage is not set");
+                if(!$package->redemption_options && !isset($data["redemptionOptions"])) return Utilities::error402("Redemption Options is required");
+                if((!$package->redemption_package_id && !empty(array_intersect($data["redemptionOptions"], [
+                    InvestmentRedemptionOption::PROFIT_ONLY->value,
+                    InvestmentRedemptionOption::PROPERTY->value
+                ]))) && !isset($data["redemptionPackageId"])) return Utilities::error402("Redemption Package is required");
+                
+            }
 
             // if brochure file is uploaded
             if($request->hasFile('brochureFile')) { 
