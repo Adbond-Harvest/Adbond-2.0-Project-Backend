@@ -9,6 +9,11 @@ use app\Rules\ValidPackageBrochureFile;
 use app\Rules\ValidPackageMediaFile;
 use app\Rules\PackageNameUnique;
 
+use app\EnumClass;
+use app\Enums\PackageType;
+use app\Enums\InvestmentRedemptionOption;
+use app\Rules\IsNonInvestmentPackage;
+
 class UpdatePackage extends BaseRequest
 {
     /**
@@ -46,7 +51,22 @@ class UpdatePackage extends BaseRequest
             "installmentOption" => "nullable|boolean",
             "vrUrl" => "nullable|string",
             "packageMediaIds" => "nullable|array",
-            "packageMediaIds.*" => ["integer", new ValidPackageMediaFile()]
+            "packageMediaIds.*" => ["integer", new ValidPackageMediaFile()],
+            "interestReturnDuration" => "nullable|integer",
+            "interestReturnTimeline" => "nullable|integer",
+            "interestReturnPercentage" => ["nullable", "integer"],
+            "interestReturnAmount" => ["nullable", "integer"],
+            "redemptionOptions" => "nullable|array",
+            "redemptionOptions.*" => ["required", "string", Rule::in(EnumClass::investmentRedemptionOptions())],
+            "redemptionPackageId" => ["integer", Rule::requiredIf(function() {
+                                                    return ($this->redemptionOptions && is_array($this->redemptionOptions)) &&
+                                                            (in_array(InvestmentRedemptionOption::PROFIT_ONLY->value, $this->redemptionOptions) 
+                                                            || 
+                                                            in_array(InvestmentRedemptionOption::PROPERTY->value, $this->redemptionOptions));
+                                                }),
+                                        new IsNonInvestmentPackage()
+                                    ]
+        
         ];
     }
 }
