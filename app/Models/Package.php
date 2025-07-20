@@ -27,6 +27,11 @@ class Package extends Model
         'redemption_options' => 'array',
     ];
 
+    public function canDelete()
+    {
+        return ($this->assets->count() == 0);
+    }
+
     public function project()
     {
         return $this->belongsTo(Project::class);

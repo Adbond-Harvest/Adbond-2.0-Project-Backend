@@ -152,10 +152,10 @@ class PackageService
         return $project;
     }
 
-    public function delete($project)
+    public function delete($package)
     {
-        if($project->canDelete()) {
-            $project->delete();
+        if($package->canDelete()) {
+            $package->delete();
         }
     }
 
