@@ -10,6 +10,7 @@ use app\Models\ClientInvestment;
 use app\Mail\MOU;
 
 use app\Enums\FilePurpose;
+use app\Enums\FileTypes;
 
 use app\Utilities;
 use app\Helpers;
