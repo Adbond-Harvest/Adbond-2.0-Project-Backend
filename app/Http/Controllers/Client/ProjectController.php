@@ -80,6 +80,7 @@ class ProjectController extends Controller
     {
         $projectTypes = $this->projectTypeService->projectTypes();
         $this->projectService->count = true;
+        $this->projectService->status = ProjectFilter::ACTIVE->value;
         $summary = [];
         $summary['all'] = ["total" => $this->projectService->projects()];
         if($projectTypes->count() > 0) {
