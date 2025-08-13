@@ -56,7 +56,9 @@ class ProjectController extends Controller
         // }
 
 
-        $projects = $this->projectService->filter($filter, ["projectType", "packages"], $offset, $perPage);
+        $projects = $this->projectService->filter($filter, ["projectType", "packages"=> function($query) {
+            $query->where('active', 1);
+        }], $offset, $perPage);
 
         // $projects = $this->projectService->projects(["projectType"], $offset, $perPage);
         $this->projectService->count = true;

@@ -54,7 +54,7 @@ class PackageService
                 $package->interest_return_timeline = $data['interestReturnTimeline'];
                 if(isset($data['interestReturnPercentage'])) $package->interest_return_percentage = $data['interestReturnPercentage'];
                 if(isset($data['interestReturnAmount'])) $package->interest_return_amount = $data['interestReturnAmount'];
-                $package->redemption_options = json_encode($data['redemptionOptions']);
+                $package->redemption_options = $data['redemptionOptions'];
                 $package->redemption_package_id = $data['redemptionPackageId'];
             }
             $package->save();

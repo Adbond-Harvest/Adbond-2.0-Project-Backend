@@ -11,6 +11,18 @@ use app\Http\Resources\PromoResource;
 
 class ProjectResource extends JsonResource
 {
+    private $onlyActivePackages = false;
+
+    /** @param  mixed  $resource
+     * @param  array  $options
+     * @return void
+     */
+    public function __construct($resource, $options = [])
+    {
+        parent::__construct($resource);
+        $this->onlyActivePackages = $options['only_active_packages'] ?? false;
+    }
+
     /**
      * Transform the resource into an array.
      *
@@ -18,6 +30,11 @@ class ProjectResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // Filter packages based on the parameter
+        $packages = $this->onlyActivePackages 
+            ? $this->packages->where('active', true)
+            : $this->packages;
+            
         $resource = [
             "id" => $this->id,
             "identifier" => $this->identifier,
