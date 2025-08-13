@@ -111,7 +111,7 @@ class OrderService
         if(isset($data['paymentStatusId'])) $order->payment_status_id = $data['paymentStatusId'];
         if(isset($data['amountPayed'])) {
             $order->amount_payed += $data['amountPayed'];
-            $order->balance = $data['balance'];
+            // $order->balance = $data['balance'];
         }
         $order->update();
 
