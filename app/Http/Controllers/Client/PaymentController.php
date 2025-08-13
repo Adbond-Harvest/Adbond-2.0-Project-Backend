@@ -208,6 +208,7 @@ class PaymentController extends Controller
             if($data['cardPayment']) {
                 // dd('got here');
                 $asset = null;
+
                 
                 // If its full payment or its the first installment or its the last installment
                 // if the client was referred to by a staff, add commission to the staff
@@ -223,6 +224,11 @@ class PaymentController extends Controller
 
                 $this->paymentService->uploadReceipt($payment, Auth::guard('client')->user());  
                 $clientInvestment = (isset($clientInvestment)) ? $clientInvestment : null;
+
+                //Update the order to register the amount payed
+                $this->orderService->update(["amountPayed" => $payment->amount], $order);
+
+                
                 if ($order->is_installment == 0 || $order->installments_payed == $order->installment_count) {
                     $this->orderService->completeOrder($order, $payment, $clientInvestment);
                 }else{
