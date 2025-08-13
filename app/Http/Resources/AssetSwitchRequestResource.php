@@ -21,7 +21,8 @@ class AssetSwitchRequestResource extends JsonResource
             "type" => $this->type,
             "packageFrom" => new PackageResource($this->packageFrom),
             "packageTo" => new PackageResource($this->packageTo),
-            "status" => ($this->approved === null) ? "pending" : (($this->approved === 1) ? "Approved" : "Rejected") 
+            "status" => ($this->approved === null) ? "pending" : (($this->approved === 1) ? "Approved" : "Rejected"),
+            "statusCheck" => ($this->approved === null) ? "pending" : $this->approved,
         ];
     }
 }
