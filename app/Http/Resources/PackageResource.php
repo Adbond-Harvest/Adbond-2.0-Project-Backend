@@ -40,7 +40,7 @@ class PackageResource extends JsonResource
             "interestReturnTimeline" => $this->interest_return_timeline." Months",
             "interestReturnPercentage" => $this->interest_return_percentage."%",
             "interestReturnAmount" => $this->interest_return_amount,
-            "redemptionOptions" => json_decode($this->redemption_options),
+            "redemptionOptions" => $this->redemption_options,
             "redemptionPackage" => $this->redemptionPackage(),
             "vrUrl" => $this->vr_url,
             "active" => ($this->active) ? true : false,
