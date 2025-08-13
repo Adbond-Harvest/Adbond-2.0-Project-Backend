@@ -65,7 +65,14 @@ class ClientPackage extends Model
 
     public function requestedSwitch()
     {
-        return ($this->upgradeRequests()->count() > 0 || $this->downgradeRequests()->count());
+        $requested = false;
+        if($this->assetSwitchRequests->count() > 0) {
+            foreach($this->assetSwitchRequests as $assetSwitch) {
+                if($assetSwitch->approved == null) $requested = true;
+            }
+        }
+        return $requested;
+        // return ($this->upgradeRequests()->count() > 0 || $this->downgradeRequests()->count());
     }
 
     protected static function boot()

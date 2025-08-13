@@ -135,6 +135,15 @@ class AssetResource extends JsonResource
         if($this->origin == ClientPackageOrigin::ORDER->value && $this->purchase->is_installment == 1) {
             $flag = ($this->purchase->installment_count > $this->purchase->installments_payed);
         }
+        $payments = $this->purchase->payments;
+        if(!$payments || $payments->count() == 0) {
+            $flag = true;
+        }else{
+            foreach($payments as $payment) {
+                if($payment->confirmed == null) $flag = false;
+            }
+        }
+        if($this->requestedSwitch()) $flag = false;
         return $flag;
     }
 }
