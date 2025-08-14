@@ -47,7 +47,7 @@ class AssetResource extends JsonResource
             "nextPaymentDate" => $this->payment_due_date,
             "appreciation" => $this->appreciation(),
             "balance" => $this->balance(),
-            "status" => ($this->origin == ClientPackageOrigin::ORDER->value && $this->purchase?->completed == 0) ? "pending" : "completed", 
+            "status" => $this->status(), 
             "active" => ($this->origin == ClientPackageOrigin::ORDER->value && !$this->purchase?->completed) ? true : false,
             "files" => FileResource::collection($this->files),
             // "returns" => $this->investmentReturns()
@@ -145,5 +145,16 @@ class AssetResource extends JsonResource
         }
         if($this->requestedSwitch()) $flag = false;
         return $flag;
+    }
+
+    private function status()
+    {
+        $status = "pending";
+        if($this->origin == ClientPackageOrigin::INVESTMENT->value) {
+            if($this->purchase->order->completed == 1) $status = "completed";
+        }else{
+            if($this->purchase->completed == 1) $status = "completed";
+        }
+        return $status;
     }
 }
