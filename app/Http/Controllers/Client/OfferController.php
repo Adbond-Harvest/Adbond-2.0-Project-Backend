@@ -46,7 +46,7 @@ class OfferController extends Controller
             if($clientPackage->sold == 1) return Utilities::error402("This asset is already sold");
 
             $offer = $this->offerService->getOffersByAssetId($data['assetId']);
-            if($offer && (!$offer->approved || $offer->approved == 1)) return Utilities::error402("This asset is already on offer");
+            if($offer && $offer->approved != 0) return Utilities::error402("This asset is already on offer");
 
             if($clientPackage->purchase_complete == 0) return Utilities::error402("This asset purchase is nor complete yet");
 
