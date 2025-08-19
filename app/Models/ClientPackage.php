@@ -75,6 +75,23 @@ class ClientPackage extends Model
         // return ($this->upgradeRequests()->count() > 0 || $this->downgradeRequests()->count());
     }
 
+    public function offers()
+    {
+        return $this->hasMany(Offer::class);
+    }
+
+    // I want to get the offer that this asset has been offered
+    public function activeOffer()
+    {
+        return $this->offers()->whereNotNull("approved");
+    }
+
+    // I want to get the offer that this asset has been offered
+    public function onOffer()
+    {
+        return $this->activeOffer->count() > 0;
+    }
+
     protected static function boot()
     {
         parent::boot();
