@@ -98,7 +98,6 @@ class OfferPaymentController extends Controller
 
     public function makePayment(MakeOfferPayment $request)
     {
-        dd(PaymentStatus::awaiting_payment());
         try{
             DB::beginTransaction();
 
@@ -111,7 +110,6 @@ class OfferPaymentController extends Controller
             $bid = $this->bidService->getBid($processedData['bidId']);
             if(!$bid) return Utilities::error402("Bid was not found");
 
-            dd(PaymentStatus::awaiting_payment());
             if($bid->payment_status_id != null && $bid->payment_status_id != PaymentStatus::awaiting_payment()->id) return Utilities::error402("Payment has already been done on this bid");
 
             if(!$bid->offer) return Utilities::error402("The offer for this bid cannot be found");
