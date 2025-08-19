@@ -98,6 +98,7 @@ class OfferPaymentController extends Controller
 
     public function makePayment(MakeOfferPayment $request)
     {
+        dd(PaymentStatus::awaiting_payment());
         try{
             DB::beginTransaction();
 
