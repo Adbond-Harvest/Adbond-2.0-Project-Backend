@@ -83,7 +83,7 @@ class ClientPackage extends Model
     // I want to get the offer that this asset has been offered
     public function activeOffer()
     {
-        return $this->offers()->whereNotNull("approved");
+        return $this->offers()->where("approved", "!=", 0);
     }
 
     // I want to get the offer that this asset has been offered
