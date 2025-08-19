@@ -30,6 +30,7 @@ class AddNextOfKin extends BaseRequest
             "firstname" => "string",
             "lastname" => "string",
             "gender" => ["string",Rule::in(EnumClass::genders())],
+            "email" => "string|email",
             "phoneNumber" => "string|min:8|max:25",
             "countryId" => "integer|nullable",
             "stateId" => "integer|nullable",

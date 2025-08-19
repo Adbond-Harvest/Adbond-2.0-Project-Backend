@@ -72,6 +72,11 @@ class OfferBidService
         return OfferBid::with($with)->where("id", $bidId)->first();
     }
 
+    public function getClientBid($offerId, $clientId)
+    {
+        return OfferBid::where("offer_id", $offerId)->where("client_id", $clientId)->first();
+    }
+
     public function accept($bid) {
         $bid->accepted = true;
         $bid->update();
