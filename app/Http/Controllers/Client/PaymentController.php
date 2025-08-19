@@ -30,6 +30,10 @@ use app\Services\ClientInvestmentService;
 use app\Models\PaymentStatus;
 use app\Models\PaymentMode;
 use app\Models\PaymentGateway;
+use app\Models\ClientPackage;
+use app\Models\Order;
+use app\Models\Offer;
+use app\Models\ClientInvestment;
 
 use app\Http\Resources\OrderResource;
 use app\Http\Resources\PaymentResource;
@@ -93,7 +97,9 @@ class PaymentController extends Controller
 
     public function prepareAdditionalPayment(PrepareAdditionalPayment $request)
     {
-        $order = $this->orderService->order($request->validated('orderId'));
+        $asset = $this->clientPackageService->clientPackage($request->validated('assetId'));
+        if(!$asset) return Utilities::error402("Asset not found");
+        $order = ($asset->purchase_type == Order::$type) ? $asset?->purchase : $asset?->purchase?->order;//$this->orderService->order($request->validated('orderId'));
         if(!$order) return Utilities::error402("Order not found");
 
         //confirm that its an installment order, else, return error
@@ -228,7 +234,7 @@ class PaymentController extends Controller
                 //Update the order to register the amount payed
                 $this->orderService->update(["amountPayed" => $payment->amount], $order);
 
-                
+
                 if ($order->is_installment == 0 || $order->installments_payed == $order->installment_count) {
                     $this->orderService->completeOrder($order, $payment, $clientInvestment);
                 }else{
