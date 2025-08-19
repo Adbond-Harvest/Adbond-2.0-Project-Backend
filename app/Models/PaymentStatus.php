@@ -23,7 +23,6 @@ class PaymentStatus extends Model
 
     public static function awaiting_payment()
     {
-        dd(Status::AWAITING_PAYMENT->value);
         return self::where("name", Status::AWAITING_PAYMENT->value)->toSql();
     }
 
