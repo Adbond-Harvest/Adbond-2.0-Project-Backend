@@ -41,8 +41,13 @@ class OfferBidController extends Controller
             if(!$offer->approved || $offer->approved==0) return Utilities::error402("Offer is not approved");
             if($offer->accepted_bid_id) return Utilities::error402("Bid has been accepted on this offer");
             if($offer->resell_order_id) return Utilities::error402("Bid is not open to offer");
-            
-            $bid = $this->bidService->save($data);
+
+            $bid = $this->bidService->getClientBid($data['offerId'], Auth::guard("client")->user()->id);
+            if($bid) {
+                $bid = $this->bidService->update(["price" => $data["price"]], $bid);
+            }else{
+                $bid = $this->bidService->save($data);
+            }
 
             return Utilities::ok(new OfferBidResource($bid));
         }catch(\Exception $e){
