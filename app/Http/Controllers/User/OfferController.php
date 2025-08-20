@@ -4,6 +4,7 @@ namespace app\Http\Controllers\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use app\Http\Controllers\Controller;
 
 use app\Http\Requests\User\ApproveOffer;
@@ -65,7 +66,7 @@ class OfferController extends Controller
 
             if($offer->approved && $offer->approved==1) return Utilities::error402("This offer has already been Approved");
 
-            $offer = $this->offerService->approve($offer);
+            $offer = $this->offerService->approve($offer, Auth::user()->id);
 
             return Utilities::okay("Offer approved successfully");
 
@@ -85,7 +86,7 @@ class OfferController extends Controller
 
             if($offer->approved && $offer->approved==1) return Utilities::error402("This offer has been Approved");
 
-            $offer = $this->offerService->reject($offer, $data['reason']);
+            $offer = $this->offerService->reject($offer, $data['reason'], Auth::user()->id);
 
             return Utilities::okay("Offer Rejected");
 
