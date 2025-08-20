@@ -153,40 +153,43 @@ class OfferService
         $letterOfHappinessFileObj = null;
         $fileService = new FileService;
         $clientInvestmentService = new ClientInvestmentService;
-        try{
-            // generate and save contract
-            Helpers::generateContract($offer);
-            // dd('generate receipt');
-            $uploadedContract = "files/contract_{$offer->id}.pdf";
+        $clientPackageService = new ClientPackageService;
+        // try{
+        //     // generate and save contract
+        //     Helpers::generateContract($offer);
+        //     // dd('generate receipt');
+        //     $uploadedContract = "files/contract_{$offer->id}.pdf";
             
-            $response = Helpers::moveUploadedFileToCloud($uploadedContract, FileTypes::PDF->value, $offer->acceptedBid->client->id, 
-            FilePurpose::CONTRACT->value, "app\Models\Client", "client-contracts");
+        //     $response = Helpers::moveUploadedFileToCloud($uploadedContract, FileTypes::PDF->value, $offer->acceptedBid->client->id, 
+        //     FilePurpose::CONTRACT->value, "app\Models\Client", "client-contracts");
             
-            if($response['success']) {
-                $contractFileId = $response['upload']['file']->id;
-                $contractFileObj = $response['upload']['file'];
-            }
+        //     if($response['success']) {
+        //         $contractFileId = $response['upload']['file']->id;
+        //         $contractFileObj = $response['upload']['file'];
+        //     }
             
-        }catch(\Exception $e) {
-            Utilities::logStuff("Error Occurred while attempting to generate and upload contract..".$e);
-        }
+        // }catch(\Exception $e) {
+        //     Utilities::logStuff("Error Occurred while attempting to generate and upload contract..".$e);
+        // }
+
+        
         // generate and save letter of happiness
-        try{
-            // generate and save contract
-            Helpers::generateLetterOfHappiness($payment);
-            // dd('generate receipt');
-            $uploadedLetter = "files/letter_of_happiness_{$offer->id}.pdf";
+        // try{
+        //     // generate and save contract
+        //     Helpers::generateLetterOfHappiness($payment);
+        //     // dd('generate receipt');
+        //     $uploadedLetter = "files/letter_of_happiness_{$offer->id}.pdf";
             
-            $response = Helpers::moveUploadedFileToCloud($uploadedLetter, FileTypes::PDF->value, $offer->acceptedBid->client->id, 
-            FilePurpose::LETTER_OF_HAPPINESS->value, "app\Models\Client", "client-letter_of_happiness");
-            if($response['success']) {
-                $letterOfHappinessFileId = $response['upload']['file']->id;
-                $letterOfHappinessFileObj = $response['upload']['file'];
-            }
+        //     $response = Helpers::moveUploadedFileToCloud($uploadedLetter, FileTypes::PDF->value, $offer->acceptedBid->client->id, 
+        //     FilePurpose::LETTER_OF_HAPPINESS->value, "app\Models\Client", "client-letter_of_happiness");
+        //     if($response['success']) {
+        //         $letterOfHappinessFileId = $response['upload']['file']->id;
+        //         $letterOfHappinessFileObj = $response['upload']['file'];
+        //     }
             
-        }catch(\Exception $e) {
-            Utilities::logStuff("Error Occurred while attempting to generate and upload letter of happiness..".$e);
-        }
+        // }catch(\Exception $e) {
+        //     Utilities::logStuff("Error Occurred while attempting to generate and upload letter of happiness..".$e);
+        // }
 
         // mark the order as complete
         $offer->completed = true;
@@ -196,14 +199,17 @@ class OfferService
         // save the clientPackage and return it
         $clientPackageService = new ClientPackageService;
         $files = [];
-        if($contractFileId) $files['contractFileId'] = $contractFileId;
-        if($letterOfHappinessFileId) $files['happinessLetterFileId'] = $letterOfHappinessFileId;
+        // if($contractFileId) $files['contractFileId'] = $contractFileId;
+        // if($letterOfHappinessFileId) $files['happinessLetterFileId'] = $letterOfHappinessFileId;
         // dd($files);
         $clientPackage = $clientPackageService->saveClientPackageOffer($offer, $files);
 
-        $fileMeta = ["belongsId"=>$clientPackage->id, "belongsType"=>"app\Models\ClientPackage"];
-        if($contractFileObj) $fileService->updateFileObj($fileMeta, $contractFileObj);
-        if($letterOfHappinessFileObj) $fileService->updateFileObj($fileMeta, $letterOfHappinessFileObj);
+        $clientPackageService->uploadContract($offer, $clientPackage, true);
+        $clientPackageService->uploadLetterOfHappiness($payment, $clientPackage);
+
+        // $fileMeta = ["belongsId"=>$clientPackage->id, "belongsType"=>"app\Models\ClientPackage"];
+        // if($contractFileObj) $fileService->updateFileObj($fileMeta, $contractFileObj);
+        // if($letterOfHappinessFileObj) $fileService->updateFileObj($fileMeta, $letterOfHappinessFileObj);
 
         return $offer;
     }

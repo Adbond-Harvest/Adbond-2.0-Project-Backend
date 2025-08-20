@@ -185,11 +185,12 @@ class ClientPackageService
         }
     }
 
-    public function uploadContract($order, $asset)
+    public function uploadContract($order, $asset, $isOffer=false)
     {
         // generate Contract
         try{
             $fileService = new FileService;
+            if($isOffer) Helpers::$purchaseOrigin = ClientPackageOrigin::OFFER->value;
             $uploadedFile = Helpers::generateContract($order);
             // dd('generate Contract');
             $response = Helpers::moveUploadedFileToCloud($uploadedFile, FileTypes::PDF->value, $asset->client->id, 
@@ -226,7 +227,7 @@ class ClientPackageService
     public function clientAssets($clientId, $with=[], $offset=0, $perPage=null)
     {
         // return ClientPackage::where("client_id", $clientId)->get();
-        $query = ClientPackage::with($with)->where("client_id", $clientId);
+        $query = ClientPackage::with($with)->where("client_id", $clientId)->where("sold", 0);
         if($this->filter && is_array($this->filter)) {
             $filter = $this->filter;
             if(isset($filter['text'])) {
