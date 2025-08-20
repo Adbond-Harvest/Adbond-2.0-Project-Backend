@@ -227,7 +227,8 @@ class ClientPackageService
     public function clientAssets($clientId, $with=[], $offset=0, $perPage=null)
     {
         // return ClientPackage::where("client_id", $clientId)->get();
-        $query = ClientPackage::with($with)->where("client_id", $clientId)->where("sold", 0);
+        // Get assets that has not been sold or upgraded
+        $query = ClientPackage::with($with)->where("client_id", $clientId)->where("sold", 0)->where("upgraded", 0);
         if($this->filter && is_array($this->filter)) {
             $filter = $this->filter;
             if(isset($filter['text'])) {
