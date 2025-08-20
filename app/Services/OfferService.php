@@ -127,9 +127,11 @@ class OfferService
         return Offer::with($with)->where("id", $id)->first();
     }
 
-    public function approve($offer)
+    public function approve($offer, $userId)
     {
         $offer->approved = true;
+        $offer->approval_date = now();
+        $offer->user_id = $userId;
         $offer->payment_status_id = PaymentStatus::pending()->id;
         $offer->update();
 
