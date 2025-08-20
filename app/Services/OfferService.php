@@ -9,6 +9,8 @@ use app\Services\FileService;
 use app\Services\ClientPackageService;
 
 use app\Enums\OfferApprovalStatus;
+use app\Enums\FileTypes;
+use app\Enums\FilePurpose;
 
 use app\Helpers;
 
