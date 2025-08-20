@@ -185,11 +185,12 @@ class ClientPackageService
         }
     }
 
-    public function uploadContract($order, $asset)
+    public function uploadContract($order, $asset, $isOffer=false)
     {
         // generate Contract
         try{
             $fileService = new FileService;
+            if($isOffer) Helpers::$purchaseOrigin = ClientPackageOrigin::OFFER->value;
             $uploadedFile = Helpers::generateContract($order);
             // dd('generate Contract');
             $response = Helpers::moveUploadedFileToCloud($uploadedFile, FileTypes::PDF->value, $asset->client->id, 
