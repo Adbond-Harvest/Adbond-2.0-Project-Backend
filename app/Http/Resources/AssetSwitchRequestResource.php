@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 use app\Http\Resources\PackageResource;
+use app\Http\Resources\ClientBriefResource;
 
 class AssetSwitchRequestResource extends JsonResource
 {
@@ -18,6 +19,7 @@ class AssetSwitchRequestResource extends JsonResource
     {
         return [
             "id" => $this->id,
+            "client" => new ClientBriefResource($this->client),
             "type" => $this->type,
             "packageFrom" => new PackageResource($this->packageFrom),
             "packageTo" => new PackageResource($this->packageTo),
