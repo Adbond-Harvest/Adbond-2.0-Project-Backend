@@ -138,10 +138,11 @@ class OfferService
         return $offer;
     }
 
-    public function reject($offer, $reason)
+    public function reject($offer, $reason, $userId)
     {
         $offer->approved = false;
         $offer->rejected_reason = $reason;
+        $offer->user_id = $userId;
         $offer->update();
 
         return $offer;

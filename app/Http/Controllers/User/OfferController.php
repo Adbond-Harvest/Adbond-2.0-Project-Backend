@@ -86,7 +86,7 @@ class OfferController extends Controller
 
             if($offer->approved && $offer->approved==1) return Utilities::error402("This offer has been Approved");
 
-            $offer = $this->offerService->reject($offer, $data['reason']);
+            $offer = $this->offerService->reject($offer, $data['reason'], Auth::user()->id);
 
             return Utilities::okay("Offer Rejected");
 
