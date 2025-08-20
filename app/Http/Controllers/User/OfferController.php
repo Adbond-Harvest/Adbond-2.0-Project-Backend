@@ -110,6 +110,8 @@ class OfferController extends Controller
             $offer = $this->offerService->offer($request->validated("offerId"));
             if(!$offer) return Utilities::error402("Offer not found");
 
+            if($offer->complete == 1) return Utilities::error402("This offer is already complete");
+
             $offerPayment = $this->paymentService->getPurchasePayment($offer->id, Offer::$type);
             if(!$offerPayment) return Utilities::error402("The payment for this offer was not found");
 
