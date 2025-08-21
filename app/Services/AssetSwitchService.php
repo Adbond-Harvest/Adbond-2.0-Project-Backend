@@ -202,18 +202,22 @@ class AssetSwitchService
 
             $asset->update();
         }else{
+            // what the client paid for the previous asset should become the amount_payed and the amount_payable should be the price of the current asset
             $order = new Order;
             $order->type = OrderType::UPGRADE->value;
             $order->client_id = $request->client_id;
             $order->package_id = $toPackage->id;
             $order->units = $asset->units;
-            $order->amount_payed = 0;
-            $order->amount_payable = ($toPackage->amount * $toPackage->units) - $asset->amount;
+            $order->amount_payed = $order->amount_payed;
+            // the amount payable is the price of the package being upgraded to multiplied by the number of units that the previous asset has
+            $order->amount_payable = $toPackage->amount * $order->units;
             $order->unit_price = $toPackage->amount;
-            $order->payment_status_id = PaymentStatus::pending()->id;
+            $order->payment_status_id = (($order->amount_payable - $order->amount_payed) > 0) ? PaymentStatus::pending()->id : PaymentStatus::complete()->id;
             $order->order_date = now();
             $order->payment_period_status_id = PaymentPeriodStatus::normal()->id;
             $order->save();
+            $order->order_number = $order->id.Utilities::getOrderProcessingId();
+            $order->update();
 
             $assetUpgrade->order_id = $order->id;
             $assetUpgrade->update();
@@ -232,8 +236,10 @@ class AssetSwitchService
             $newAsset->purchase_type = Order::$type;
             $newAsset->purchase_id = $order->id;
             $newAsset->upgrade_id = $assetUpgrade->id;
+            if($order->completed == 1) $newAsset->purchase_complete = 1;
             $newAsset->save();
 
+            // return $newAsset;
         }
 
         $fromPackage->units += $order->units;

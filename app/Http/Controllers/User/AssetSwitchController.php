@@ -16,6 +16,7 @@ use app\Services\PackageService;
 use app\Services\ClientPackageService;
 
 use app\Enums\AssetSwitchType;
+use app\Enums\ClientPackageOrigin;
 
 use app\Utilities;
 
@@ -101,9 +102,17 @@ class AssetSwitchController extends Controller
 
             $request = $this->assetSwitchService->approve($request);
             if($request->type == AssetSwitchType::DOWNGRADE->value) {
-                $this->assetSwitchService->downgrade($request, $request->packageTo);
+                $assetSwitch = $this->assetSwitchService->downgrade($request, $request->packageTo);
             }else{
-                $this->assetSwitchService->upgrade($request, $request->packageTo);
+                $assetSwitch = $this->assetSwitchService->upgrade($request, $request->packageTo);
+            }
+
+            //if the purchase is complete, send the required documents
+            if($assetSwitch?->asset?->purchase_complete == 1) {
+                $order = ($assetSwitch?->asset?->origin == ClientPackageOrigin::INVESTMENT->value) ? $assetSwitch?->purchase?->order : $assetSwitch?->purchase;
+                if($order) $this->clientPackageService->uploadContract($order, $assetSwitch->asset);
+                $payment = $order->payments->first();
+                if($payment) $this->clientPackageService->uploadLetterOfHappiness($payment, $assetSwitch->asset);
             }
 
             DB::commit();
