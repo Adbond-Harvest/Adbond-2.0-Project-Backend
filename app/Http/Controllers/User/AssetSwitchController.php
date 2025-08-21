@@ -109,7 +109,7 @@ class AssetSwitchController extends Controller
 
             //if the purchase is complete, send the required documents
             if($assetSwitch?->asset?->purchase_complete == 1) {
-                $order = ($assetSwitch?->asset?->origin == ClientPackageOrigin::INVESTMENT->value) ? $assetSwitch?->purchase?->order : $assetSwitch?->purchase;
+                $order = ($assetSwitch?->asset?->origin == ClientPackageOrigin::INVESTMENT->value) ? $assetSwitch?->asset?->purchase?->order : $assetSwitch?->asset?->purchase;
                 if($order) $this->clientPackageService->uploadContract($order, $assetSwitch->asset);
                 $payment = $order->payments->first();
                 if($payment) $this->clientPackageService->uploadLetterOfHappiness($payment, $assetSwitch->asset);
