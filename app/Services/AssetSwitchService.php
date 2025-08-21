@@ -240,6 +240,11 @@ class AssetSwitchService
             if($order->completed == 1) $newAsset->purchase_complete = 1;
             $newAsset->save();
 
+            if($newAsset->purchase_complete == 1) {
+                $assetUpgrade->complete = 1;
+                $assetUpgrade->update();
+            }
+
             // return $newAsset;
         }
 
