@@ -31,6 +31,6 @@ class AssetUpgrade extends Model
 
     public function asset()
     {
-        return $this->belongsTo(ClientPackage::class);
+        return $this->belongsTo(ClientPackage::class, "client_package_id", "id");
     }
 }
