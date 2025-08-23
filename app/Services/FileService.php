@@ -284,7 +284,7 @@ class FileService
             $upload = Storage::disk('local')->putFileAs('files', $file, $filename);
             $upload = storage_path('app/' . $upload);
         }else{
-            $upload = $file->getRealPath();
+            $upload = $file;
         }
         // dd($upload);
         if($upload) {
