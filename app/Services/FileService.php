@@ -282,9 +282,11 @@ class FileService
         if(!$uploaded) {
             $filename = time().$file->getClientOriginalName();
             $upload = Storage::disk('local')->putFileAs('files', $file, $filename);
+            $upload = storage_path('app/' . $upload);
         }else{
-            $upload = $file;
+            $upload = $file->getRealPath();
         }
+        // dd($upload);
         if($upload) {
             $uploadFolder = ($folder==null) ? env("CLOUDINARY_DOCS") : env("CLOUDINARY_DOCS")."/".$folder;
             
@@ -300,7 +302,7 @@ class FileService
                     // "format" => "pdf"
                 ]
             );
-            // unlink($upload);
+            unlink($upload);
             return $uploadedFile;
         }else{
             return false;

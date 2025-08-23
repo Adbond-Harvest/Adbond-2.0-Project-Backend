@@ -3,13 +3,21 @@
 namespace app\Http\Controllers\User;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use app\Http\Controllers\Controller;
+
+use app\Http\Requests\User\UploadDoa;
 
 use app\Http\Resources\AssetResource;
 
-
 use app\Services\ClientPackageService;
 use app\Services\AssetService;
+use app\Services\FileService;
+
+use app\Models\ClientPackage;
+use app\Models\Client;
+
+use app\Enums\FilePurpose;
 
 use app\Utilities;
 
@@ -17,11 +25,34 @@ class AssetController extends Controller
 {
     private $assetService;
     private $clientPackageService;
+    private $fileService;
 
     public function __construct()
     {
         $this->assetService = new AssetService;   
         $this->clientPackageService = new ClientPackageService;
+        $this->fileService = new FileService;
+    }
+
+    public function saveDoa(UploadDoa $request)
+    {
+        // try{
+            $asset = $this->assetService->asset($request->validated("assetId"));
+            if(!$asset) return Utilities::error402("Asset not found");
+
+            $file = $request->file('doa');
+            $fileType = Utilities::getFileType($file->getMimeType());
+            $this->fileService->belongsId = $asset->id;
+            $this->fileService->belongsType = ClientPackage::$type;
+            $res = $this->fileService->save($file, $fileType, Auth::user()->id, FilePurpose::DEED_OF_ASSIGNMENT->value, Client::$userType, 'doa');
+            if($res['status'] != 200) return Utilities::error402('Sorry file could not be uploaded: '.$res['message']);
+
+            $asset = $this->assetService->saveDoa($res['file']->id, $asset);
+
+            return new AssetResource($asset);
+        // }catch(\Exception $e){
+        //     return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        // }
     }
 
     public function assets(Request $request)

@@ -182,6 +182,7 @@ Route::group(['prefix' => '/v2',], function () {
         //Assets Routes
         Route::group(['prefix' => '/assets'], function () {
             Route::get('', [UserAssetController::class, "assets"]);
+            Route::post('/upload_doa', [UserAssetController::class, "saveDoa"]);
 
             Route::get('/switch_requests', [UserAssetSwitchController::class, 'assetSwitchRequests']);
             Route::post('/approve_switch_request', [UserAssetSwitchController::class, 'approve']);
