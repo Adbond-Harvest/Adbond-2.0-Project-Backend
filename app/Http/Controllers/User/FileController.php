@@ -21,7 +21,7 @@ use app\Utilities;
 
 class FileController extends Controller
 {
-    private static $userType = "appModels\User";
+    private static $userType = "app\Models\User";
     private $fileService;
     private $clientPackageService;
 

@@ -15,6 +15,14 @@ class AssetService
     public $count = false;
     public $filter = null;
 
+    public function saveDoa($doaFileId, $asset)
+    {
+        $asset->doa_file_id = $doaFileId;
+        $asset->update();
+
+        return $asset;
+    }
+
     public function clientAssetSummary($clientId)
     {
         return ClientAssetsView::where("client_id", $clientId)->first();
@@ -23,6 +31,11 @@ class AssetService
     public function assetsSummary()
     {
         return ClientAssetsView::all();
+    }
+
+    public function asset($id)
+    {
+        return ClientPackage::find($id);
     }
 
     public function assets($with=[], $offset=0, $perPage=null)

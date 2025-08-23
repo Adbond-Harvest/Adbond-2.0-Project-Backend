@@ -424,4 +424,25 @@ class Utilities
         return round(($val/$total) * 100, 2);
     }
 
+    public static function getFileType($mime)
+    {
+        $type = 'unknown';
+        switch($mime) {
+        case 'application/pdf' : 
+            $type = 'pdf';
+            break;
+        case 'application/msword':
+            $type = 'doc';
+            break;
+        case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+            $type = 'docx';
+            break;
+        } 
+        if (str_starts_with($mime, 'image/')) {
+            $type = 'image';
+        }
+
+        return $type;
+    }
+
 }
