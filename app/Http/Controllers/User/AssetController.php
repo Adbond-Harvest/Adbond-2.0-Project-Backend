@@ -36,7 +36,7 @@ class AssetController extends Controller
 
     public function saveDoa(UploadDoa $request)
     {
-        // try{
+        try{
             $asset = $this->assetService->asset($request->validated("assetId"));
             if(!$asset) return Utilities::error402("Asset not found");
 
@@ -50,9 +50,9 @@ class AssetController extends Controller
             $asset = $this->assetService->saveDoa($res['file']->id, $asset);
 
             return new AssetResource($asset);
-        // }catch(\Exception $e){
-        //     return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
-        // }
+        }catch(\Exception $e){
+            return Utilities::error($e, 'An error occurred while trying to process the request, Please try again later or contact support');
+        }
     }
 
     public function assets(Request $request)
