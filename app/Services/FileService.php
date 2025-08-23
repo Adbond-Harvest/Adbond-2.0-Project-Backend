@@ -65,7 +65,7 @@ class FileService
                 $fileObj->user_id = $user_id;
                 if($user_type) $fileObj->user_type = $user_type;
                 $fileObj->file_type = $fileType;
-                $fileObj->mime_type = (is_string($file)) ? FileFacade::mimeType($file) : $file->getMimeType();
+                $fileObj->mime_type = (is_string($file)) ? FileFacade::mimeType(storage_path('app/files/' . $file)) : $file->getMimeType();
                 $fileObj->original_filename = (is_string($file)) ? pathinfo($file, PATHINFO_FILENAME) : $file->getClientOriginalName();
                 $fileObj->extension = (is_string($file)) ? pathinfo($file, PATHINFO_EXTENSION) : $file->getClientOriginalExtension();
                 if($this->belongsId) $fileObj->belongs_id = $this->belongsId;
