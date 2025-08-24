@@ -638,8 +638,10 @@ Class Helpers
         $pdf = PDF::loadView('pdf/letter_of_happiness_homes', $pdfData);
         // return $pdf->stream('letter_of_happiness.pdf');
         // $pdf->setPaper('A4', 'portrait');
-        $pdf->save("files/letter_of_happiness_{$payment->purchase->id}.pdf");
+        $file = "files/letter_of_happiness_{$payment->purchase->id}.pdf";
+        $pdf->save($file);
         // dd('done');
+        return $file;
     }
 
     public static function generateMemorandumAgreement($order)
