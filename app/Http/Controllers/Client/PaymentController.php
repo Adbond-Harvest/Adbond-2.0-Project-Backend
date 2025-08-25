@@ -380,6 +380,7 @@ class PaymentController extends Controller
             // }
             $paymentData['amount'] = $processedData['amountPayable'];
             $paymentData['evidenceFileId'] = $data['evidenceFileId'];
+            $paymentData["bankAccountId"] = $data["bankId"];
         }
         
         $paymentData['purchaseId'] = $order->id;
