@@ -238,7 +238,7 @@ class Utilities
     {
         $min = pow(10, $length - 1); // Minimum number with the given length
         $max = pow(10, $length) - 1; // Maximum number with the given length
-        return rand($min, $max); // Generate a random number between min and max
+        return random_int($min, $max); // Generate a random number between min and max
     }
 
     public static function generateRandomString($length)
