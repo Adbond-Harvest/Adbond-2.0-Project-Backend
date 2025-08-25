@@ -200,7 +200,7 @@ class OrderService
         // dd($files);
         if($order->package->type==PackageType::NON_INVESTMENT->value) {
             $clientPackage = $clientPackageService->saveClientPackageOrder($order, $files);
-            // $clientPackageService->uploadContract($order, $clientPackage);
+            $clientPackageService->uploadContract($order, $clientPackage);
             $clientPackageService->uploadLetterOfHappiness($payment, $clientPackage);
         }
 
