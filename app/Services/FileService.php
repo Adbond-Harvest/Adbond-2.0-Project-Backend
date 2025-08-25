@@ -39,7 +39,6 @@ class FileService
                     : 
                     (($this->docFile) ? $this->uploadDocFile($file, $purpose, $folder) : $this->uploadDoc($file, $purpose, $folder));
         if($uploadedFile) {
-            dd($file);
             $status = $this->getStatus($uploadedFile);
             //dd($uploadedFile->offsetGet('secure_url'));
             if($status['code']==200) {
