@@ -42,6 +42,7 @@ class FileService
             $status = $this->getStatus($uploadedFile);
             //dd($uploadedFile->offsetGet('secure_url'));
             if($status['code']==200) {
+                dd('stop');
                 dd(FileFacade::mimeType($file));
                 $url = $uploadedFile->offsetGet('url');
                 $secureUrl = $uploadedFile->offsetGet('secure_url');
