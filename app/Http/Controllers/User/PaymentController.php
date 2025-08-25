@@ -74,9 +74,8 @@ class PaymentController extends Controller
                 }
             }
 
-            // $this->paymentService->uploadReceipt($payment, $payment->client); 
+            $this->paymentService->uploadReceipt($payment, $payment->client); 
             if($order->is_installment == 0 || $order->installments_payed == $order->installment_count) {
-                DB::rollBack();
                 $this->orderService->completeOrder($order, $payment);
             }else{
                 if($order->installments_payed == 1) {
