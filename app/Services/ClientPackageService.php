@@ -165,7 +165,7 @@ class ClientPackageService
             $uploadedFile = ($payment->purchase->package->project->project_type_id == ProjectType::land()->id) ?
                     Helpers::generateLetterOfHappiness($payment->load('paymentMode')) : Helpers::generateHomesLetterOfHappiness($payment->load('paymentMode'));
             // dd('generate letter of happiness');
-            dd($uploadedFile);
+            // dd($uploadedFile);
             $response = Helpers::moveUploadedFileToCloud($uploadedFile, FileTypes::PDF->value, $asset->client->id, 
                                 FilePurpose::LETTER_OF_HAPPINESS->value, UserType::CLIENT->value, "client-letter-of-happiness");
             if($response['success']) {
