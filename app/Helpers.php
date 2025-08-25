@@ -408,7 +408,6 @@ Class Helpers
         $success = false;
         $uploadRes = null;
         if (file_exists($filePath)) {
-            dd($filePath);
             $uploadRes = $fileService->save($filePath, $fileType, $userId, $purpose, $userType, $folder);
             if($uploadRes['status'] == 200) {
                 $success = true;
