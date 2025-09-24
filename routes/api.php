@@ -70,12 +70,17 @@ use app\Http\Controllers\VirtualTeamApplicationController;
 use app\Http\Controllers\TestController;
 use app\Utilities;
 
+use app\Http\Controllers\MigrationController;
+
 
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
 Route::group(['prefix' => '/v2',], function () {
+
+    // Route::get('/migrate', [MigrationController::class, "index"]);
+    // Route::get('/migrate/clients', [MigrationController::class, "clients"]);
 
     //Auth URLS
     Route::group(['prefix' => '/auth', 'namespace' => 'Auth',], function () {
@@ -154,6 +159,7 @@ Route::group(['prefix' => '/v2',], function () {
         });
         // Package
         Route::group(['prefix' => '/packages'], function () {
+            Route::get('', [UserPackageController::class, "allPackages"]);
             Route::post('', [UserPackageController::class, "save"]);
             Route::post('/save_media', [UserPackageController::class, "saveMedia"]);
             Route::post('/save_multiple_media', [UserPackageController::class, "saveMultipleMedia"]);
@@ -279,6 +285,7 @@ Route::group(['prefix' => '/v2',], function () {
         // Client
         Route::group(['prefix' => '/clients'], function () {
             Route::get('', [UserClientController::class, "index"]);
+            Route::get('/export', [UserClientController::class, "export"]);
             Route::get('/{clientId}', [UserClientController::class, "show"]);
             Route::post('/{clientId}', [UserClientController::class, "update"]);
             Route::post('/re_upload_document/{assetId}', [UserFileController::class, "saveClientDocument"]);

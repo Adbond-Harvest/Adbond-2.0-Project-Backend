@@ -21,6 +21,8 @@ class Client extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected $connection = 'mysql';
+
     public static $userType = "app\Models\Client";
 
     /**

@@ -29,9 +29,10 @@ class Utilities
     public static function error($e, $message='')
     {
         Log::stack(['project'])->info($e->getMessage().' in '.$e->getFile().' at Line '.$e->getLine());
+        Log::stack(['project'])->info($e);
         return response()->json([
             'statusCode' => 500,
-            'message' => ($message != '') ? $message : 'An error occured while trying to perform this operation, Please try again later or contact support'
+            'message' => ($message != '') ? $message : 'An error occurred while trying to perform this operation, Please try again later or contact support'
         ], 500);
     }
 

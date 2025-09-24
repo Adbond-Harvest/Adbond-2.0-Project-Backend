@@ -145,4 +145,19 @@ class ClientController extends Controller
         }
         return $response;
     }
+
+    public function export(Request $request)
+    {
+        try {
+            $clients = $this->clientService->getClients();
+
+            // $clients = [$clients];
+            // $clients = collect($clients);
+
+            return $this->clientService->exportToPDF($clients);
+
+        } catch (\Exception $e) {
+            return Utilities::error($e, 'An error occurred during export');
+        }
+    }
 }

@@ -50,6 +50,14 @@ class PackageController extends Controller
         $this->promoService = new PromoService;
     }
 
+    public function allPackages(Request $request)
+    {
+        $this->packageService->active = 1;
+        $packages = $this->packageService->packages();
+
+        return Utilities::ok(PackageResource::collection($packages));
+    }
+
     public function packages(Request $request, $projectId)
     {
         if (!is_numeric($projectId) || !ctype_digit($projectId)) return Utilities::error402("Invalid parameter projectID");
