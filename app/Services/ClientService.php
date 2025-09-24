@@ -5,6 +5,7 @@ namespace app\Services;
 use app\Exceptions\UserNotFoundException;
 
 use Carbon\Carbon;
+use PDF;
 
 use Illuminate\Support\Facades\DB;
 
@@ -15,6 +16,8 @@ use app\Models\ClientNextOfKin;
 use app\Models\ClientSummaryView;
 use app\Models\ClientCommissionEarning;
 use app\Models\ClientIdentification;
+
+use app\Exports\ClientExport;
 
 use app\Enums\KYCStatus;
 use app\Enums\ActiveToggle;
@@ -48,11 +51,9 @@ class ClientService
         return Client::where('provider_name', $provider_name)->where('provider_id', $provider_id)->first();
     }
 
-    public function getClients($page=1, $perPage=10)
+    public function getClients()
     {
-        if($page <= 0) $page = 1;
-        $offset = $perPage * ($page-1);
-        return Client::limit($perPage)->offset($offset)->orderBy('created_at', 'DESC')->get();
+        return Client::orderBy('created_at', 'DESC')->get();
     }
 
     public function clients($with=[], $offset=0, $perPage=null)
@@ -222,6 +223,20 @@ class ClientService
     public function referralEarnings($clientId)
     {
         return ClientCommissionEarning::where("client_id", $clientId)->get();
+    }
+
+    public function exportToPDF($clients, $headingConfig = null)
+    {
+        $export = new ClientExport($clients, $headingConfig);
+        $data = [
+            'headings' => $export->headings(),
+            'mappedData' => $clients->map(function ($client) use ($export) {
+                return $export->map($client);
+            })
+        ];
+
+        $pdf = PDF::loadView('exports.pdf.clients', $data);
+        return $pdf->download('clients-' . now()->format('Y-m-d') . '.pdf');
     }
 
 }

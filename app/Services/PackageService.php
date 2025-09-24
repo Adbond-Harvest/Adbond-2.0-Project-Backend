@@ -19,6 +19,7 @@ class PackageService
 {
     public $count = false;
     public $projectId = null;
+    public $active = null;
 
     public $all = null;
 
@@ -170,9 +171,10 @@ class PackageService
     {
         $query = Package::with($with);
         if($this->projectId) $query = $query->where("project_id", $this->projectId);
+        if($this->active != null) $query->where("active", $this->active);
         if($this->count) return $query->count();
 
-        if($perPage==null) $perPage=env('PAGINATION_PER_PAGE');
+        if($perPage==null) return $query->orderBy("created_at", "DESC")->get(); // $perPage=env('PAGINATION_PER_PAGE');
         return $query->offset($offset)->limit($perPage)->orderBy("created_at", "DESC")->get();
     }
 
