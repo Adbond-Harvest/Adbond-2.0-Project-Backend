@@ -9,6 +9,8 @@ class DowngradeUpgradeRequest extends Model
 {
     use HasFactory;
 
+    public static $type = "app\Models\DowngradeUpgradeRequest";
+
     public function client()
     {
         return $this->belongsTo(Client::class);

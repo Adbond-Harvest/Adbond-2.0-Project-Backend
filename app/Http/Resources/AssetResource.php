@@ -51,6 +51,7 @@ class AssetResource extends JsonResource
             "active" => ($this->origin == ClientPackageOrigin::ORDER->value && !$this->purchase?->completed) ? true : false,
             "sold" => $this->sold > 0,
             "onOffer" => $this->onOffer(),
+            "doaUploaded" => ($this->doa()) ? true : false,
             "files" => FileResource::collection($this->files),
             // "returns" => $this->investmentReturns()
         ];

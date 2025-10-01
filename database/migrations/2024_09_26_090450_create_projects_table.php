@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->foreignId('project_type_id')->references("id")->on("project_types");
             $table->text('description')->nullable();
+            $table->string("state");
             $table->boolean('active')->default(true);
             $table->dateTime('deactivated_at')->nullable();
             $table->double('reverted_interest_rate', 3,1)->default(10.0);
