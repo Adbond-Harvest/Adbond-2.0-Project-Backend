@@ -5,9 +5,9 @@ namespace app\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PackageMedia extends Model
+class CompanyInfo extends Model
 {
     use HasFactory;
 
-    public static $type = "app\Models\PackageMedia";
+    protected $table = "company_info";
 }

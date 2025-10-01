@@ -10,6 +10,8 @@ use app\Enums\AssetSwitchType;
 
 use app\Services\FileService;
 
+use app\Enums\FilePurpose;
+
 class ClientPackage extends Model
 {
     use HasFactory;
@@ -30,6 +32,11 @@ class ClientPackage extends Model
     public function files()
     {
         return $this->morphMany(File::class, 'belongs');
+    }
+
+    public function doa()
+    {
+        return $this->files()->where('purpose', FilePurpose::DEED_OF_ASSIGNMENT->value)->first();
     }
 
     /**

@@ -19,6 +19,7 @@ use app\Services\OfferBidService;
 use app\Services\OfferService;
 use app\Services\PackageService;
 use app\Services\FileService;
+use app\Services\NotificationService;
 
 use app\Models\PaymentStatus;
 use app\Models\Client;
@@ -30,6 +31,7 @@ use app\Helpers;
 
 use app\Enums\PaymentPurpose;
 use app\Enums\FilePurpose;
+use app\Enums\NotificationType;
 
 class OfferPaymentController extends Controller
 {
@@ -38,6 +40,7 @@ class OfferPaymentController extends Controller
     private $offerService;
     private $packageService;
     private $fileService;
+    private $notificationService;
 
     public function __construct()
     {
@@ -46,6 +49,7 @@ class OfferPaymentController extends Controller
         $this->offerService = new OfferService;
         $this->packageService = new PackageService;
         $this->fileService = new FileService;
+        $this->notificationService = new NotificationService;
     }
 
     public function preparePayment(PrepareOfferPayment $request)
@@ -153,6 +157,8 @@ class OfferPaymentController extends Controller
             }else{
                 $this->offerService->update(['paymentStatusId' => PaymentStatus::pending()->id], $offer);
             }
+
+            $this->notificationService->save($payment, NotificationType::OFFER_PAYMENT_CONF->value);
 
             DB::commit();
 

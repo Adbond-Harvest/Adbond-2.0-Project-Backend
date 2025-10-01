@@ -44,10 +44,11 @@ use app\Enums\FileTypes;
 use app\Enums\PackageType;
 use app\Enums\UserType;
 use app\Enums\OrderType;
+use app\Enums\NotificationType;
 
 use app\Utilities;
 use app\Helpers;
-
+use app\Services\NotificationService;
 
 class PaymentController extends Controller
 {
@@ -59,6 +60,7 @@ class PaymentController extends Controller
     private $commissionService;
     private $clientPackageService;
     private $clientInvestmentService;
+    private $notificationService;
 
     private static $userType = "app\Models\Client";
 
@@ -72,6 +74,7 @@ class PaymentController extends Controller
         $this->commissionService = new CommissionService;
         $this->clientPackageService = new ClientPackageService;
         $this->clientInvestmentService = new ClientInvestmentService;
+        $this->notificationService = new NotificationService;
     }
 
     public function initializeCardPayment(InitializeCardPayment $request)
@@ -237,7 +240,9 @@ class PaymentController extends Controller
 
 
                 if ($order->is_installment == 0 || $order->installments_payed == $order->installment_count) {
-                    $this->orderService->completeOrder($order, $payment, $clientInvestment);
+                    $clientPackage = $this->orderService->completeOrder($order, $payment, $clientInvestment);
+                    $this->notificationService->save($clientPackage, NotificationType::ORDER_COMPLETION->value);
+
                 }else{
                     $asset = (($order->package->type==PackageType::INVESTMENT->value) ? $this->clientPackageService->saveClientPackageInvestment($clientInvestment) : $this->clientPackageService->saveClientPackageOrder($order));
                 }
@@ -391,7 +396,7 @@ class PaymentController extends Controller
         $paymentData['paymentGatewayId'] = ($data['cardPayment']) ? PaymentMode::cardPayment()->id : PaymentMode::bankTransfer()->id;
         $payment = $this->paymentService->save($paymentData);
 
-        
+        if(!$data['cardPayment']) $this->notificationService->save($payment, NotificationType::ORDER_PAYMENT_CONFIRMATION_REQ->value);
         // dd($gatewayRes['paymentError']);
 
         return $payment;

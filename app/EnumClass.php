@@ -21,6 +21,7 @@ use app\Enums\PurchaseSummaryDuration;
 use app\Enums\AssetSwitchType;
 use app\Enums\Weekday;
 use app\Enums\PromoProductType;
+use app\Enums\NotificationType;
 
 class EnumClass
 {
@@ -204,6 +205,19 @@ class EnumClass
         return [
             PromoProductType::PROJECT->value,
             PromoProductType::PACKAGE->value
+        ];
+    }
+
+    public static function notificationTypes()
+    {
+        return [
+            NotificationType::ASSET_UPGRADE_REQ->value,
+            NotificationType::ASSET_DOWNGRADE_REQ->value,
+            NotificationType::NEW_OFFER_APPROVAL_REQ->value,
+            NotificationType::OFFER_PAYMENT_CONF->value,
+            NotificationType::ORDER_COMPLETION->value,
+            NotificationType::ORDER_PAYMENT_CONFIRMATION_REQ->value,
+            NotificationType::WALLET_WITHDRAWAL_REQ->value
         ];
     }
 }

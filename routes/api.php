@@ -37,6 +37,7 @@ use app\Http\Controllers\User\AssessmentAttemptController;
 use app\Http\Controllers\User\AnalyticsController;
 use app\Http\Controllers\User\ReferralController;
 use app\Http\Controllers\User\UserBankAccountController;
+use app\Http\Controllers\User\NotificationController as UserNotificationController;
 
 
 // Client Controllers
@@ -142,6 +143,7 @@ Route::group(['prefix' => '/v2',], function () {
         });
         // Project
         Route::group(['prefix' => '/projects'], function () {
+            Route::get('', [UserProjectController::class, "allProjects"]);
             Route::post('', [UserProjectController::class, "save"]);
             Route::patch('', [UserProjectController::class, "update"]);
             Route::post('/activate', [UserProjectController::class, "activate"]);
@@ -280,6 +282,10 @@ Route::group(['prefix' => '/v2',], function () {
             Route::get('/redemptions', [ReferralController::class, "commissionRedemptions"]);
         });
 
+        Route::group(['middleware' => HRAuth::class, 'prefix' => '/notifications'], function () {
+            Route::get('/unread', [UserNotificationController::class, "unreadNotifications"]);
+            Route::post('mark_as_read', [UserNotificationController::class, "read"]);
+        });
 
 
         // Client

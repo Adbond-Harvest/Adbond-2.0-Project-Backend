@@ -166,6 +166,15 @@ class ProjectController extends Controller
         
     }
 
+    public function allProjects()
+    {
+        $this->projectService->status = ProjectFilter::ACTIVE->value;
+        $this->projectService->all = true;
+        $projects = $this->projectService->projects();
+
+        return Utilities::ok(ProjectResource::collection($projects));
+    }
+
     public function projects(Request $request, $projectTypeId)
     {
         if (!is_numeric($projectTypeId) || !ctype_digit($projectTypeId)) return Utilities::error402("Invalid parameter projectTypeID");

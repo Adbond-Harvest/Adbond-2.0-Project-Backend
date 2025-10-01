@@ -17,16 +17,21 @@ use app\Http\Resources\WalletResource;
 use app\Http\Resources\WalletTransactionResource;
 
 use app\Services\WalletService;
+use app\Services\NotificationService;
+
+use app\Enums\NotificationType;
 
 use app\Utilities;
 
 class WalletController extends Controller
 {
     private $walletService;
+    private $notificationService;
 
     public function __construct()
     {
         $this->walletService = new WalletService;
+        $this->notificationService = new NotificationService;
     }
 
     public function index(Request $request)
@@ -121,6 +126,8 @@ class WalletController extends Controller
             if($data['amount'] > $availableAmount) return Utilities::error402("Insufficient Available funds");
 
             $withdrawalRequest = $this->walletService->generateWithdrawalRequest($wallet, $data['amount']);
+
+            $this->notificationService->save($withdrawalRequest, NotificationType::WALLET_WITHDRAWAL_REQ->value);
 
             return Utilities::ok(new WalletWithdrawalRequestResource($withdrawalRequest));
         }catch(\Exception $e){

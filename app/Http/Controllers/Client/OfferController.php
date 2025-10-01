@@ -14,10 +14,12 @@ use app\Http\Resources\OfferResource;
 use app\Services\OfferService;
 use app\Services\ResellOrderService;
 use app\Services\ClientPackageService;
+use app\Services\NotificationService;
 
 use app\Enums\ClientPackageOrigin;
 use app\Enums\PackageType;
 use app\Enums\OfferApprovalStatus;
+use app\Enums\NotificationType;
 
 use app\Utilities;
 
@@ -26,12 +28,14 @@ class OfferController extends Controller
     private $offerService;
     private $clientPackageService;
     private $resellOrderService;
+    private $notificationService;
 
     public function __construct()
     {
         $this->offerService = new OfferService;
         $this->clientPackageService = new ClientPackageService;
         $this->resellOrderService = new ResellOrderService;
+        $this->notificationService = new NotificationService;
     }
 
     public function create(CreateOffer $request)
@@ -72,6 +76,8 @@ class OfferController extends Controller
             }
 
             $offer = $this->offerService->save($data);
+
+            $this->notificationService->save($offer, NotificationType::NEW_OFFER_APPROVAL_REQ->value);
 
             return Utilities::ok(new OfferResource($offer));
 

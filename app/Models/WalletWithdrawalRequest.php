@@ -9,6 +9,8 @@ class WalletWithdrawalRequest extends Model
 {
     use HasFactory;
 
+    public static $type = "app\Models\WalletWithdrawalRequest";
+
     public function wallet()
     {
         return $this->belongsTo(Wallet::class);
