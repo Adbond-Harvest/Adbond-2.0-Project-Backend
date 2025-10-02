@@ -138,11 +138,11 @@ class MigrationController extends Controller
             if(!$this->usersMigration->migrated) $this->users();
             if(!$this->customersMigration->migrated) $this->clients();
 
-            // if(!$this->bankAccountsMigration->migrated) $this->bankAccounts();
-            // if(!$this->postsMigration->migrated) $this->posts();
-            // if(!$this->commentsMigration->migrated) $this->comments();
-            // if(!$this->newsMigration->migrated) $this->news();
-            // if(!$this->reactionsMigration->migrated) $this->reactions();
+            if(!$this->bankAccountsMigration->migrated) $this->bankAccounts();
+            if(!$this->postsMigration->migrated) $this->posts();
+            if(!$this->commentsMigration->migrated) $this->comments();
+            if(!$this->newsMigration->migrated) $this->news();
+            if(!$this->reactionsMigration->migrated) $this->reactions();
 
             // if(!$this->projectsMigration->migrated) $this->projects();
 
