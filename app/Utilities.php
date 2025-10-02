@@ -49,6 +49,16 @@ class Utilities
         Log::stack(['project'])->info($message);
     }
 
+    public static function logSuccessMigration($message)
+    {
+        Log::stack(['success_migration'])->info($message);
+    }
+
+    public static function logFailedMigration($message)
+    {
+        Log::stack(['failed_migration'])->info($message);
+    }
+
     public function refreshToken()
     {
         $authService = new AuthService($this->guard, $this->reference);

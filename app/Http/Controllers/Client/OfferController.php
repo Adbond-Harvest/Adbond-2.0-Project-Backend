@@ -77,7 +77,7 @@ class OfferController extends Controller
 
             $offer = $this->offerService->save($data);
 
-            $this->notificationService->save($offer, NotificationType::NEW_OFFER_APPROVAL_REQ->value);
+            $this->notificationService->save($offer, NotificationType::NEW_OFFER_APPROVAL_REQ->value,  Auth::guard("client")->user());
 
             return Utilities::ok(new OfferResource($offer));
 

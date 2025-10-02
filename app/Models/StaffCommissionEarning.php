@@ -13,6 +13,8 @@ class StaffCommissionEarning extends Model
 {
     use HasFactory;
 
+    public static $type = "app\Models\StaffCommissionEarning";
+
     protected $fillable = [
         'user_id',
         'order_id',

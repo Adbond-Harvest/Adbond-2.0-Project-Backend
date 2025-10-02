@@ -27,6 +27,8 @@ then get the time, then use all these to create a new inspection
 - package_photos
 - orders
 
+-user_commissions
+- user_commission_payments
 
  projects->projectLocation->packages->orders->payments->
                                             ->orderClientPackages->orderOffers->offerCLientPackages->offerOffers
