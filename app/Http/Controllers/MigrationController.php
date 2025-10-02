@@ -64,6 +64,7 @@ class MigrationController extends Controller
 
     private $bankAccountsMigration;
     private $usersMigration;
+    private $customersMigration;
     private $postsMigration;
     private $commentsMigration;
     private $newsMigration;
@@ -99,6 +100,7 @@ class MigrationController extends Controller
 
         $this->bankAccountsMigration = TableMigration::where("name", "bank_accounts")->first();
         $this->usersMigration = TableMigration::where("name", "users")->first();
+        $this->customersMigration = TableMigration::where("name", "customers")->first();
         $this->postsMigration = TableMigration::where("name", "posts")->first();
         $this->commentsMigration = TableMigration::where("name", "comments")->first();
         $this->newsMigration = TableMigration::where("name", "news")->first();
@@ -133,12 +135,14 @@ class MigrationController extends Controller
             if(!$this->questionOptionsMigration->migrated) $this->questionOptions();
             if(!$this->staffAssessmentsMigration->migrated) $this->assessmentAttempts();
 
-            if(!$this->bankAccountsMigration->migrated) $this->bankAccounts();
             if(!$this->usersMigration->migrated) $this->users();
-            if(!$this->postsMigration->migrated) $this->posts();
-            if(!$this->commentsMigration->migrated) $this->comments();
-            if(!$this->newsMigration->migrated) $this->news();
-            if(!$this->reactionsMigration->migrated) $this->reactions();
+            if(!$this->customersMigration->migrated) $this->clients();
+
+            // if(!$this->bankAccountsMigration->migrated) $this->bankAccounts();
+            // if(!$this->postsMigration->migrated) $this->posts();
+            // if(!$this->commentsMigration->migrated) $this->comments();
+            // if(!$this->newsMigration->migrated) $this->news();
+            // if(!$this->reactionsMigration->migrated) $this->reactions();
 
             // if(!$this->projectsMigration->migrated) $this->projects();
 
@@ -160,76 +164,84 @@ class MigrationController extends Controller
     {
         $sourceTable = 'customers'; // table in v1
 
-        // Fetch from v1 in chunks (to handle large data)
-        DB::connection('db1')->table($sourceTable)->orderBy('id')->chunk(500, function ($records) {
-            foreach ($records as $record) {
-                // Convert to array
-                $data = (array) $record;
+        try{
+            DB::beginTransaction();
+            // Fetch from v1 in chunks (to handle large data)
+            DB::connection('db1')->table($sourceTable)->orderBy('id')->chunk(500, function ($records) {
+                foreach ($records as $record) {
+                    // Convert to array
+                    $data = (array) $record;
 
-                $countryId = null;
-                if($data['country_id']) {
-                    $countryRecord = DB::connection('db1')->table('countries')->where('id', $data['country_id'])->first();
-                    $countryRecord = (array) $countryRecord;
-                    if($countryRecord) {
-                        $country = Country::where("name", $countryRecord['name'])->first();
-                        if($country) $countryId = $country->id;
-                    }
-                }
-
-                // Use Eloquent model for v2
-                $client = new Client;
-                $client->title = $data['title'];
-                $client->firstname = $data['firstname'];
-                $client->lastname = $data['lastname'];
-                // $client->othernames
-                $client->email = $data['email'];
-                $client->password = $data['password'];
-                $client->phone_number = $data['phone_number'];
-                // $client->photo_id 
-                // $client->client_identification_id
-                $client->dob = $data['dob'];
-                $client->gender = $data['gender'];
-                $client->provider_id = $data['provider_id'];
-                $client->provider_name = $data['provider_name'];
-                $client->email_verified_at = $data['email_verified_at'];
-                $client->country_id = $countryId;
-                // $client->state_id 
-                $client->age_group_id = $data['age_group_id'];
-                $client->address = $data['address'];
-                $client->postal_code = $data['postal_code'];
-                $client->marital_status = $data['marital_status'];
-                $client->employment_status = $data['employment_status'];
-                $client->occupation = $data['occupation'];
-                $client->activated = $data['activated'];
-                // $client->kyc_status = 
-                $client->referer_id = $data['referer_id'];
-                if($data['referer_id']) $client->referer_type = User::$userType;
-                // $client->referer_code
-                $client->migrated = true;
-
-                $client->save();
-
-                $photo = null;
-
-                if($data['photo_id']) {
-                    $photoRecord = DB::connection('db1')->table('files')->where('id', $data['photo_id'])->first();
-                    $photoRecord = (array) $photoRecord;
-                    if($photoRecord) {
-                        $user = ["id" => $client->id, "type" => Client::$userType];
-                        $file = $this->migrateFile($photoRecord, $user, $user, FilePurpose::CLIENT_PROFILE_PHOTO);
-                        if($file) {
-                            $client->photo_id = $file->id;
-                            $client->update();
+                    $countryId = null;
+                    if($data['country_id']) {
+                        $countryRecord = DB::connection('db1')->table('countries')->where('id', $data['country_id'])->first();
+                        $countryRecord = (array) $countryRecord;
+                        if($countryRecord) {
+                            $country = Country::where("name", $countryRecord['name'])->first();
+                            if($country) $countryId = $country->id;
                         }
                     }
-                }
 
-                // User::updateOrCreate(
-                //     ['id' => $data['id']], // match by id
-                //     $data                  // fill attributes
-                // );
-            }
-        });
+                    // Use Eloquent model for v2
+                    $client = new Client;
+                    $client->title = $data['title'];
+                    $client->firstname = $data['firstname'];
+                    $client->lastname = $data['lastname'];
+                    // $client->othernames
+                    $client->email = $data['email'];
+                    $client->password = $data['password'];
+                    $client->phone_number = $data['phone_number'];
+                    // $client->photo_id 
+                    // $client->client_identification_id
+                    $client->dob = $data['dob'];
+                    $client->gender = $data['gender'];
+                    $client->provider_id = $data['provider_id'];
+                    $client->provider_name = $data['provider_name'];
+                    $client->email_verified_at = $data['email_verified_at'];
+                    $client->country_id = $countryId;
+                    // $client->state_id 
+                    $client->age_group_id = $data['age_group_id'];
+                    $client->address = $data['address'];
+                    $client->postal_code = $data['postal_code'];
+                    $client->marital_status = $data['marital_status'];
+                    $client->employment_status = $data['employment_status'];
+                    $client->occupation = $data['occupation'];
+                    $client->activated = $data['activated'];
+                    // $client->kyc_status = 
+                    $client->referer_id = $data['referer_id'];
+                    if($data['referer_id']) $client->referer_type = User::$userType;
+                    // $client->referer_code
+                    $client->migrated = true;
+
+                    $client->save();
+
+                    $photo = null;
+
+                    if($data['photo_id']) {
+                        $photoRecord = DB::connection('db1')->table('files')->where('id', $data['photo_id'])->first();
+                        $photoRecord = (array) $photoRecord;
+                        if($photoRecord) {
+                            $user = ["id" => $client->id, "type" => Client::$userType];
+                            $file = $this->migrateFile($photoRecord, $user, $user, FilePurpose::CLIENT_PROFILE_PHOTO);
+                            if($file) {
+                                $client->photo_id = $file->id;
+                                $client->update();
+                            }
+                        }
+                    }
+
+                    // User::updateOrCreate(
+                    //     ['id' => $data['id']], // match by id
+                    //     $data                  // fill attributes
+                    // );
+                }
+            });
+            $this->markAsMigrated($this->customersMigration);
+            DB::commit();
+        }catch(\Exception $e) {
+            DB::rollBack();
+            return Utilities::error($e, 'An error occurred while trying to process the request');
+        }
 
         // return response()->json(['message' => 'Clients copied successfully!']);
     }
