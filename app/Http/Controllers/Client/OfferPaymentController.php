@@ -158,7 +158,7 @@ class OfferPaymentController extends Controller
                 $this->offerService->update(['paymentStatusId' => PaymentStatus::pending()->id], $offer);
             }
 
-            $this->notificationService->save($payment, NotificationType::OFFER_PAYMENT_CONF->value);
+            $this->notificationService->save($payment, NotificationType::OFFER_PAYMENT_CONF->value,  Auth::guard("client")->user());
 
             DB::commit();
 

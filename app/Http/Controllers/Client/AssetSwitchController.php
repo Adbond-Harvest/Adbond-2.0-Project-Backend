@@ -108,7 +108,7 @@ class AssetSwitchController extends Controller
             $switchRequest = $this->assetSwitchService->requestAssetSwitch($data);
 
             $notificationType = ($data['type'] == AssetSwitchType::DOWNGRADE->value) ? NotificationType::ASSET_DOWNGRADE_REQ->value : NotificationType::ASSET_UPGRADE_REQ->value;
-            $this->notificationService->save($switchRequest, $notificationType);
+            $this->notificationService->save($switchRequest, $notificationType,  Auth::guard("client")->user());
 
             return Utilities::ok(new AssetSwitchRequestResource($switchRequest));
         }catch(\Exception $e){

@@ -26,10 +26,18 @@ use app\Models\Package;
 use app\Models\PackageMedia;
 use app\Models\ClientPackage;
 use app\Models\Offer;
+use app\Models\OfferBid;
 use app\Models\Order;
 use app\Models\Payment;
 use app\Models\PaymentStatus;
 use app\Models\PaymentMode;
+use app\Models\OrderDiscount;
+use app\Models\SiteTourSchedule;
+use app\Models\SiteTourBooking;
+use app\Models\SiteTourBookedSchedule;
+use app\Models\StaffCommissionEarning;
+use app\Models\StaffCommissionRedemption;
+use app\Models\StaffCommissionTransaction;
 
 use app\Models\TableMigration;
 
@@ -40,6 +48,7 @@ use app\Enums\PackageType;
 use app\Enums\OrderType;
 use app\Enums\PaymentPurpose;
 use app\Enums\ClientPackageOrigin;
+use app\Enums\RedemptionStatus;
 
 use app\Services\UtilityService;
 
@@ -66,10 +75,19 @@ class MigrationController extends Controller
     private $packagesMigration;
     private $packageItemsMigration;
     private $packagePhotosMigration;
-    private $clientPackageMigration;
+    private $customerPackageMigration;
     private $ordersMigration;
     private $paymentsMigration;
     private $offersMigration;
+    private $orderDiscountsMigration;
+    private $salesOfferPaymentMigration;
+    private $offerBidsMigration;
+
+    private $monthlyWeekDaysMigration;
+    private $inspectionDaysMigration;
+    private $inspectionRequestsMigration;
+    private $userCommissionsMigration;
+    private $userCommissionPaymentsMigration;
 
     public function __construct()
     {
@@ -86,16 +104,25 @@ class MigrationController extends Controller
         $this->newsMigration = TableMigration::where("name", "news")->first();
         $this->reactionsMigration = TableMigration::where("name", "reactions")->first();
 
-        $this->nextOfKinMigration = TableMigration::where("name", "customer_next_of_kin")->first();
+        $this->nextOfKinMigration = TableMigration::where("name", "customer_next_of_kins")->first();
         $this->projectLocationsMigration = TableMigration::where("name", "project_locations")->first();
         $this->projectsMigration = TableMigration::where("name", "projects")->first();
         $this->packagesMigration = TableMigration::where("name", "packages")->first();
         $this->packageItemsMigration = TableMigration::where("name", "package_items")->first();
         $this->packagePhotosMigration = TableMigration::where("name", "package_photos")->first();
-        $this->clientPackageMigration = TableMigration::where("name", "client_packages")->first();
+        $this->customerPackageMigration = TableMigration::where("name", "customer_packages")->first();
         $this->ordersMigration = TableMigration::where("name", "orders")->first();
+        $this->orderDiscountsMigration = TableMigration::where("name", "order_discounts")->first();
         $this->paymentsMigration = TableMigration::where("name", "payments")->first();
         $this->offersMigration = TableMigration::where("name", "offers")->first();
+        $this->salesOfferPaymentMigration = TableMigration::where("name", "sales_offer_payments")->first();
+        $this->offerBidsMigration = TableMigration::where("name", "offer_bids")->first();
+
+        $this->monthlyWeekDaysMigration = TableMigration::where("name", "monthly_week_days")->first();
+        $this->inspectionDaysMigration = TableMigration::where("name", "inspection_days")->first();
+        $this->inspectionRequestsMigration = TableMigration::where("name", "inspection_requests")->first();
+        $this->userCommissionsMigration = TableMigration::where("name", "user_commissions")->first();
+        $this->userCommissionPaymentsMigration = TableMigration::where("name", "user_commission_payments")->first();
     }
     
     public function index()
@@ -114,6 +141,11 @@ class MigrationController extends Controller
             if(!$this->reactionsMigration->migrated) $this->reactions();
 
             if(!$this->projectsMigration->migrated) $this->projects();
+            
+            if(!$this->nextOfKinMigration->migration) $this->nextOfKins();
+            if(!$this->inspectionDaysMigration->migration) $this->siteTours();
+            if(!$this->userCommissionsMigration->migration) $this->userCommissions();
+
         }catch(\Exception $e) {
             return Utilities::error($e, 'An error occurred while trying to process the request');
         }
@@ -751,8 +783,11 @@ class MigrationController extends Controller
             $this->markAsMigrated($this->packagesMigration);
             $this->markAsMigrated($this->packageItemsMigration);
             $this->markAsMigrated($this->ordersMigration);
-            $this->markAsMigrated($this->clientPackageMigration);
+            $this->markAsMigrated($this->orderDiscountsMigration);
+            $this->markAsMigrated($this->customerPackageMigration);
             $this->markAsMigrated($this->offersMigration);
+            $this->markAsMigrated($this->offerBidsMigration);
+            $this->markAsMigrated($this->salesOfferPaymentMigration);
             DB::commit();
             // return response()->json(['message' => 'Customer Next Of Kin copied successfully!']);
         }catch(\Exception $e) {
@@ -796,9 +831,15 @@ class MigrationController extends Controller
 
                     // migrate project packages
                     $this->migratePackages($projectLocation, $project);
+
+                    Utilities::logSuccessMigration("Project Migration Successful.. ProjectId: ".$project->id);
+                }else{
+                    Utilities::logFailedMigration("Project not Migrated, State not found.. ProjectLocationId: ".$projectLocation['id']);
                 }
                 
             }
+        }else{
+            Utilities::logFailedMigration("Project not Migrated, Category not found or no project location");
         }
     }
 
@@ -854,11 +895,15 @@ class MigrationController extends Controller
                                         $package->update();
                                     }
 
+                                    Utilities::logSuccessMigration("Package Migration Successful.. PackageId: ".$package->id);
+
                                     //Migrate Package Orders
                                     $this->migrateOrders($packageItem, $package);
 
                                     //Migrate Package Photos
                                     $this->migratePackagePhotos($v1Package, $package, $user);
+                                }else{
+                                    Utilities::logFailedMigration("Package not Migrated.. User not found V1PackageId: ".$v1Package['id']);
                                 }
                             }
                         }
@@ -876,11 +921,14 @@ class MigrationController extends Controller
                     $v1Order = (array) $record;
                     $client = $this->getClient($v1Order['customer_id']);
 
-                    $paymentStatus = DB::connection('db1')->table('payment_statuses')->where("id", $packageItem['payment_status_id'])->first();
-                    if($paymentStatus) {
-                        $paymentStatus = (array) $paymentStatus;
-                        $paymentStatus = PaymentStatus::where("name", "LIKE",  "%".$paymentStatus['name']."%")->first();
+                    $v1PaymentStatus = DB::connection('db1')->table('payment_statuses')->where("id", $v1Order['payment_status_id'])->first();
+                    $paymentStatus = null;
+                    if($v1PaymentStatus) {
+                        $v1PaymentStatus = (array) $v1PaymentStatus;
+                        $paymentStatus = PaymentStatus::where("name", "LIKE",  "%".$v1PaymentStatus['name']."%")->first();
                     }
+                    if(!$v1PaymentStatus) $paymentStatus = PaymentStatus::pending();
+                    // dd($paymentStatus?->id);
 
                     if($client) {
                         $order = new Order;
@@ -895,7 +943,7 @@ class MigrationController extends Controller
                         // $order->installment_count = ;
                         // $order->installments_payed = ;
                         $order->balance = $v1Order['balance'];
-                        $order->payment_status_id = $paymentStatus->id;
+                        $order->payment_status_id = $paymentStatus?->id;
                         $order->completed = ($v1Order['balance'] <= 0);
                         $order->order_date = $v1Order['order_date'];
                         $order->payment_due_date = $v1Order['payment_due_date'];
@@ -907,23 +955,43 @@ class MigrationController extends Controller
                         $order->migrated = true;
                         $order->save();
 
-                        // $happinessFile = DB::connection('db1')->table('files')->where("id", $v1Order['happiness_letter_id'])->first();
-                        // $letterOfHappiness = null;
-                        // if($happinessFile) {
-                        //     $happinessFile = (array) $happinessFile;
-                        //     $letterOfHappiness = $this->migrateFile($happinessFile, ['id'=>$client->id, 'type'=>Client::$userType], ['id'=>$order->id, 'type'=>Order::$type], FilePurpose::LETTER_OF_HAPPINESS->value);
-                        // }
-
                         $processingId = Utilities::getOrderProcessingId();
                         $order->order_number = $order->id.$processingId;
                         $order->update();
 
+                        Utilities::logSuccessMigration("Order Migration Successful.. OrderId: ".$order->id);
+
+                        $this->migrateOrderDiscounts($v1Order, $order);
                         $this->migratePayments($v1Order, $order);
                         $this->migrateOrderClientPackages($v1Order, $order);
+                    }else{
+                        Utilities::logFailedMigration("Order not Migrated.. Client not found V1OrderId: ".$v1Order['id']);
                     }
                 }
             }
         });
+    }
+
+    private function migrateOrderDiscounts($v1Order, $order)
+    {
+        $v1Discounts = DB::connection('db1')->table('order_discounts')->where('order_id', $v1Order['id'])->get();
+        if($v1Discounts->count() > 0) {
+            foreach($v1Discounts as $v1Discount) {
+                $v1Discount = (array) $v1Discount;
+                $discount = new OrderDiscount;
+                $discount->order_id = $order->id;
+                $discount->type = $v1Discount['type'];
+                $discount->discount = $v1Discount['discount'];
+                $discount->amount = Utilities::getDiscount($order->amount_payable, $v1Discount['discount'])['amount'];
+                $discount->description = $v1Discount['description'];
+                $discount->migrated = true;
+                $discount->created_at = $v1Discount['created_at'];
+                $discount->updated_at = $v1Discount['updated_at'];
+                $discount->save();
+
+                Utilities::logSuccessMigration("Order Discount Migration Successful.. OrderDiscountId: ".$discount->id);
+            }
+        }
     }
 
     private function migratePayments($v1Order, $order)
@@ -970,11 +1038,16 @@ class MigrationController extends Controller
                         $evidenceFile = null;
                         if($v1Payment['evidence_file_id']) $evidenceFile = $this->getFile($v1Payment['evidence_file_id'], ['id'=>$client->id, 'type'=>Client::$userType], ['id'=>$payment->id, 'type'=>Payment::$type], FilePurpose::PAYMENT_EVIDENCE->value);
 
-                        $receiptFile = $this->getFile($v1Payment['receipt_file_id'], ['id'=>$client->id, 'type'=>Client::$userType], ['id'=>$payment->id, 'type'=>Payment::$type], FilePurpose::PAYMENT_RECEIPT->value);
-
-                        $payment->receipt_file_id = $receiptFile->id;
+                        if(isset($v1Payment['receipt_file_id']) && $v1Payment['receipt_file_id']) {
+                            $receiptFile = $this->getFile($v1Payment['receipt_file_id'], ['id'=>$client->id, 'type'=>Client::$userType], ['id'=>$payment->id, 'type'=>Payment::$type], FilePurpose::PAYMENT_RECEIPT->value);
+                            $payment->receipt_file_id = $receiptFile->id;
+                        }
                         if($evidenceFile) $payment->evidence_file_id = $evidenceFile->id;
                         $payment->update();
+
+                        Utilities::logSuccessMigration("Payment Migration Successful.. PaymentId: ".$payment->id);
+                    }else{
+                        Utilities::logFailedMigration("Payment not Migrated.. Client not found V1PaymentId: ".$v1Payment['id']);
                     }
                 }
             }
@@ -984,7 +1057,7 @@ class MigrationController extends Controller
 
     private function migrateOrderClientPackages($v1Order, $order)
     {
-        $customerPackage = DB::connection('db1')->table('customer_packages')->where("purchase_id", $v1Order['id'])->where("purchase_type", "LIKE", "%".Order::$type."%")->first();
+        $customerPackage = DB::connection('db1')->table('customer_packages')->where("purchase_id", $v1Order['id'])->where("purchase_type", "LIKE", "%Order%")->first();
         if($customerPackage) {
             $customerPackage = (array) $customerPackage;
             $client = $this->getClient($customerPackage['customer_id']);
@@ -1016,8 +1089,15 @@ class MigrationController extends Controller
                 if($happinessFile) $clientPackage->happiness_letter_file_id = $happinessFile->id;
                 $clientPackage->update();
 
+                Utilities::logSuccessMigration("Order Client Package Migration Successful.. CustomerPackageId: ".$customerPackage['id']);
+
                 $this->migrateOrderOffers($customerPackage, $clientPackage);
+            }else{
+                Utilities::logFailedMigration("Order Client Package not Migrated.. Client not found CustomerPackageId: ".$customerPackage['id']);
             }
+        }else{
+            Utilities::logFailedMigration("Order Client Package not Migrated.. Customer Package not found PurchaseId: ".$v1Order['id']); 
+            throw("Customer Package not found");
         }
     }
 
@@ -1026,36 +1106,43 @@ class MigrationController extends Controller
     */
     private function migrateOrderOffers($customerPackage, $clientPackage)
     {
-        $v1Offers = DB::connection('db1')->table('offers')->where("client_package_id", $customerPackage['id'])->get();
+        $v1Offers = DB::connection('db1')->table('offers')->where("customer_package_id", $customerPackage['id'])->get();
         if($v1Offers->count() > 0) {
             foreach($v1Offers as $v1Offer) {
+                $v1Offer = (array) $v1Offer;
                 $client = $this->getClient($v1Offer['customer_id']);
-                $user = $this->getUser($customerPackage['user_id']);
+                $user = ($v1Offer['user_id']) ? $this->getUser($v1Offer['user_id']) : null;
                 $paymentStatus = $this->getPaymentStatus($v1Offer['payment_status_id']);
                 if($client) {
                     $offer = new Offer;
                     $offer->client_id = $client->id;
                     $offer->package_id = $clientPackage->package_id;
                     $offer->client_package_id = $clientPackage->id;
-                    $offer->units = $customerPackage['units'];
+                    $offer->units = $v1Offer['units'];
                     $offer->project_id = $clientPackage->package->project->id;
-                    $offer->price = $customerPackage['price'];
+                    $offer->price = $v1Offer['price'];
                     $offer->package_price = $clientPackage->package->amount;
                     // $offer->resell_order_id = ;
                     // $offer->accepted_bid_id = ;
-                    $offer->active = $customerPackage['active'];
-                    $offer->approved = $customerPackage['approved'];
-                    $offer->rejected_reason = $customerPackage['rejected_reason'];
-                    $offer->completed = $customerPackage['completed'];
+                    $offer->active = $v1Offer['active'];
+                    $offer->approved = $v1Offer['approved'];
+                    $offer->rejected_reason = $v1Offer['rejected_reason'];
+                    $offer->completed = $v1Offer['completed'];
                     $offer->payment_status_id = ($paymentStatus) ? $paymentStatus->id : null;
                     $offer->user_id = ($user) ? $user->id : null;
-                    $offer->approval_date = $customerPackage['updated_at'];
-                    $offer->created_at = $customerPackage['created_at'];
-                    $offer->updated_at = $customerPackage['updated_at'];
+                    $offer->approval_date = $v1Offer['updated_at'];
+                    $offer->created_at = $v1Offer['created_at'];
+                    $offer->updated_at = $v1Offer['updated_at'];
                     $offer->migrated = true;
                     $offer->save();
 
+                    Utilities::logSuccessMigration("Order Offer Migration Successful.. OfferId: ".$offer->id);
+
                     $this->migrateOfferClientPackages($v1Offer, $offer);
+                    $this->migrateOfferPayments($v1Offer, $offer);
+                    $this->migrateOfferBids($v1Offer, $offer);
+                }else{
+                    Utilities::logFailedMigration("Order Offer not Migrated.. Client not found V1OfferId: ".$v1Offer['id']);
                 }
             }
         }
@@ -1098,7 +1185,11 @@ class MigrationController extends Controller
                 if($happinessFile) $clientPackage->happiness_letter_file_id = $happinessFile->id;
                 $clientPackage->update();
 
+                Utilities::logSuccessMigration("Offer Client Package Migration Successful.. CustomerPackageId: ".$customerPackage['id']);
+
                 $this->migrateOfferOffers($customerPackage, $clientPackage);
+            }else{
+                Utilities::logFailedMigration("Order Client Package not Migrated.. Customer Package not found PurchaseId: ".$v1Offer['id']); 
             }
         }
     }
@@ -1108,7 +1199,7 @@ class MigrationController extends Controller
     */
     private function migrateOfferOffers($customerPackage, $clientPackage)
     {
-        $v1Offers = DB::connection('db1')->table('offers')->where("client_package_id", $customerPackage['id'])->get();
+        $v1Offers = DB::connection('db1')->table('offers')->where("customer_package_id", $customerPackage['id'])->get();
         if($v1Offers->count() > 0) {
             foreach($v1Offers as $v1Offer) {
                 $client = $this->getClient($v1Offer['customer_id']);
@@ -1136,6 +1227,14 @@ class MigrationController extends Controller
                     $offer->updated_at = $customerPackage['updated_at'];
                     $offer->migrated = true;
                     $offer->save();
+
+                    $this->migrateOfferPayments($v1Offer, $offer);
+
+                    $this->migrateOfferBids($v1Offer, $offer);
+
+                    Utilities::logSuccessMigration("Offer Offer Migration Successful.. OfferId: ".$offer->id);
+                }else{
+                    Utilities::logFailedMigration("Offer Offer not Migrated.. Client not found V1OfferId: ".$v1Offer['id']);
                 }
             }
         }
@@ -1163,10 +1262,305 @@ class MigrationController extends Controller
                         $media->file_id = $file->id;
                         $media->update();
                     }
+                    Utilities::logSuccessMigration("Package Media Migration.. MediaId: ".$media->id);
                 }
             }
         });
         $this->markAsMigrated($this->packagePhotosMigration);
+    }
+
+    private function migrateOfferPayments($v1Offer, $offer)
+    {
+        DB::connection('db1')->table('sales_offer_payments')->where("offer_id", $v1Offer['id'])->orderBy('id')->chunk(500, function ($records) use($v1Offer, $offer) {
+            if(count($records) > 0) {
+                foreach ($records as $record) {
+                    $v1Payment = (array) $record;
+                    $paymentMode = DB::connection('db1')->table('payment_modes')->where("id", $v1Payment['payment_mode_id'])->first();
+                    if($paymentMode) {
+                        $paymentMode = (array) $paymentMode;
+                        $paymentMode = PaymentMode::where('name', 'LIKE', '%'.$paymentMode['name'].'%')->first();
+                    }
+                    $bankAccount = ($v1Payment['bank_account_id']) ? $this->getBankAccount($v1Payment['bank_account_id']) : null;
+                    $user = ($v1Payment['user_id']) ? $this->getUser($v1Payment['user_id']) : null;
+                    $client = $this->getClient($v1Offer['customer_id']);
+
+                    if($client) {
+                        $payment = new Payment;
+                        $payment->client_id = $client->id;
+                        $payment->purchase_id = $offer->id;
+                        $payment->purchase_type = Offer::$type;
+                        $payment->receipt_no = $v1Payment['receipt_no'];
+                        $payment->amount = $v1Payment['amount'];
+                        $payment->payment_mode_id = ($paymentMode) ? $paymentMode->id : PaymentMode::bankTransfer()->id;
+                        $payment->confirmed = $v1Payment['confirmed'];
+                        $payment->rejected_reason = $v1Payment['rejected_reason'];
+                        $payment->payment_gateway_id = $v1Payment['card_payment_channel_id'];
+                        $payment->reference = $v1Payment['reference'];
+                        $payment->success = $v1Payment['success'];
+                        $payment->failure_message = $v1Payment['failure_message'];
+                        $payment->flag = $v1Payment['flag'];
+                        $payment->flag_message = $v1Payment['flag_message'];
+                        $payment->bank_account_id = ($bankAccount) ? $bankAccount->id : null;
+                        $payment->payment_date = $v1Payment['payment_date'];
+                        $payment->purpose = PaymentPurpose::OFFER_PAYMENT->value;
+                        // $payment->installment_number = ;
+                        $payment->user_id = ($user) ? $user->id : null;
+                        $payment->created_at = $v1Payment['created_at'];
+                        $payment->updated_at = $v1Payment['updated_at'];
+                        $payment->migrated = true;
+                        $payment->save();
+
+                        $evidenceFile = null;
+                        if($v1Payment['evidence_file_id']) $evidenceFile = $this->getFile($v1Payment['evidence_file_id'], ['id'=>$client->id, 'type'=>Client::$userType], ['id'=>$payment->id, 'type'=>Payment::$type], FilePurpose::PAYMENT_EVIDENCE->value);
+
+                        if(isset($v1Payment['receipt_file_id']) && $v1Payment['receipt_file_id']) {
+                            $receiptFile = $this->getFile($v1Payment['receipt_file_id'], ['id'=>$client->id, 'type'=>Client::$userType], ['id'=>$payment->id, 'type'=>Payment::$type], FilePurpose::PAYMENT_RECEIPT->value);
+                            $payment->receipt_file_id = $receiptFile->id;
+                        }
+                        if($evidenceFile) $payment->evidence_file_id = $evidenceFile->id;
+                        $payment->update();
+
+                        Utilities::logSuccessMigration("Offer Payment Migration Successful.. PaymentId: ".$payment->id);
+                    }else{
+                        Utilities::logFailedMigration("Offer Payment not Migrated.. Client not found SalesOfferPaymentId: ".$v1Payment['id']);
+                    }
+                }
+            }
+        });
+        $this->markAsMigrated($this->paymentsMigration);
+    }
+
+    private function migrateOfferBids($v1Offer, $offer)
+    {
+        DB::connection('db1')->table('offer_bids')->where("offer_id", $v1Offer['id'])->orderBy('id')->chunk(500, function ($records) use($v1Offer, $offer) {
+            if(count($records) > 0) {
+                foreach ($records as $record) {
+                    $v1Bid = (array) $record;
+                    $client = $this->getClient($v1Offer['customer_id']);
+                    $paymentStatus = $this->getPaymentStatus($v1Offer['payment_status_id']);
+                    if(!$paymentStatus) $paymentStatus = PaymentStatus::pending();
+
+                    if($client) {
+                        $bid = new OfferBid;
+                        $bid->client_id = $client->id;
+                        $bid->offer_id = $offer->id;
+                        $bid->price = $v1Bid['bid_price'];
+                        $bid->accepted = $v1Bid['accepted'];
+                        $bid->cancelled = $v1Bid['cancelled'];
+                        $bid->payment_status_id = $paymentStatus->id;
+                        $bid->created_at = $v1Bid['created_at'];
+                        $bid->updated_at = $v1Bid['updated_at'];
+                        $bid->migrated = true;
+                        $bid->save();
+
+                        Utilities::logSuccessMigration("Offer Bid Migration Successful.. BidId: ".$bid->id);
+                    }else{
+                        Utilities::logFailedMigration("Offer Bid not Migrated.. Client not found V1BidId: ".$v1Bid['id']);
+                    }
+                }
+            }
+        });
+    }
+
+    public function siteTours()
+    {
+        // Fetch from v1 in chunks (to handle large data)
+        try{
+            DB::beginTransaction();
+            DB::connection('db1')->table('inspection_days')->orderBy('id')->chunk(500, function ($records) {
+                if(count($records) > 0) {
+                    foreach ($records as $record) {
+                        // Convert to array
+                        $inspectionDay = (array) $record;
+                        $monthlyWeekDay = DB::connection('db1')->table('monthly_week_days')->where("id", $inspectionDay['monthly_week_day_id'])->first();
+                        $project = $this->getProjectFromProjectLocation($inspectionDay['project_location_id']);
+
+                        if($monthlyWeekDay && $project) {
+                            $monthlyWeekDay = (array) $monthlyWeekDay;
+                            // Use Eloquent model for v2
+                            $schedule = new SiteTourSchedule;
+                            $schedule->project_type_id = $project->project_type_id;
+                            $schedule->project_id = $project->id;
+                            // $schedule->package_id = $data['lastname'];
+                            if($monthlyWeekDay['custom_date']) {
+                                $schedule->available_date = $monthlyWeekDay['custom_date'];
+                            }else{
+                                $schedule->recurrent = 1;
+                                $schedule->recurrent_day = ucfirst($monthlyWeekDay['day_name']);
+                            }
+                            $schedule->available_time = $inspectionDay['time'];
+                            $schedule->slots = 20;
+                            $schedule->fee = 5000;
+                            $schedule->created_at = $inspectionDay['created_at'];
+                            $schedule->updated_at = $inspectionDay['updated_at'];
+                            $schedule->migrated = true;
+
+                            $schedule->save();
+
+                            Utilities::logSuccessMigration("Site Tour Schedule Migration Successful.. ScheduleId: ".$schedule->id);
+
+                            $this->migrateSiteTourBooking($inspectionDay, $schedule);
+                        }
+                    }
+                }
+            });
+            $this->markAsMigrated($this->monthlyWeekDaysMigration);
+            $this->markAsMigrated($this->inspectionDaysMigration);
+            $this->markAsMigrated($this->inspectionRequestsMigration);
+            DB::commit();
+            // return response()->json(['message' => 'Site Tour Schedules Attempts copied successfully!']);
+        }catch(\Exception $e) {
+            DB::rollBack();
+            return Utilities::error($e, 'An error occurred while trying to process the request');
+        }
+    }
+
+    private function migrateSiteTourBooking($inspectionDay, $schedule)
+    {
+        $requests = DB::connection('db1')->table('inspection_requests')->where("inspection_day_id", $inspectionDay['id'])->get();
+        if($requests->count() > 0) {
+            foreach($requests as $request) {
+                $request = (array) $request;
+                $booked = SiteTourBookedSchedule::where("booked_date", $request['proposed_date'])->first();
+                if($booked) {
+                    $booked->total = $booked->total + 1;
+                    $booked->save();
+                }else{
+                    $booked = new SiteTourBookedSchedule;
+                    $booked->site_tour_schedule_id = $schedule->id;
+                    $booked->booked_date = $request['proposed_date'];
+                    $booked->total = 1;
+                    $booked->created_at = $request['created_at'];
+                    $booked->updated_at = $request['updated_at'];
+                    $booked->migrated = true;
+                    $booked->save();
+
+                    Utilities::logSuccessMigration("Booked Site Tour Migration Successful.. BookedId: ".$booked->id);
+                }
+                $client = null;
+                if($request['customer_id']) $client = $this->getClient($request['customer_id']);
+
+                $booking = new SiteTourBooking;
+                $booking->booked_schedules_id = $booked->id;
+                if($client) $booking->client_id = $client->id;
+                $booking->firstname = $request['firstname'];
+                $booking->lastname = $request['lastname'];
+                $booking->email = $request['email'];
+                if($request['phone_number']) $booking->phone_number = $request['phone_number'];
+                $booking->created_at = $request['created_at'];
+                $booking->updated_at = $request['updated_at'];
+                $booking->migrated = true;
+                $booking->save();
+
+                Utilities::logSuccessMigration("Site Tour Booking Migration Successful.. BookingId: ".$booking->id);
+            }
+        }
+    }
+
+    private function userCommissions()
+    {
+        DB::connection('db1')->table('user_commissions')->orderBy('id')->chunk(500, function ($records) {
+            if(count($records) > 0) {
+                foreach ($records as $record) {
+                    $v1Commission = (array) $record;
+                    $user = $this->getUser($v1Commission['user_id']);
+
+                    $order = null;
+                    $v1Order = DB::connection('db1')->table('orders')->where("id", $v1Commission['order_id'])->first();
+                    if($v1Order) {
+                        $v1Order = (array) $v1Order;
+                        $client = $this->getClient($v1Order['customer_id']);
+                        $package = $this->getPackageFromPackageItem($v1Order['package_item_id']);
+                        dd($client);
+                        //packageId=1201  $clientId = 12
+                        if($client && $package) {
+                            $order = Order::where("migrated", true)->where("client_id", $client->id)
+                                        ->where("package_id", $package->id)->where("order_date", $v1Order['order_date'])
+                                        ->where("created_at", $v1Order['created_at'])->where("updated_at", $v1Order['updated_at'])
+                                        ->first();
+                        }
+                    }
+
+                    if($user) {
+                        $this->userCommissionPayments($user->id, $v1Commission['created_at']);
+
+                        $commission = new StaffCommissionEarning;
+                        $commission->user_id = $user->id;
+                        $commission->order_id = $order->id;
+                        $commission->amount = $v1Commission['order_amount'];
+                        $commission->commission = $v1Commission['commission'];
+                        $commission->commission_amount = $v1Commission['commission_before_tax'];
+                        $commission->tax = $v1Commission['tax'];
+                        $commission->commission_after_tax = $v1Commission['commission_amount'];
+                        $commission->type = $v1Commission['commission_type'];
+                        $commission->created_at = $v1Commission['created_at'];
+                        $commission->updated_at = $v1Commission['updated_at'];
+                        $commission->migrated = true;
+                        $commission->save();
+
+                        Utilities::logSuccessMigration("User Commission Earning Migration Successful.. CommissionId: ".$commission->id);
+
+                        $latestTransaction = $this->latestUserCommissionTransaction($user->id);
+                        $transaction = new StaffCommissionTransaction;
+                        $transaction->user_id = $user->id;
+                        $transaction->transaction_id = $commission->id;
+                        $transaction->transaction_type = StaffCommissionEarning::$type;
+                        $transaction->balance = ($latestTransaction) ? $latestTransaction->balance + $commission->commission_after_tax : $commission->commission_after_tax;
+                        $transaction->created_at = $v1Commission['created_at'];
+                        $transaction->updated_at = $v1Commission['updated_at'];
+                        $transaction->migrated = true;
+                        $transaction->save();
+
+                        Utilities::logSuccessMigration("User Commission Transaction Migration Successful.. TransactionId: ".$transaction->id);
+                    }else{
+                        Utilities::logFailedMigration("User Commission Earning not Migrated.. Client not found V1CommissionId: ".$v1Commission['id']);
+                    }
+                }
+            }
+        });
+        $this->markAsMigrated($this->userCommissionsMigration);
+        $this->markAsMigrated($this->userCommissionPaymentsMigration);
+    }
+
+    private function userCommissionPayments($userId, $date)
+    {
+        DB::connection('db1')->table('user_commission_payments')
+            ->where("user_id", $userId)->where('created_at', '<', $date)
+            ->orderBy('id')->chunk(500, function ($records) use($userId) {
+            if(count($records) > 0) {
+                foreach ($records as $record) {
+                    $commissionPayment = (array) $record;
+                    $redemption = new StaffCommissionRedemption;
+                    $redemption->user_id = $userId;
+                    $redemption->amount = $commissionPayment['amount'];
+                    $redemption->status = RedemptionStatus::COMPLETED->value;
+                    $redemption->created_at = $commissionPayment['created_at'];
+                    $redemption->updated_at = $commissionPayment['updated_at'];
+                    $redemption->migrated = true;
+                    $redemption->save();
+
+                    Utilities::logSuccessMigration("User Commission Redemption Migration Successful.. RedemptionId: ".$redemption->id);
+
+                    $latestTransaction = $this->latestUserCommissionTransaction($userId);
+                    $transaction = new StaffCommissionTransaction;
+                    $transaction->user_id = $userId;
+                    $transaction->transaction_id = $redemption->id;
+                    $transaction->transaction_type = StaffCommissionRedemption::$type;
+                    $transaction->balance = ($latestTransaction) ? $latestTransaction->balance - $redemption->amount : 0;
+                    $transaction->created_at = $commissionPayment['created_at'];
+                    $transaction->updated_at = $commissionPayment['updated_at'];
+                    $transaction->migrated = true;
+                    $transaction->save();
+
+                    Utilities::logSuccessMigration("User Commission Transaction Migration Successful.. TransactionId: ".$transaction->id);
+                }
+            }
+        });
+    }
+
+    private function latestUserCommissionTransaction($userId)
+    {
+        return StaffCommissionTransaction::where("user_id", $userId)->orderBy("created_at", "DESC")->first();
     }
 
     private function migrateFile($record, $user, $belongs, $purpose)
@@ -1236,9 +1630,45 @@ class MigrationController extends Controller
         $client = null;
         if($customer) {
             $customer = (array) $customer;
-            $client = User::where("email", $customer['email'])->first();
+            $client = Client::where("email", $customer['email'])->first();
         }
         return $client;
+    }
+
+    private function getProjectFromProjectLocation($projectLocationId)
+    {
+        $project = null;
+        $projectLocation = DB::connection('db1')->table('project_locations')->where("id", $projectLocationId)->first();
+        if($projectLocation) {
+            $projectLocation = (array) $projectLocation;
+            $state = DB::connection('db1')->table('states')->where("id", $projectLocation['state_id'])->first();
+            $projectLocations = DB::connection('db1')->table('project_locations')->where("project_id", $projectLocation['project_id'])->get();
+            $v1Project = DB::connection('db1')->table('projects')->where("id", $projectLocation['project_id'])->first();
+            if($v1Project && $state) {
+                $v1Project = (array) $v1Project;
+                $state = (array) $state;
+                $name = ($projectLocations->count() > 1) ? $v1Project['name']." ".$state['name'] : $v1Project['name'];
+                $project = Project::where("name", $name)->first();
+            }
+        }
+        return $project;
+    }
+
+    private function getPackageFromPackageItem($packageItemId)
+    {
+        $package = null;
+        $packageItem = DB::connection('db1')->table('package_items')->where("id", $packageItemId)->first();
+        if($packageItem) {
+            $packageItem = (array) $packageItem;
+            $packageItems = DB::connection('db1')->table('package_items')->where("package_id", $packageItem['package_id'])->get();
+            $v1Package = DB::connection('db1')->table('packages')->where("id", $packageItem['package_id'])->first();
+            if($v1Package) {
+                $v1Package = (array) $v1Package;
+                $name = ($packageItems->count() > 1) ? $v1Package['name']." ".$packageItem['size']."SQM" : $v1Package['name'];
+                $package = Package::where("name", $name)->first();
+            }
+        }
+        return $package;
     }
 
     private function getBankAccount($accountId)

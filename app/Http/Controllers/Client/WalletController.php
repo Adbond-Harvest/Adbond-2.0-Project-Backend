@@ -127,7 +127,7 @@ class WalletController extends Controller
 
             $withdrawalRequest = $this->walletService->generateWithdrawalRequest($wallet, $data['amount']);
 
-            $this->notificationService->save($withdrawalRequest, NotificationType::WALLET_WITHDRAWAL_REQ->value);
+            $this->notificationService->save($withdrawalRequest, NotificationType::WALLET_WITHDRAWAL_REQ->value,  Auth::guard("client")->user());
 
             return Utilities::ok(new WalletWithdrawalRequestResource($withdrawalRequest));
         }catch(\Exception $e){

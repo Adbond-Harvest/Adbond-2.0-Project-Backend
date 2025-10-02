@@ -241,7 +241,7 @@ class PaymentController extends Controller
 
                 if ($order->is_installment == 0 || $order->installments_payed == $order->installment_count) {
                     $clientPackage = $this->orderService->completeOrder($order, $payment, $clientInvestment);
-                    $this->notificationService->save($clientPackage, NotificationType::ORDER_COMPLETION->value);
+                    $this->notificationService->save($clientPackage, NotificationType::ORDER_COMPLETION->value,  Auth::guard("client")->user());
 
                 }else{
                     $asset = (($order->package->type==PackageType::INVESTMENT->value) ? $this->clientPackageService->saveClientPackageInvestment($clientInvestment) : $this->clientPackageService->saveClientPackageOrder($order));
@@ -396,7 +396,7 @@ class PaymentController extends Controller
         $paymentData['paymentGatewayId'] = ($data['cardPayment']) ? PaymentMode::cardPayment()->id : PaymentMode::bankTransfer()->id;
         $payment = $this->paymentService->save($paymentData);
 
-        if(!$data['cardPayment']) $this->notificationService->save($payment, NotificationType::ORDER_PAYMENT_CONFIRMATION_REQ->value);
+        if(!$data['cardPayment']) $this->notificationService->save($payment, NotificationType::ORDER_PAYMENT_CONFIRMATION_REQ->value,  Auth::guard("client")->user());
         // dd($gatewayRes['paymentError']);
 
         return $payment;

@@ -4,6 +4,7 @@ namespace app\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 use app\Http\Requests\BookSiteTour;
 
@@ -29,6 +30,8 @@ class SiteTourController extends Controller
         try{
             $data = $request->validated();
 
+            DB::beginTransaction();
+
             $schedule = $this->siteTourService->schedule($data["siteTourScheduleId"]);
             if(!$schedule) return Utilities::error402("Site Tour Schedule not found");
 
@@ -51,8 +54,10 @@ class SiteTourController extends Controller
 
             $booking = $this->siteTourService->book($bookedSchedule, $data);
 
+            DB::commit();
             return Utilities::okay("Site Tour Booked Successfully");
         }catch (\Exception $e) {
+            DB::rollBack();
             return Utilities::error($e, 'An error occurred while attempting to carry out this operation');
         }
     }

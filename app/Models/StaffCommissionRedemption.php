@@ -13,6 +13,8 @@ class StaffCommissionRedemption extends Model
 {
     use HasFactory;
 
+    public static $type = "app\Models\StaffCommissionRedemption";
+
     protected $fillable = [
         'user_id',
         'amount',

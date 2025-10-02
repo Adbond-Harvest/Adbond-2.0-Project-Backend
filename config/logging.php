@@ -71,6 +71,18 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
         ],
 
+        'success_migration' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/success_migration.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+
+        'failed_migration' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/failed_migration.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
