@@ -97,32 +97,32 @@ class MigrationController extends Controller
         $this->staffAssessmentsMigration =  TableMigration::where("name", "virtual_staff_assessments")->first();
         $this->staffAssessmentAnswersMigration =  TableMigration::where("name", "virtual_staff_assessment_answers")->first();
 
-        // $this->bankAccountsMigration = TableMigration::where("name", "bank_accounts")->first();
-        // $this->usersMigration = TableMigration::where("name", "users")->first();
-        // $this->postsMigration = TableMigration::where("name", "posts")->first();
-        // $this->commentsMigration = TableMigration::where("name", "comments")->first();
-        // $this->newsMigration = TableMigration::where("name", "news")->first();
-        // $this->reactionsMigration = TableMigration::where("name", "reactions")->first();
+        $this->bankAccountsMigration = TableMigration::where("name", "bank_accounts")->first();
+        $this->usersMigration = TableMigration::where("name", "users")->first();
+        $this->postsMigration = TableMigration::where("name", "posts")->first();
+        $this->commentsMigration = TableMigration::where("name", "comments")->first();
+        $this->newsMigration = TableMigration::where("name", "news")->first();
+        $this->reactionsMigration = TableMigration::where("name", "reactions")->first();
 
-        // $this->nextOfKinMigration = TableMigration::where("name", "customer_next_of_kins")->first();
-        // $this->projectLocationsMigration = TableMigration::where("name", "project_locations")->first();
-        // $this->projectsMigration = TableMigration::where("name", "projects")->first();
-        // $this->packagesMigration = TableMigration::where("name", "packages")->first();
-        // $this->packageItemsMigration = TableMigration::where("name", "package_items")->first();
-        // $this->packagePhotosMigration = TableMigration::where("name", "package_photos")->first();
-        // $this->customerPackageMigration = TableMigration::where("name", "customer_packages")->first();
-        // $this->ordersMigration = TableMigration::where("name", "orders")->first();
-        // $this->orderDiscountsMigration = TableMigration::where("name", "order_discounts")->first();
-        // $this->paymentsMigration = TableMigration::where("name", "payments")->first();
-        // $this->offersMigration = TableMigration::where("name", "offers")->first();
-        // $this->salesOfferPaymentMigration = TableMigration::where("name", "sales_offer_payments")->first();
-        // $this->offerBidsMigration = TableMigration::where("name", "offer_bids")->first();
+        $this->nextOfKinMigration = TableMigration::where("name", "customer_next_of_kins")->first();
+        $this->projectLocationsMigration = TableMigration::where("name", "project_locations")->first();
+        $this->projectsMigration = TableMigration::where("name", "projects")->first();
+        $this->packagesMigration = TableMigration::where("name", "packages")->first();
+        $this->packageItemsMigration = TableMigration::where("name", "package_items")->first();
+        $this->packagePhotosMigration = TableMigration::where("name", "package_photos")->first();
+        $this->customerPackageMigration = TableMigration::where("name", "customer_packages")->first();
+        $this->ordersMigration = TableMigration::where("name", "orders")->first();
+        $this->orderDiscountsMigration = TableMigration::where("name", "order_discounts")->first();
+        $this->paymentsMigration = TableMigration::where("name", "payments")->first();
+        $this->offersMigration = TableMigration::where("name", "offers")->first();
+        $this->salesOfferPaymentMigration = TableMigration::where("name", "sales_offer_payments")->first();
+        $this->offerBidsMigration = TableMigration::where("name", "offer_bids")->first();
 
-        // $this->monthlyWeekDaysMigration = TableMigration::where("name", "monthly_week_days")->first();
-        // $this->inspectionDaysMigration = TableMigration::where("name", "inspection_days")->first();
-        // $this->inspectionRequestsMigration = TableMigration::where("name", "inspection_requests")->first();
-        // $this->userCommissionsMigration = TableMigration::where("name", "user_commissions")->first();
-        // $this->userCommissionPaymentsMigration = TableMigration::where("name", "user_commission_payments")->first();
+        $this->monthlyWeekDaysMigration = TableMigration::where("name", "monthly_week_days")->first();
+        $this->inspectionDaysMigration = TableMigration::where("name", "inspection_days")->first();
+        $this->inspectionRequestsMigration = TableMigration::where("name", "inspection_requests")->first();
+        $this->userCommissionsMigration = TableMigration::where("name", "user_commissions")->first();
+        $this->userCommissionPaymentsMigration = TableMigration::where("name", "user_commission_payments")->first();
     }
     
     public function index()
@@ -140,11 +140,11 @@ class MigrationController extends Controller
             if(!$this->newsMigration->migrated) $this->news();
             if(!$this->reactionsMigration->migrated) $this->reactions();
 
-            if(!$this->projectsMigration->migrated) $this->projects();
+            // if(!$this->projectsMigration->migrated) $this->projects();
 
-            if(!$this->nextOfKinMigration->migrated) $this->nextOfKins();
-            if(!$this->inspectionDaysMigration->migrated) $this->siteTours();
-            if(!$this->userCommissionsMigration->migrated) $this->userCommissions();
+            // if(!$this->nextOfKinMigration->migrated) $this->nextOfKins();
+            // if(!$this->inspectionDaysMigration->migrated) $this->siteTours();
+            // if(!$this->userCommissionsMigration->migrated) $this->userCommissions();
 
         }catch(\Exception $e) {
             return Utilities::error($e, 'An error occurred while trying to process the request');
