@@ -80,8 +80,8 @@ use app\Http\Controllers\MigrationController;
 // })->middleware('auth:sanctum');
 Route::group(['prefix' => '/v2',], function () {
 
-    // Route::get('/migrate', [MigrationController::class, "index"]);
-    // Route::get('/migrate/clients', [MigrationController::class, "clients"]);
+    Route::get('/migrate', [MigrationController::class, "index"]);
+    Route::get('/migrate/clients', [MigrationController::class, "clients"]);
 
     //Auth URLS
     Route::group(['prefix' => '/auth', 'namespace' => 'Auth',], function () {

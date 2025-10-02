@@ -97,32 +97,32 @@ class MigrationController extends Controller
         $this->staffAssessmentsMigration =  TableMigration::where("name", "virtual_staff_assessments")->first();
         $this->staffAssessmentAnswersMigration =  TableMigration::where("name", "virtual_staff_assessment_answers")->first();
 
-        $this->bankAccountsMigration = TableMigration::where("name", "bank_accounts")->first();
-        $this->usersMigration = TableMigration::where("name", "users")->first();
-        $this->postsMigration = TableMigration::where("name", "posts")->first();
-        $this->commentsMigration = TableMigration::where("name", "comments")->first();
-        $this->newsMigration = TableMigration::where("name", "news")->first();
-        $this->reactionsMigration = TableMigration::where("name", "reactions")->first();
+        // $this->bankAccountsMigration = TableMigration::where("name", "bank_accounts")->first();
+        // $this->usersMigration = TableMigration::where("name", "users")->first();
+        // $this->postsMigration = TableMigration::where("name", "posts")->first();
+        // $this->commentsMigration = TableMigration::where("name", "comments")->first();
+        // $this->newsMigration = TableMigration::where("name", "news")->first();
+        // $this->reactionsMigration = TableMigration::where("name", "reactions")->first();
 
-        $this->nextOfKinMigration = TableMigration::where("name", "customer_next_of_kins")->first();
-        $this->projectLocationsMigration = TableMigration::where("name", "project_locations")->first();
-        $this->projectsMigration = TableMigration::where("name", "projects")->first();
-        $this->packagesMigration = TableMigration::where("name", "packages")->first();
-        $this->packageItemsMigration = TableMigration::where("name", "package_items")->first();
-        $this->packagePhotosMigration = TableMigration::where("name", "package_photos")->first();
-        $this->customerPackageMigration = TableMigration::where("name", "customer_packages")->first();
-        $this->ordersMigration = TableMigration::where("name", "orders")->first();
-        $this->orderDiscountsMigration = TableMigration::where("name", "order_discounts")->first();
-        $this->paymentsMigration = TableMigration::where("name", "payments")->first();
-        $this->offersMigration = TableMigration::where("name", "offers")->first();
-        $this->salesOfferPaymentMigration = TableMigration::where("name", "sales_offer_payments")->first();
-        $this->offerBidsMigration = TableMigration::where("name", "offer_bids")->first();
+        // $this->nextOfKinMigration = TableMigration::where("name", "customer_next_of_kins")->first();
+        // $this->projectLocationsMigration = TableMigration::where("name", "project_locations")->first();
+        // $this->projectsMigration = TableMigration::where("name", "projects")->first();
+        // $this->packagesMigration = TableMigration::where("name", "packages")->first();
+        // $this->packageItemsMigration = TableMigration::where("name", "package_items")->first();
+        // $this->packagePhotosMigration = TableMigration::where("name", "package_photos")->first();
+        // $this->customerPackageMigration = TableMigration::where("name", "customer_packages")->first();
+        // $this->ordersMigration = TableMigration::where("name", "orders")->first();
+        // $this->orderDiscountsMigration = TableMigration::where("name", "order_discounts")->first();
+        // $this->paymentsMigration = TableMigration::where("name", "payments")->first();
+        // $this->offersMigration = TableMigration::where("name", "offers")->first();
+        // $this->salesOfferPaymentMigration = TableMigration::where("name", "sales_offer_payments")->first();
+        // $this->offerBidsMigration = TableMigration::where("name", "offer_bids")->first();
 
-        $this->monthlyWeekDaysMigration = TableMigration::where("name", "monthly_week_days")->first();
-        $this->inspectionDaysMigration = TableMigration::where("name", "inspection_days")->first();
-        $this->inspectionRequestsMigration = TableMigration::where("name", "inspection_requests")->first();
-        $this->userCommissionsMigration = TableMigration::where("name", "user_commissions")->first();
-        $this->userCommissionPaymentsMigration = TableMigration::where("name", "user_commission_payments")->first();
+        // $this->monthlyWeekDaysMigration = TableMigration::where("name", "monthly_week_days")->first();
+        // $this->inspectionDaysMigration = TableMigration::where("name", "inspection_days")->first();
+        // $this->inspectionRequestsMigration = TableMigration::where("name", "inspection_requests")->first();
+        // $this->userCommissionsMigration = TableMigration::where("name", "user_commissions")->first();
+        // $this->userCommissionPaymentsMigration = TableMigration::where("name", "user_commission_payments")->first();
     }
     
     public function index()
@@ -141,10 +141,10 @@ class MigrationController extends Controller
             if(!$this->reactionsMigration->migrated) $this->reactions();
 
             if(!$this->projectsMigration->migrated) $this->projects();
-            
-            if(!$this->nextOfKinMigration->migration) $this->nextOfKins();
-            if(!$this->inspectionDaysMigration->migration) $this->siteTours();
-            if(!$this->userCommissionsMigration->migration) $this->userCommissions();
+
+            if(!$this->nextOfKinMigration->migrated) $this->nextOfKins();
+            if(!$this->inspectionDaysMigration->migrated) $this->siteTours();
+            if(!$this->userCommissionsMigration->migrated) $this->userCommissions();
 
         }catch(\Exception $e) {
             return Utilities::error($e, 'An error occurred while trying to process the request');
@@ -1364,6 +1364,7 @@ class MigrationController extends Controller
 
     public function siteTours()
     {
+        dd('dont run');
         // Fetch from v1 in chunks (to handle large data)
         try{
             DB::beginTransaction();
@@ -1459,103 +1460,122 @@ class MigrationController extends Controller
 
     private function userCommissions()
     {
-        DB::connection('db1')->table('user_commissions')->orderBy('id')->chunk(500, function ($records) {
-            if(count($records) > 0) {
-                foreach ($records as $record) {
-                    $v1Commission = (array) $record;
-                    $user = $this->getUser($v1Commission['user_id']);
+        try{
+            DB::beginTransaction();
+            DB::connection('db1')->table('user_commissions')->orderBy('id')->chunk(500, function ($records) {
+                if(count($records) > 0) {
+                    foreach ($records as $record) {
+                        $v1Commission = (array) $record;
+                        $user = $this->getUser($v1Commission['user_id']);
 
-                    $order = null;
-                    $v1Order = DB::connection('db1')->table('orders')->where("id", $v1Commission['order_id'])->first();
-                    if($v1Order) {
-                        $v1Order = (array) $v1Order;
-                        $client = $this->getClient($v1Order['customer_id']);
-                        $package = $this->getPackageFromPackageItem($v1Order['package_item_id']);
-                        dd($client);
-                        //packageId=1201  $clientId = 12
-                        if($client && $package) {
-                            $order = Order::where("migrated", true)->where("client_id", $client->id)
-                                        ->where("package_id", $package->id)->where("order_date", $v1Order['order_date'])
-                                        ->where("created_at", $v1Order['created_at'])->where("updated_at", $v1Order['updated_at'])
-                                        ->first();
+                        $order = null;
+                        $v1Order = DB::connection('db1')->table('orders')->where("id", $v1Commission['order_id'])->first();
+                        if($v1Order) {
+                            $v1Order = (array) $v1Order;
+                            $client = $this->getClient($v1Order['customer_id']);
+                            $package = $this->getPackageFromPackageItem($v1Order['package_item_id']);
+                            // dd($v1Order);
+                            //packageId=1201  $clientId = 12 orderDate = 2023-03-06 createdAt = 2023-03-06 07:26:35 
+                            //updatedAt = 2023-03-08 09:59:53
+                            if($client && $package) {
+                                $order = Order::where("migrated", true)->where("client_id", $client->id)
+                                            ->where("package_id", $package->id)->where("order_date", $v1Order['order_date'])
+                                            ->where("created_at", $v1Order['created_at'])
+                                            ->first();
+                            }
                         }
-                    }
+                        // dd($order);
+                        if($user) {
+                            $this->userCommissionPayments($v1Commission['user_id'], $v1Commission['created_at']);
 
-                    if($user) {
-                        $this->userCommissionPayments($user->id, $v1Commission['created_at']);
+                            $commission = new StaffCommissionEarning;
+                            $commission->user_id = $user->id;
+                            $commission->order_id = $order->id;
+                            $commission->amount = $v1Commission['order_amount'];
+                            $commission->commission = $v1Commission['commission'];
+                            $commission->commission_amount = $v1Commission['commission_before_tax'];
+                            $commission->tax = $v1Commission['tax'];
+                            $commission->commission_after_tax = $v1Commission['commission_amount'];
+                            $commission->type = $v1Commission['commission_type'];
+                            $commission->created_at = $v1Commission['created_at'];
+                            $commission->updated_at = $v1Commission['updated_at'];
+                            $commission->migrated = true;
+                            $commission->save();
 
-                        $commission = new StaffCommissionEarning;
-                        $commission->user_id = $user->id;
-                        $commission->order_id = $order->id;
-                        $commission->amount = $v1Commission['order_amount'];
-                        $commission->commission = $v1Commission['commission'];
-                        $commission->commission_amount = $v1Commission['commission_before_tax'];
-                        $commission->tax = $v1Commission['tax'];
-                        $commission->commission_after_tax = $v1Commission['commission_amount'];
-                        $commission->type = $v1Commission['commission_type'];
-                        $commission->created_at = $v1Commission['created_at'];
-                        $commission->updated_at = $v1Commission['updated_at'];
-                        $commission->migrated = true;
-                        $commission->save();
+                            Utilities::logSuccessMigration("User Commission Earning Migration Successful.. CommissionId: ".$commission->id);
 
-                        Utilities::logSuccessMigration("User Commission Earning Migration Successful.. CommissionId: ".$commission->id);
+                            $latestTransaction = $this->latestUserCommissionTransaction($user->id);
+                            $transaction = new StaffCommissionTransaction;
+                            $transaction->user_id = $user->id;
+                            $transaction->transaction_id = $commission->id;
+                            $transaction->transaction_type = StaffCommissionEarning::$type;
+                            $transaction->balance = ($latestTransaction) ? $latestTransaction->balance + $commission->commission_after_tax : $commission->commission_after_tax;
+                            $transaction->created_at = $v1Commission['created_at'];
+                            $transaction->updated_at = $v1Commission['updated_at'];
+                            $transaction->migrated = true;
+                            $transaction->save();
 
-                        $latestTransaction = $this->latestUserCommissionTransaction($user->id);
-                        $transaction = new StaffCommissionTransaction;
-                        $transaction->user_id = $user->id;
-                        $transaction->transaction_id = $commission->id;
-                        $transaction->transaction_type = StaffCommissionEarning::$type;
-                        $transaction->balance = ($latestTransaction) ? $latestTransaction->balance + $commission->commission_after_tax : $commission->commission_after_tax;
-                        $transaction->created_at = $v1Commission['created_at'];
-                        $transaction->updated_at = $v1Commission['updated_at'];
-                        $transaction->migrated = true;
-                        $transaction->save();
+                            Utilities::logSuccessMigration("User Commission Transaction Migration Successful.. TransactionId: ".$transaction->id);
+                        }else{
+                            Utilities::logFailedMigration("User Commission Earning not Migrated.. Client not found V1CommissionId: ".$v1Commission['id']);
+                        }
 
-                        Utilities::logSuccessMigration("User Commission Transaction Migration Successful.. TransactionId: ".$transaction->id);
-                    }else{
-                        Utilities::logFailedMigration("User Commission Earning not Migrated.. Client not found V1CommissionId: ".$v1Commission['id']);
                     }
                 }
-            }
-        });
+            });
+            DB::commit();
+        }catch(\Exception $e) {
+            DB::rollBack();
+            return Utilities::error($e, 'An error occurred while trying to process the request');
+        }
         $this->markAsMigrated($this->userCommissionsMigration);
         $this->markAsMigrated($this->userCommissionPaymentsMigration);
     }
 
     private function userCommissionPayments($userId, $date)
     {
-        DB::connection('db1')->table('user_commission_payments')
+        $user = $this->getUser($userId);
+        // if($date == '2023-03-16 07:10:41') dd($date);
+        $commissionPayments = DB::connection('db1')->table('user_commission_payments')
             ->where("user_id", $userId)->where('created_at', '<', $date)
-            ->orderBy('id')->chunk(500, function ($records) use($userId) {
-            if(count($records) > 0) {
-                foreach ($records as $record) {
-                    $commissionPayment = (array) $record;
-                    $redemption = new StaffCommissionRedemption;
-                    $redemption->user_id = $userId;
-                    $redemption->amount = $commissionPayment['amount'];
-                    $redemption->status = RedemptionStatus::COMPLETED->value;
-                    $redemption->created_at = $commissionPayment['created_at'];
-                    $redemption->updated_at = $commissionPayment['updated_at'];
-                    $redemption->migrated = true;
-                    $redemption->save();
+            ->orderBy('id')->get();
 
-                    Utilities::logSuccessMigration("User Commission Redemption Migration Successful.. RedemptionId: ".$redemption->id);
+        //     $sql = $commissionPayments->toSql();
+        //     $bindings = $commissionPayments->getBindings();
 
-                    $latestTransaction = $this->latestUserCommissionTransaction($userId);
-                    $transaction = new StaffCommissionTransaction;
-                    $transaction->user_id = $userId;
-                    $transaction->transaction_id = $redemption->id;
-                    $transaction->transaction_type = StaffCommissionRedemption::$type;
-                    $transaction->balance = ($latestTransaction) ? $latestTransaction->balance - $redemption->amount : 0;
-                    $transaction->created_at = $commissionPayment['created_at'];
-                    $transaction->updated_at = $commissionPayment['updated_at'];
-                    $transaction->migrated = true;
-                    $transaction->save();
+        //     dd($sql, $bindings);
+        //     dd($commissionPayments);
 
-                    Utilities::logSuccessMigration("User Commission Transaction Migration Successful.. TransactionId: ".$transaction->id);
-                }
+        // if($date == '2023-03-16 07:10:41') dd($commissionPayments);
+                
+        if($commissionPayments->count() > 0) {
+            foreach ($commissionPayments as $record) {
+                $commissionPayment = (array) $record;
+                $redemption = new StaffCommissionRedemption;
+                $redemption->user_id = $user->id;
+                $redemption->amount = $commissionPayment['amount'];
+                $redemption->status = RedemptionStatus::COMPLETED->value;
+                $redemption->created_at = $commissionPayment['created_at'];
+                $redemption->updated_at = $commissionPayment['updated_at'];
+                $redemption->migrated = true;
+                $redemption->save();
+
+                Utilities::logSuccessMigration("User Commission Redemption Migration Successful.. RedemptionId: ".$redemption->id);
+
+                $latestTransaction = $this->latestUserCommissionTransaction($userId);
+                $transaction = new StaffCommissionTransaction;
+                $transaction->user_id = $user->id;
+                $transaction->transaction_id = $redemption->id;
+                $transaction->transaction_type = StaffCommissionRedemption::$type;
+                $transaction->balance = ($latestTransaction) ? $latestTransaction->balance - $redemption->amount : 0;
+                $transaction->created_at = $commissionPayment['created_at'];
+                $transaction->updated_at = $commissionPayment['updated_at'];
+                $transaction->migrated = true;
+                $transaction->save();
+
+                Utilities::logSuccessMigration("User Commission Transaction Migration Successful.. TransactionId: ".$transaction->id);
             }
-        });
+        }
     }
 
     private function latestUserCommissionTransaction($userId)
