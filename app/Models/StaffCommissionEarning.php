@@ -56,16 +56,17 @@ class StaffCommissionEarning extends Model
         // After creating a new commission earning
         static::created(function ($earning) {
             // get the latest transaction for this user
-            $latestTransaction = StaffCommissionTransaction::where("user_id", $earning->user_id)->orderBy("created_at", "DESC")->first(); 
-            // Create corresponding transaction record
-            $transactionType = (string) CommissionTransactionType::EARNING->value;
-            // dd($transactionType);
-            StaffCommissionTransaction::create([
-                'user_id' => $earning->user_id,
-                'transaction_id' => $earning->id,
-                'transaction_type' => $transactionType,
-                'balance' => ($latestTransaction) ? $latestTransaction->balance + $earning->commission_after_tax : $earning->commission_after_tax,
-            ]);
+            
+            // $latestTransaction = StaffCommissionTransaction::where("user_id", $earning->user_id)->orderBy("created_at", "DESC")->first(); 
+            // // Create corresponding transaction record
+            // $transactionType = (string) CommissionTransactionType::EARNING->value;
+            // // dd($transactionType);
+            // StaffCommissionTransaction::create([
+            //     'user_id' => $earning->user_id,
+            //     'transaction_id' => $earning->id,
+            //     'transaction_type' => $transactionType,
+            //     'balance' => ($latestTransaction) ? $latestTransaction->balance + $earning->commission_after_tax : $earning->commission_after_tax,
+            // ]);
         });
 
         // Before deleting a commission earning

@@ -52,17 +52,17 @@ class StaffCommissionRedemption extends Model
         // After creating a new redemption
         static::created(function ($redemption) {
             // get the latest transaction for this user
-            $latestTransaction = StaffCommissionTransaction::where("user_id", $redemption->user_id)->orderBy("created_at", "DESC")->first(); 
+            // $latestTransaction = StaffCommissionTransaction::where("user_id", $redemption->user_id)->orderBy("created_at", "DESC")->first(); 
 
-            if($latestTransaction) {
-            // Create corresponding transaction record
-                StaffCommissionTransaction::create([
-                    'user_id' => $redemption->user_id,
-                    'transaction_id' => $redemption->id,
-                    'transaction_type' => CommissionTransactionType::REDEMPTION->value,
-                    'balance' => $latestTransaction->balance - $redemption->amount, // Negative amount for redemption
-                ]);
-            }
+            // if($latestTransaction) {
+            // // Create corresponding transaction record
+            //     StaffCommissionTransaction::create([
+            //         'user_id' => $redemption->user_id,
+            //         'transaction_id' => $redemption->id,
+            //         'transaction_type' => CommissionTransactionType::REDEMPTION->value,
+            //         'balance' => $latestTransaction->balance - $redemption->amount, // Negative amount for redemption
+            //     ]);
+            // }
         });
 
         // Before deleting a redemption
