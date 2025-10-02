@@ -1488,7 +1488,7 @@ class MigrationController extends Controller
                             $v1Order = (array) $v1Order;
                             $client = $this->getClient($v1Order['customer_id']);
                             $package = $this->getPackageFromPackageItem($v1Order['package_item_id']);
-                            //packageId=1201  $clientId = 12 orderDate = 2023-11-08 createdAt = 2023-11-08 10:55:37 
+                            //packageId = 203  $clientId = 146 orderDate = 2023-11-08 createdAt = 2023-11-08 10:55:37 
                             //updatedAt = 2023-03-08 09:59:53
                             if($client && $package) {
                                 $order = Order::where("migrated", true)->where("client_id", $client->id)
@@ -1498,8 +1498,8 @@ class MigrationController extends Controller
                             }
                         }
                         if(!$order) {
-                            // dd($v1Order);
-                            dd($client, $package);
+                            dd($v1Order);
+                            dd($v1Order, $client, $package);
                             dd($package);
                         }
                         // dd($order);
