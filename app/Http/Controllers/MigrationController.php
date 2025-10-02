@@ -867,6 +867,7 @@ class MigrationController extends Controller
                             foreach($itemRecords as $itemRecord) {
                                 $packageItem = (array) $itemRecord;
                                 $user = $this->getUser($v1Package['user_id']);
+                                if(!$user) $this->getUser(1);
 
                                 if($v1Package['package_brochure_file_id']) {
                                     $brochure = DB::connection('db1')->table('files')->where("id", $v1Package['package_brochure_file_id'])->first();
@@ -1110,7 +1111,7 @@ class MigrationController extends Controller
             }
         }else{
             Utilities::logFailedMigration("Order Client Package not Migrated.. Customer Package not found PurchaseId: ".$v1Order['id']); 
-            throw("Customer Package not found");
+            // throw("Customer Package not found");
         }
     }
 
