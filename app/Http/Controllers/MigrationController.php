@@ -684,6 +684,7 @@ class MigrationController extends Controller
 
                             $post->save();
 
+                            $coverPhoto = (array) $coverPhoto;
                             $file = $this->migrateFile($coverPhoto, ["id"=>$user->id, "type"=>User::$userType], ['id'=>$post->id, 'type'=>Post::$type], FilePurpose::POST_MEDIA->value);
                             if($file) {
                                 $post->file_id = $file->id;
@@ -1376,7 +1377,7 @@ class MigrationController extends Controller
 
     public function siteTours()
     {
-        dd('dont run');
+        // dd('dont run');
         // Fetch from v1 in chunks (to handle large data)
         try{
             DB::beginTransaction();
