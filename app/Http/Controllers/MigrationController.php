@@ -569,7 +569,7 @@ class MigrationController extends Controller
                             $post->file_id = $coverPhoto->id;
                             $post->topic = $data['title'];
                             $post->slug = $data['slug'];
-                            $post->preview = $data['description'];
+                            $post->preview = $this->getPreview($data['description']);
                             $post->content = $data['body'];
                             $post->active = $data['published'];
                             $post->user_id = $user->id;
