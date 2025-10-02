@@ -1488,9 +1488,6 @@ class MigrationController extends Controller
                             $v1Order = (array) $v1Order;
                             $client = $this->getClient($v1Order['customer_id']);
                             $package = $this->getPackageFromPackageItem($v1Order['package_item_id']);
-                            dd($v1Order);
-                            dd($client);
-                            dd($package);
                             //packageId=1201  $clientId = 12 orderDate = 2023-03-06 createdAt = 2023-03-06 07:26:35 
                             //updatedAt = 2023-03-08 09:59:53
                             if($client && $package) {
@@ -1499,6 +1496,11 @@ class MigrationController extends Controller
                                             ->where("created_at", $v1Order['created_at'])
                                             ->first();
                             }
+                        }
+                        if(!$order) {
+                            dd($v1Order);
+                            dd($client);
+                            dd($package);
                         }
                         // dd($order);
                         if($user) {
