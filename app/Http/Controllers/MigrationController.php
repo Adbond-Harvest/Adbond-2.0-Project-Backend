@@ -146,9 +146,9 @@ class MigrationController extends Controller
 
             if(!$this->projectsMigration->migrated) $this->projects();
 
-            if(!$this->nextOfKinMigration->migrated) $this->nextOfKins();
-            if(!$this->inspectionDaysMigration->migrated) $this->siteTours();
-            if(!$this->userCommissionsMigration->migrated) $this->userCommissions();
+            // if(!$this->nextOfKinMigration->migrated) $this->nextOfKins();
+            // if(!$this->inspectionDaysMigration->migrated) $this->siteTours();
+            // if(!$this->userCommissionsMigration->migrated) $this->userCommissions();
 
         }catch(\Exception $e) {
             return Utilities::error($e, 'An error occurred while trying to process the request');
@@ -879,7 +879,7 @@ class MigrationController extends Controller
                                 if($user) {         
                                     $package = new Package;
                                     $package->user_id = $user->id;
-                                    $package->name = (count($itemRecords) > 1) ? $v1Package['name']." ".$packageItem['size']."SQM" : $v1Package['name'];
+                                    $package->name = (count($itemRecords) > 1) ? $this->getPackageNameFromPackageItem($packageItem['id'], $v1Package, $itemRecords) : $v1Package['name'];
                                     $package->category = ProductCategory::PURCHASE->value;
                                     $package->state = $project->state;
                                     $package->address = $v1ProjectLocation['address'];
@@ -1702,11 +1702,24 @@ class MigrationController extends Controller
             $v1Package = DB::connection('db1')->table('packages')->where("id", $packageItem['package_id'])->first();
             if($v1Package) {
                 $v1Package = (array) $v1Package;
-                $name = ($packageItems->count() > 1) ? $v1Package['name']." ".$packageItem['size']."SQM" : $v1Package['name'];
+                $name = ($packageItems->count() > 1) ? $this->getPackageNameFromPackageItem($packageItem['id'], $v1Package, $packageItems) : $v1Package['name'];
                 $package = Package::where("name", $name)->first();
             }
         }
         return $package;
+    }
+
+    private function getPackageNameFromPackageItem($packageItemId, $package, $packageItems)
+    {
+        $name = null;
+        $i = 0;
+        foreach($packageItems as $packageItem) {
+            $i = $i + 1;
+            if($packageItem->id == $packageItemId) {
+                $name = $package['name'].$i." ".$packageItem->size."SQM";
+            }
+        }
+        return $name;
     }
 
     private function getBankAccount($accountId)
