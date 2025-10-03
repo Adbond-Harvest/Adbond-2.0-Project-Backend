@@ -146,9 +146,9 @@ class MigrationController extends Controller
 
             if(!$this->projectsMigration->migrated) $this->projects();
 
-            // if(!$this->nextOfKinMigration->migrated) $this->nextOfKins();
-            // if(!$this->inspectionDaysMigration->migrated) $this->siteTours();
-            // if(!$this->userCommissionsMigration->migrated) $this->userCommissions();
+            if(!$this->nextOfKinMigration->migrated) $this->nextOfKins();
+            if(!$this->inspectionDaysMigration->migrated) $this->siteTours();
+            if(!$this->userCommissionsMigration->migrated) $this->userCommissions();
 
         }catch(\Exception $e) {
             return Utilities::error($e, 'An error occurred while trying to process the request');
