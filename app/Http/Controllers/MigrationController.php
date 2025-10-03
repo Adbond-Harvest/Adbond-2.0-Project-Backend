@@ -1489,7 +1489,7 @@ class MigrationController extends Controller
                             $v1Order = (array) $v1Order;
                             $client = $this->getClient($v1Order['customer_id']);
                             $package = $this->getPackageFromPackageItem($v1Order['package_item_id']);
-                            //packageId = 203  $clientId = 146 orderDate = 2023-11-08 createdAt = 2023-11-08 10:55:37 
+                            //packageId = 265  $clientId = 909 orderDate = 2024-02-15 createdAt = 2024-02-15 08:58:41 
                             //updatedAt = 2023-03-08 09:59:53
                             if($client && $package) {
                                 $order = Order::where("migrated", true)->where("client_id", $client->id)
@@ -1699,7 +1699,7 @@ class MigrationController extends Controller
         $packageItem = DB::connection('db1')->table('package_items')->where("id", $packageItemId)->first();
         if($packageItem) {
             $packageItem = (array) $packageItem;
-            $packageItems = DB::connection('db1')->table('package_items')->where("package_id", $packageItem['package_id'])->get();
+            $packageItems = DB::connection('db1')->table('package_items')->where("package_id", $packageItem['package_id'])->orderBy("id", "ASC")->get();
             $v1Package = DB::connection('db1')->table('packages')->where("id", $packageItem['package_id'])->first();
             if($v1Package) {
                 $v1Package = (array) $v1Package;
