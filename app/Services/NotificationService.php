@@ -84,10 +84,8 @@ class NotificationService
         return $notification;
     }
 
-    public function markAsRead($notificationId)
+    public function markAsRead($notification)
     {
-        $notification = Notification::find($notificationId);
-
         $notification->read = true;
         $notification->save();
 
