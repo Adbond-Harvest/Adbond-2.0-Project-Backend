@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("notification_type");
             $table->morphs("target");
+            $table->morphs("user");
             $table->string("message");
             $table->boolean("read")->default(false);
             $table->timestamps();

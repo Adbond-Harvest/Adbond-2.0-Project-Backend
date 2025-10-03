@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Notification extends Model
 {
     use HasFactory;
+
+    public function user()
+    {
+        return $this->morphTo();
+    }
+
+    public function target()
+    {
+        return $this->morphTo();
+    }
 }
