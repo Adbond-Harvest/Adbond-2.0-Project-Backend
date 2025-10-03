@@ -18,6 +18,7 @@ class NotificationResource extends JsonResource
             "id" => $this->id,
             "notificationType" => $this->notification_type,
             "targetId" => $this->target_id,
+            "userId" => $this->user_id,
             "message" => $this->message,
             "read" => ($this->read == 1) ? true : false
         ];
