@@ -1483,6 +1483,7 @@ class MigrationController extends Controller
                         $user = $this->getUser($v1Commission['user_id']);
 
                         $order = null;
+                        $client = null;
                         $v1Order = DB::connection('db1')->table('orders')->where("id", $v1Commission['order_id'])->first();
                         if($v1Order) {
                             $v1Order = (array) $v1Order;
@@ -1503,7 +1504,7 @@ class MigrationController extends Controller
                             dd($package);
                         }
                         // dd($order);
-                        if($user) {
+                        if($user && $client) {
                             $this->userCommissionPayments($v1Commission['user_id'], $v1Commission['created_at']);
 
                             $commission = new StaffCommissionEarning;
