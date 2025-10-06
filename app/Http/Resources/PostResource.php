@@ -25,6 +25,7 @@ class PostResource extends JsonResource
             "topic" => $this->topic,
             "type" => $this->post_type,
             "coverPhoto" => new FileResource($this->coverPhoto),
+            "preview" => $this->preview,
             "content" => $this->content,
             "active" => ($this->active == 1) ? true : false,
             "projectType" => new ProjectTypeResource($this->projectType),
