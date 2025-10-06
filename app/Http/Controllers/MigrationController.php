@@ -38,6 +38,8 @@ use app\Models\SiteTourBookedSchedule;
 use app\Models\StaffCommissionEarning;
 use app\Models\StaffCommissionRedemption;
 use app\Models\StaffCommissionTransaction;
+use app\Models\Promo;
+use app\Models\PromoProduct;
 
 use app\Models\TableMigration;
 
@@ -90,6 +92,9 @@ class MigrationController extends Controller
     private $userCommissionsMigration;
     private $userCommissionPaymentsMigration;
 
+    private $promosMigration;
+    private $promoProductsMigration;
+
     public function __construct()
     {
         $this->assessmentsMigration = TableMigration::where("name", "assessments")->first();
@@ -125,6 +130,9 @@ class MigrationController extends Controller
         $this->inspectionRequestsMigration = TableMigration::where("name", "inspection_requests")->first();
         $this->userCommissionsMigration = TableMigration::where("name", "user_commissions")->first();
         $this->userCommissionPaymentsMigration = TableMigration::where("name", "user_commission_payments")->first();
+
+        $this->promosMigration = TableMigration::where("name", "promos")->first();
+        $this->promoProductsMigration = TableMigration::where("name", "promo_products")->first();
     }
     
     public function index()
@@ -145,10 +153,12 @@ class MigrationController extends Controller
             if(!$this->reactionsMigration->migrated) $this->reactions();
 
             if(!$this->projectsMigration->migrated) $this->projects();
-
+            
             if(!$this->nextOfKinMigration->migrated) $this->nextOfKins();
             if(!$this->inspectionDaysMigration->migrated) $this->siteTours();
             if(!$this->userCommissionsMigration->migrated) $this->userCommissions();
+            
+            if(!$this->promosMigration->migrated) $this->promos();
 
         }catch(\Exception $e) {
             return Utilities::error($e, 'An error occurred while trying to process the request');
@@ -1602,6 +1612,88 @@ class MigrationController extends Controller
         return StaffCommissionTransaction::where("user_id", $userId)->orderBy("created_at", "DESC")->first();
     }
 
+    private function promos()
+    {
+        try{
+            DB::beginTransaction();
+            DB::connection('db1')->table('promos')->orderBy('id')->chunk(500, function ($records) {
+                if(count($records) > 0) {
+                    foreach ($records as $record) {
+                        $v1Promo = (array) $record;
+                        $user = $this->getUser($v1Promo['user_id']);
+                        if($v1Promo['user_id'] > 0) {
+                            $promo = new Promo;
+                            $promo->title = $v1Promo['title'];
+                            $promo->discount = $v1Promo['discount'];
+                            $promo->start = $v1Promo['start'];
+                            $promo->end = $v1Promo['end'];
+                            $promo->active = $v1Promo['active'];
+                            $promo->description = $v1Promo['description'];
+                            $promo->title = $v1Promo['title'];
+                            $promo->user_id = $user->id;
+                            $promo->created_at = $v1Promo['created_at'];
+                            $promo->updated_at = $v1Promo['updated_at'];
+                            $promo->migrated = true;
+                            $promo->save();
+
+                            Utilities::logSuccessMigration("Promo Migration Successful.. PromoId: ".$promo->id);
+
+                            $this->migratePromoProducts($v1Promo, $promo);
+                        }
+                    }
+                }
+            });
+            DB::commit();
+        }catch(\Exception $e) {
+            DB::rollBack();
+            return Utilities::error($e, 'An error occurred while trying to process the request');
+        }
+        $this->markAsMigrated($this->promosMigration);
+        $this->markAsMigrated($this->promoProductsMigration);
+    }
+
+    private function migratePromoProducts($v1Promo, $promo)
+    {
+        $v1PromoProducts = DB::connection('db1')->table('promo_products')->where("promo_id", $v1Promo['id'])->get();
+        if($v1PromoProducts->count() > 0) {
+            foreach($v1PromoProducts as $v1PromoProduct) {
+                $v1PromoProduct = (array) $v1PromoProduct;
+                if($v1PromoProduct['product_type'] || $v1PromoProduct['product_id']) {
+                    if($v1PromoProduct['product_type'] == 'App\Models\Project_location') {
+                        $product = $this->getProjectFromProjectLocation($v1PromoProduct['product_id']);
+                        $productType = Project::$type;
+                        if(!$product) dd($v1PromoProduct['product_id']);
+                        $this->savePromoProduct($promo, $product, $productType, $v1PromoProduct);
+                    }else{
+                        $products = $this->getPackages($v1PromoProduct['product_id']);
+                        $productType = Package::$type;
+                        if($products->count() > 0) {
+                            foreach($products as $product) $this->savePromoProduct($promo, $product, $productType, $v1PromoProduct);
+                        }else{
+                            dd($v1PromoProduct['product_id']);
+                        }
+                    }
+                }else{
+                    Utilities::logFailedMigration("PromoProduct not Migrated.. product_type not found V1PromoProductId: ".$v1PromoProduct['id']);
+                }
+            }
+        }
+    }
+
+    private function savePromoProduct($promo, $product, $productType, $v1PromoProduct)
+    {
+        $promoProduct = new PromoProduct;
+        $promoProduct->promo_id = $promo->id;
+        $promoProduct->product_id = $product->id;
+        $promoProduct->product_type = $productType;
+        $promoProduct->created_at = $v1PromoProduct['created_at'];
+        $promoProduct->updated_at = $v1PromoProduct['updated_at'];
+        $promoProduct->migrated = true;
+        $promoProduct->save();
+
+        Utilities::logSuccessMigration("PromoProduct Migration Successful.. PromoProductId: ".$promoProduct->id);
+    }
+
     private function migrateFile($record, $user, $belongs, $purpose)
     {
         $file = new File;
@@ -1672,6 +1764,17 @@ class MigrationController extends Controller
             $client = Client::where("email", $customer['email'])->first();
         }
         return $client;
+    }
+
+    private function getPackages($packageId)
+    {
+        $v1Package = DB::connection('db1')->table('packages')->where("id", $packageId)->first();
+        $package = null;
+        if($v1Package) {
+            $v1Package = (array) $v1Package;
+            $packages = Package::where("name", "LIKE",  "%".$v1Package['name']."%")->get();
+        }
+        return $packages;
     }
 
     private function getProjectFromProjectLocation($projectLocationId)

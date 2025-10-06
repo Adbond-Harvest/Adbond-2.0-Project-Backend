@@ -81,7 +81,7 @@ use app\Http\Controllers\MigrationController;
 Route::group(['prefix' => '/v2',], function () {
 
     Route::get('/migrate', [MigrationController::class, "index"]);
-    Route::get('/migrate/clients', [MigrationController::class, "clients"]);
+    // Route::get('/migrate/clients', [MigrationController::class, "clients"]);
 
     //Auth URLS
     Route::group(['prefix' => '/auth', 'namespace' => 'Auth',], function () {

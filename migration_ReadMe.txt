@@ -30,6 +30,8 @@ then get the time, then use all these to create a new inspection
 -user_commissions
 - user_commission_payments
 
+- promos
+
  projects->projectLocation->packages->orders->payments->
                                             ->orderClientPackages->orderOffers->offerCLientPackages->offerOffers
                                     ->packagePhotos->
