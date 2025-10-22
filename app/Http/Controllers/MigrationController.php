@@ -159,18 +159,18 @@ class MigrationController extends Controller
             // if(!$this->assessmentsMigration->migrated) $this->assessments();
             // if(!$this->questionsMigration->migrated) $this->questions();
             // if(!$this->questionOptionsMigration->migrated) $this->questionOptions();
-            if(!$this->staffAssessmentsMigration->migrated) $this->assessmentAttempts();
+            // if(!$this->staffAssessmentsMigration->migrated) $this->assessmentAttempts();
 
             // if(!$this->usersMigration->migrated) $this->users();
-            if(!$this->customersMigration->migrated) $this->clients();
+            // if(!$this->customersMigration->migrated) $this->clients();
 
             // if(!$this->bankAccountsMigration->migrated) $this->bankAccounts();
-            if(!$this->postsMigration->migrated) $this->posts();
+            // if(!$this->postsMigration->migrated) $this->posts();
             // if(!$this->commentsMigration->migrated) $this->comments();
-            if(!$this->newsMigration->migrated) $this->news();
+            // if(!$this->newsMigration->migrated) $this->news();
             // if(!$this->reactionsMigration->migrated) $this->reactions();
 
-            if(!$this->projectsMigration->migrated) $this->projects();
+            // if(!$this->projectsMigration->migrated) $this->projects();
             
             if(!$this->nextOfKinMigration->migrated) $this->nextOfKins();
             // if(!$this->inspectionDaysMigration->migrated) $this->siteTours();
