@@ -97,68 +97,86 @@ class MigrationController extends Controller
 
     public function __construct()
     {
-        $this->assessmentsMigration = TableMigration::where("name", "assessments")->first();
-        $this->questionsMigration = TableMigration::where("name", "questions")->first();
-        $this->questionOptionsMigration = TableMigration::where("name", "question_options")->first();
+        // $this->assessmentsMigration = TableMigration::where("name", "assessments")->first();
+        // $this->questionsMigration = TableMigration::where("name", "questions")->first();
+        // $this->questionOptionsMigration = TableMigration::where("name", "question_options")->first();
         $this->staffAssessmentsMigration =  TableMigration::where("name", "virtual_staff_assessments")->first();
         $this->staffAssessmentAnswersMigration =  TableMigration::where("name", "virtual_staff_assessment_answers")->first();
 
-        $this->bankAccountsMigration = TableMigration::where("name", "bank_accounts")->first();
-        $this->usersMigration = TableMigration::where("name", "users")->first();
+        // $this->bankAccountsMigration = TableMigration::where("name", "bank_accounts")->first();
+        // $this->usersMigration = TableMigration::where("name", "users")->first();
         $this->customersMigration = TableMigration::where("name", "customers")->first();
         $this->postsMigration = TableMigration::where("name", "posts")->first();
-        $this->commentsMigration = TableMigration::where("name", "comments")->first();
+        // $this->commentsMigration = TableMigration::where("name", "comments")->first();
         $this->newsMigration = TableMigration::where("name", "news")->first();
-        $this->reactionsMigration = TableMigration::where("name", "reactions")->first();
+        // $this->reactionsMigration = TableMigration::where("name", "reactions")->first();
 
         $this->nextOfKinMigration = TableMigration::where("name", "customer_next_of_kins")->first();
-        $this->projectLocationsMigration = TableMigration::where("name", "project_locations")->first();
-        $this->projectsMigration = TableMigration::where("name", "projects")->first();
-        $this->packagesMigration = TableMigration::where("name", "packages")->first();
-        $this->packageItemsMigration = TableMigration::where("name", "package_items")->first();
-        $this->packagePhotosMigration = TableMigration::where("name", "package_photos")->first();
+        // $this->projectLocationsMigration = TableMigration::where("name", "project_locations")->first();
+        // $this->projectsMigration = TableMigration::where("name", "projects")->first();
+        // $this->packagesMigration = TableMigration::where("name", "packages")->first();
+        // $this->packageItemsMigration = TableMigration::where("name", "package_items")->first();
+        // $this->packagePhotosMigration = TableMigration::where("name", "package_photos")->first();
         $this->customerPackageMigration = TableMigration::where("name", "customer_packages")->first();
         $this->ordersMigration = TableMigration::where("name", "orders")->first();
         $this->orderDiscountsMigration = TableMigration::where("name", "order_discounts")->first();
         $this->paymentsMigration = TableMigration::where("name", "payments")->first();
         $this->offersMigration = TableMigration::where("name", "offers")->first();
-        $this->salesOfferPaymentMigration = TableMigration::where("name", "sales_offer_payments")->first();
-        $this->offerBidsMigration = TableMigration::where("name", "offer_bids")->first();
+        // $this->salesOfferPaymentMigration = TableMigration::where("name", "sales_offer_payments")->first();
+        // $this->offerBidsMigration = TableMigration::where("name", "offer_bids")->first();
 
-        $this->monthlyWeekDaysMigration = TableMigration::where("name", "monthly_week_days")->first();
-        $this->inspectionDaysMigration = TableMigration::where("name", "inspection_days")->first();
-        $this->inspectionRequestsMigration = TableMigration::where("name", "inspection_requests")->first();
+        // $this->monthlyWeekDaysMigration = TableMigration::where("name", "monthly_week_days")->first();
+        // $this->inspectionDaysMigration = TableMigration::where("name", "inspection_days")->first();
+        // $this->inspectionRequestsMigration = TableMigration::where("name", "inspection_requests")->first();
         $this->userCommissionsMigration = TableMigration::where("name", "user_commissions")->first();
         $this->userCommissionPaymentsMigration = TableMigration::where("name", "user_commission_payments")->first();
 
-        $this->promosMigration = TableMigration::where("name", "promos")->first();
-        $this->promoProductsMigration = TableMigration::where("name", "promo_products")->first();
+        // $this->promosMigration = TableMigration::where("name", "promos")->first();
+        // $this->promoProductsMigration = TableMigration::where("name", "promo_products")->first();
+
+        /*
+            orders - 2025-10-01
+            Staff_assessments = 2025-09-29
+            Staff_assessment_answerss = 2025-09-29
+            Customers = 2025-10-02
+            posts = 2025-09-10
+            news = 2025-08-29
+            nextOfKin = 2025-10-01
+            customer_packages = 2025-10-01
+            orders = 2025-10-01
+            order_discounts = 2025-09-30
+            payments = 2025-10-02
+            offers = 2025-10-01
+            user_commissions = 2025-10-01
+            user_commission_payments = 2025-10-01
+
+        */
     }
     
     public function index()
     {
         try{
-            if(!$this->assessmentsMigration->migrated) $this->assessments();
-            if(!$this->questionsMigration->migrated) $this->questions();
-            if(!$this->questionOptionsMigration->migrated) $this->questionOptions();
+            // if(!$this->assessmentsMigration->migrated) $this->assessments();
+            // if(!$this->questionsMigration->migrated) $this->questions();
+            // if(!$this->questionOptionsMigration->migrated) $this->questionOptions();
             if(!$this->staffAssessmentsMigration->migrated) $this->assessmentAttempts();
 
-            if(!$this->usersMigration->migrated) $this->users();
+            // if(!$this->usersMigration->migrated) $this->users();
             if(!$this->customersMigration->migrated) $this->clients();
 
-            if(!$this->bankAccountsMigration->migrated) $this->bankAccounts();
+            // if(!$this->bankAccountsMigration->migrated) $this->bankAccounts();
             if(!$this->postsMigration->migrated) $this->posts();
-            if(!$this->commentsMigration->migrated) $this->comments();
+            // if(!$this->commentsMigration->migrated) $this->comments();
             if(!$this->newsMigration->migrated) $this->news();
-            if(!$this->reactionsMigration->migrated) $this->reactions();
+            // if(!$this->reactionsMigration->migrated) $this->reactions();
 
             if(!$this->projectsMigration->migrated) $this->projects();
             
             if(!$this->nextOfKinMigration->migrated) $this->nextOfKins();
-            if(!$this->inspectionDaysMigration->migrated) $this->siteTours();
+            // if(!$this->inspectionDaysMigration->migrated) $this->siteTours();
             if(!$this->userCommissionsMigration->migrated) $this->userCommissions();
             
-            if(!$this->promosMigration->migrated) $this->promos();
+            // if(!$this->promosMigration->migrated) $this->promos();
 
         }catch(\Exception $e) {
             return Utilities::error($e, 'An error occurred while trying to process the request');
@@ -177,7 +195,7 @@ class MigrationController extends Controller
         try{
             DB::beginTransaction();
             // Fetch from v1 in chunks (to handle large data)
-            DB::connection('db1')->table($sourceTable)->orderBy('id')->chunk(500, function ($records) {
+            DB::connection('db1')->table($sourceTable)->where("created_at", ">", "2025-10-02")->orderBy('id')->chunk(500, function ($records) {
                 foreach ($records as $record) {
                     // Convert to array
                     $data = (array) $record;
@@ -370,7 +388,7 @@ class MigrationController extends Controller
         // Fetch from v1 in chunks (to handle large data)
         try{
             DB::beginTransaction();
-            DB::connection('db1')->table('virtual_staff_assessments')->orderBy('id')->chunk(500, function ($records) {
+            DB::connection('db1')->table('virtual_staff_assessments')->where("created_at", ">", "2025-09-29")->orderBy('id')->chunk(500, function ($records) {
                 if(count($records) > 0) {
                     foreach ($records as $record) {
                         $assessment = Assessment::where("migrated", true)->first();
@@ -424,7 +442,7 @@ class MigrationController extends Controller
         try{
             DB::beginTransaction();
             // Fetch from v1 in chunks (to handle large data)
-            DB::connection('db1')->table('virtual_staff_assessment_answers')->where("virtual_staff_assessment_id", $staffAssessmentId)->orderBy('id')->chunk(500, function ($records) use($attemptId) {
+            DB::connection('db1')->table('virtual_staff_assessment_answers')->where("virtual_staff_assessment_id", $staffAssessmentId)->where("created_at", ">", "2025-09-29")->orderBy('id')->chunk(500, function ($records) use($attemptId) {
                 if(count($records) > 0) {
                     foreach ($records as $record) {
                         
@@ -557,7 +575,7 @@ class MigrationController extends Controller
     {
         try{
             DB::beginTransaction();
-            DB::connection('db1')->table('posts')->orderBy('id')->chunk(500, function ($records) {
+            DB::connection('db1')->table('posts')->where("created_at", ">", "2025-09-10")->orderBy('id')->chunk(500, function ($records) {
                 if(count($records) > 0) {
                     foreach ($records as $record) {
                         
@@ -662,7 +680,7 @@ class MigrationController extends Controller
     {
         try{
             DB::beginTransaction();
-            DB::connection('db1')->table('news')->orderBy('id')->chunk(500, function ($records) {
+            DB::connection('db1')->table('news')->where("created_at", ">", "2025-08-29")->orderBy('id')->chunk(500, function ($records) {
                 if(count($records) > 0) {
                     foreach ($records as $record) {
                         
@@ -679,7 +697,7 @@ class MigrationController extends Controller
                         }
                         if($coverPhoto && $user) {
                             $post = new Post;
-                            $post->post_type = PostType::BLOG->value;
+                            $post->post_type = PostType::NEWS->value;
                             $post->file_id = $coverPhoto->id;
                             $post->topic = $data['title'];
                             $post->slug = $data['slug'];
@@ -748,7 +766,7 @@ class MigrationController extends Controller
     {
         try{
             DB::beginTransaction();
-            DB::connection('db1')->table('customer_next_of_kins')->orderBy('id')->chunk(500, function ($records) {
+            DB::connection('db1')->table('customer_next_of_kins')->where("created_at", ">", "2025-10-01")->orderBy('id')->chunk(500, function ($records) {
                 if(count($records) > 0) {
                     foreach ($records as $record) {
                         
@@ -831,31 +849,33 @@ class MigrationController extends Controller
                 $state = DB::connection('db1')->table('states')->where("id", $projectLocation['state_id'])->first();
                 if($state) {
                     $state = (array) $state;
-                    $project = new Project;
+                    $project = null; // new Project;
                     if($projectLocations->count() > 1) {
-                        $project->name = $v1Project['name']." ".$state['name'];
+                        // $project->name = $v1Project['name']." ".$state['name'];
+                        $project = Project::where("name", $v1Project['name']." ".$state['name'])->first();
                     }else{
-                        $project->name = $v1Project['name'];
+                        // $project->name = $v1Project['name'];
+                        $project = Project::where("name", $v1Project['name'])->first();
                     }
-                    $project->project_type_id = $v1Project['category_id'];
-                    $project->description = $v1Project['description'];
-                    $project->active = $projectLocation['active'];
-                    $project->state = $state['name'];
-                    $project->deactivated_at = $projectLocation['deactivated_at'];
-                    $project->created_at = $projectLocation['created_at'];
-                    $project->updated_at = $projectLocation['updated_at'];
-                    $project->migrated = true;
-                    $project->save();
+                    // $project->project_type_id = $v1Project['category_id'];
+                    // $project->description = $v1Project['description'];
+                    // $project->active = $projectLocation['active'];
+                    // $project->state = $state['name'];
+                    // $project->deactivated_at = $projectLocation['deactivated_at'];
+                    // $project->created_at = $projectLocation['created_at'];
+                    // $project->updated_at = $projectLocation['updated_at'];
+                    // $project->migrated = true;
+                    // $project->save();
 
                     $typeCode = strtoupper(substr($category['name'], 0, 3));
                     $idCode = str_pad($project->id, 3, '0', STR_PAD_LEFT);
-                    $project->identifier = "ADB".$typeCode.'-'.$idCode;
-                    $project->update();
+                    // $project->identifier = "ADB".$typeCode.'-'.$idCode;
+                    // $project->update();
 
                     // migrate project packages
-                    $this->migratePackages($projectLocation, $project);
+                    if($project) $this->migratePackages($projectLocation, $project);
 
-                    Utilities::logSuccessMigration("Project Migration Successful.. ProjectId: ".$project->id);
+                    // Utilities::logSuccessMigration("Project Migration Successful.. ProjectId: ".$project->id);
                 }else{
                     Utilities::logFailedMigration("Project not Migrated, State not found.. ProjectLocationId: ".$projectLocation['id']);
                 }
@@ -887,45 +907,47 @@ class MigrationController extends Controller
                                 }
                                 
                                 if($user) {         
-                                    $package = new Package;
-                                    $package->user_id = $user->id;
-                                    $package->name = (count($itemRecords) > 1) ? $this->getPackageNameFromPackageItem($packageItem['id'], $v1Package, $itemRecords) : $v1Package['name'];
-                                    $package->category = ProductCategory::PURCHASE->value;
-                                    $package->state = $project->state;
-                                    $package->address = $v1ProjectLocation['address'];
-                                    $package->project_id = $project->id;
-                                    $package->size = $packageItem['size'];
-                                    $package->amount = $packageItem['price'];
-                                    $package->units = $packageItem['available_units'];
-                                    $package->available_units = $packageItem['available_units'];
-                                    $package->discount = $packageItem['discount'];
-                                    $package->min_price = $packageItem['min_price'];
-                                    $package->installment_duration = $packageItem['installment_duration'];
-                                    $package->infrastructure_fee = $packageItem['infrastructure_fee'];
-                                    $package->description = $v1Package['description'];
-                                    $package->type = PackageType::NON_INVESTMENT->value;
-                                    $package->installment_option = 1;
-                                    $package->active = $v1Package['active'];
-                                    $package->deactivated_at = $v1Package['deactivated_at'];
-                                    $package->sold_out = ($packageItem['available_units'] <= 0) ? 1 : 0;
-                                    $package->created_at = $v1Package['created_at'];
-                                    $package->updated_at = $v1Package['updated_at'];
-                                    $package->migrated = true;
-                                    $package->save();
+                                    $package = null; // new Package;
+                                    // $package->user_id = $user->id;
+                                    // $package->name = (count($itemRecords) > 1) ? $this->getPackageNameFromPackageItem($packageItem['id'], $v1Package, $itemRecords) : $v1Package['name'];
+                                    $name = (count($itemRecords) > 1) ? $this->getPackageNameFromPackageItem($packageItem['id'], $v1Package, $itemRecords) : $v1Package['name'];
+                                    $package = Package::where("name", $name)->where("category", ProductCategory::PURCHASE->value)->first();
+                                    // $package->category = ProductCategory::PURCHASE->value;
+                                    // $package->state = $project->state;
+                                    // $package->address = $v1ProjectLocation['address'];
+                                    // $package->project_id = $project->id;
+                                    // $package->size = $packageItem['size'];
+                                    // $package->amount = $packageItem['price'];
+                                    // $package->units = $packageItem['available_units'];
+                                    // $package->available_units = $packageItem['available_units'];
+                                    // $package->discount = $packageItem['discount'];
+                                    // $package->min_price = $packageItem['min_price'];
+                                    // $package->installment_duration = $packageItem['installment_duration'];
+                                    // $package->infrastructure_fee = $packageItem['infrastructure_fee'];
+                                    // $package->description = $v1Package['description'];
+                                    // $package->type = PackageType::NON_INVESTMENT->value;
+                                    // $package->installment_option = 1;
+                                    // $package->active = $v1Package['active'];
+                                    // $package->deactivated_at = $v1Package['deactivated_at'];
+                                    // $package->sold_out = ($packageItem['available_units'] <= 0) ? 1 : 0;
+                                    // $package->created_at = $v1Package['created_at'];
+                                    // $package->updated_at = $v1Package['updated_at'];
+                                    // $package->migrated = true;
+                                    // $package->save();
 
-                                    $brochureFile = ($brochure) ? $this->migrateFile($brochure, ['id' => $user->id, 'type' => User::$userType], ['id'=>$package->id, 'type'=>Package::$type], FilePurpose::PACKAGE_BROCHURE) : null;
-                                    if($brochureFile) {
-                                        $package->package_brochure_file_id = $brochureFile->id;
-                                        $package->update();
-                                    }
+                                    // $brochureFile = ($brochure) ? $this->migrateFile($brochure, ['id' => $user->id, 'type' => User::$userType], ['id'=>$package->id, 'type'=>Package::$type], FilePurpose::PACKAGE_BROCHURE) : null;
+                                    // if($brochureFile) {
+                                    //     $package->package_brochure_file_id = $brochureFile->id;
+                                    //     $package->update();
+                                    // }
 
-                                    Utilities::logSuccessMigration("Package Migration Successful.. PackageId: ".$package->id);
+                                    // Utilities::logSuccessMigration("Package Migration Successful.. PackageId: ".$package->id);
 
                                     //Migrate Package Orders
-                                    $this->migrateOrders($packageItem, $package);
+                                    if($package) $this->migrateOrders($packageItem, $package);
 
                                     //Migrate Package Photos
-                                    $this->migratePackagePhotos($v1Package, $package, $user);
+                                    // $this->migratePackagePhotos($v1Package, $package, $user);
                                 }else{
                                     Utilities::logFailedMigration("Package not Migrated.. User not found V1PackageId: ".$v1Package['id']);
                                 }
@@ -939,7 +961,7 @@ class MigrationController extends Controller
 
     private function migrateOrders($packageItem, $package)
     {
-        DB::connection('db1')->table('orders')->where("package_item_id", $packageItem['id'])->orderBy('id')->chunk(500, function ($records) use($packageItem, $package) {
+        DB::connection('db1')->table('orders')->where("package_item_id", $packageItem['id'])->where("created_at", ">", "2025-10-01")->orderBy('id')->chunk(500, function ($records) use($packageItem, $package) {
             if(count($records) > 0) {
                 foreach ($records as $record) {
                     $v1Order = (array) $record;
@@ -1486,7 +1508,7 @@ class MigrationController extends Controller
     {
         try{
             DB::beginTransaction();
-            DB::connection('db1')->table('user_commissions')->orderBy('id')->chunk(500, function ($records) {
+            DB::connection('db1')->table('user_commissions')->where("created_at", ">", "2025-10-01")->orderBy('id')->chunk(500, function ($records) {
                 if(count($records) > 0) {
                     foreach ($records as $record) {
                         $v1Commission = (array) $record;
@@ -1510,8 +1532,8 @@ class MigrationController extends Controller
                         }
                         if($client && !$order) {
                             // dd($v1Order);
-                            dd($v1Order, $client, $package);
-                            dd($package);
+                            // dd($v1Order, $client, $package);
+                            // dd($package);
                         }
                         // dd($order);
                         if($user && $client) {
