@@ -113,7 +113,7 @@ class MigrationController extends Controller
 
         $this->nextOfKinMigration = TableMigration::where("name", "customer_next_of_kins")->first();
         // $this->projectLocationsMigration = TableMigration::where("name", "project_locations")->first();
-        // $this->projectsMigration = TableMigration::where("name", "projects")->first();
+        $this->projectsMigration = TableMigration::where("name", "projects")->first();
         // $this->packagesMigration = TableMigration::where("name", "packages")->first();
         // $this->packageItemsMigration = TableMigration::where("name", "package_items")->first();
         // $this->packagePhotosMigration = TableMigration::where("name", "package_photos")->first();
