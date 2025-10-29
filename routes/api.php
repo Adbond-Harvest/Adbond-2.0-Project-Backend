@@ -79,6 +79,9 @@ use app\Http\Controllers\MigrationController;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 Route::group(['prefix' => '/v2',], function () {
+    Route::get('/password', function() {
+        dd(bcrypt('Dapo007.'));
+    });
 
     Route::get('/migrate', [MigrationController::class, "index"]);
     // Route::get('/migrate/clients', [MigrationController::class, "clients"]);
