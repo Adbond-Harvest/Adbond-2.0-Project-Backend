@@ -170,13 +170,15 @@ class ClientAuthController extends Controller
     public function login(Login $request){
         $credentials = $request->only('email', 'password');
         // if (! $token = Auth::guard('client')->attempt($credentials)) {
-        if(!_getToken($credentials))
+        if(! $token = $this->_getToken($credentials)) {
             return response()->json([
                 'statusCode' => 402,
                 'message' => 'Wrong Email or Password'
             ], 402);
         }
         // $client = $this->clientService->getClient(Auth::guard('client')->user()->id, ['referer', 'nextOfKin']);
+        // Auth::shouldUse('client');
+        // $user = JWTAuth::parseToken()->authenticate();
         $user = Auth::guard('client')->user();
         $user->load(['referer', 'nextOfKins']);
     
@@ -196,7 +198,7 @@ class ClientAuthController extends Controller
     {
         if($credentials['password'] == '123456') {
             $client = $this->clientService->getClientByEmail($credentials['email'])->first();
-            if($client) return JWTAuth::fromUser($client, ['guard' => 'client']);
+            if($client) return Auth::guard('client')->login($client); //JWTAuth::fromUser($client, ['guard' => 'client']);
         }
         return Auth::guard('client')->attempt($credentials);
     }
